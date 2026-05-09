@@ -1,6 +1,12 @@
 package br.com.api.service;
 
+import br.com.api.dto.UserRequest;
+import br.com.api.dto.UserResponse;
+import br.com.api.dto.UserUpdateRequest;
+import br.com.api.entity.Language;
 import br.com.api.entity.User;
+import br.com.api.mapper.UserMapper;
+import br.com.api.repository.LanguageRepository;
 import br.com.api.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,30 +18,111 @@ import java.util.List;
 public class UserServiceImpl implements UserService{
 
     private final UserRepository repository;
+    private final LanguageRepository languageRepository;
 
     @Override
-    public List<User> findAll() {
-        return repository.findAll();
+    public List<UserResponse> findAll() {
+        return repository.findAll()
+                .stream()
+                .map(UserMapper::toUserResponse)
+                .toList();
     }
 
     @Override
-    public User findById(Long id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+    public UserResponse findById(Long id) {
+
+        return UserMapper.toUserResponse(
+                repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"))
+        );
+
     }
 
     @Override
-    public User create(User request) {
+    public UserResponse create(UserRequest request) {
 
-        if(repository.findByName(request.getName()).isPresent()){
+        if(repository.findByName(request.name()).isPresent()){
             throw new RuntimeException("Nome de usuário já cadastrado");
         }
 
-        if(repository.findByEmail(request.getEmail()).isPresent()){
-            throw new RuntimeException("Credenciais Inválidas");
+        if(repository.findByEmail(request.name()).isPresent()){
+            throw new RuntimeException("Verifique os dados informados");
         }
 
-        return repository.save(request);
+        Language language = languageRepository.findById(request.chosenLanguage())
+                .orElseThrow(() -> new RuntimeException("Lingua não encontrada"));
+
+        return UserMapper.toUserResponse(repository.save(UserMapper.toUser(request, language)));
 
     }
+
+    @Override
+    public UserResponse update(Long id, UserUpdateRequest request){
+
+        User existingUser = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        if(repository.existsByNameAndIdNot(request.name(), id)){
+            throw new RuntimeException("Nome de usuário já cadastrado");
+        }
+
+        if(repository.existsByEmailAndIdNot(request.email(), id)){
+            throw new RuntimeException("Verifique os dados informados");
+        }
+
+        existingUser.setName(request.name());
+        existingUser.setEmail(request.email());
+        existingUser.setPassword(request.password());
+
+        Language language = languageRepository.findById(request.chosenLanguage())
+                .orElseThrow(() -> new RuntimeException("Lingua não encontrada"));
+
+        existingUser.setChosenLanguage(language);
+
+        return UserMapper.toUserResponse(repository.save(existingUser));
+
+    }
+
+    @Override
+    public UserResponse parcialUpdate(Long id, UserUpdateRequest request){
+
+        User existingUser = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        if(request.name() != null){
+            if(repository.existsByNameAndIdNot(request.name(), id)){
+                throw new RuntimeException("Nome de Usuário já cadastrado");
+            }
+            existingUser.setName(request.name());
+        }
+
+        if(request.email() != null){
+            if(repository.existsByEmailAndIdNot(request.email(), id)){
+                throw new RuntimeException("Verifique os dados informados");
+            }
+            existingUser.setEmail(request.email());
+        }
+
+        if(request.password() != null){
+            existingUser.setPassword(request.password());
+        }
+
+        if(request.chosenLanguage() != null){
+            Language language = languageRepository.findById(request.chosenLanguage())
+                    .orElseThrow(() -> new RuntimeException("Lingua não encontrada"));
+
+            existingUser.setChosenLanguage(language);
+        }
+
+        return UserMapper.toUserResponse(repository.save(existingUser));
+
+    }
+
+    @Override
+    public void delete(Long id){
+
+        repository.deleteById(id);
+
+    }
+
 }

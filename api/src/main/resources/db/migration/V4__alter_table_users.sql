@@ -1,0 +1,1 @@
+ALTER TABLE users ADD CONSTRAINT fk_users_languages FOREIGN KEY (language_id) REFERENCES languages(id) NOT VALID;

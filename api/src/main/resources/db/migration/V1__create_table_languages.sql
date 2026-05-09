@@ -1,0 +1,8 @@
+CREATE TABLE languages (
+
+   id SERIAL PRIMARY KEY,
+   code VARCHAR(5) NOT NULL UNIQUE,
+   name VARCHAR(100) NOT NULL UNIQUE,
+   created_at timestamp DEFAULT CURRENT_TIMESTAMP
+
+);
