@@ -2,6 +2,9 @@
   <img src="mobile/assets/images/icon.png" alt="Logo do Lumin" width="200" />
 </div>
 
+
+---
+
 ## Sobre o Projeto
 
 O **Lumin** é um aplicativo de aprendizado de idiomas que transforma o seu dia a dia em uma sala de aula.  
