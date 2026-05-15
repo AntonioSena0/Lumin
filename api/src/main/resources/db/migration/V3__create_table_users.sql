@@ -6,6 +6,7 @@ CREATE TABLE users (
     password VARCHAR(100) NOT NULL,
     created_at timestamp,
     updated_at timestamp,
-    language_id INTEGER
+    native_language_id INTEGER NOT NULL,
+    to_language_id INTEGER NOT NULL
 
 );

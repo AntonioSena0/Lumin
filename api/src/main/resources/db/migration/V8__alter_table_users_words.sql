@@ -1,0 +1,2 @@
+ALTER TABLE users_words ADD CONSTRAINT fk_users_words_users FOREIGN KEY (user_id) REFERENCES users(id) NOT VALID;
+ALTER TABLE users_words ADD CONSTRAINT fk_users_words_words FOREIGN KEY (word_id) REFERENCES words(id) NOT VALID;

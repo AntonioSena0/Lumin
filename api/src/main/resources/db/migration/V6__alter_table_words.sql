@@ -1,0 +1,1 @@
+ALTER TABLE words ADD CONSTRAINT fk_words_languages FOREIGN KEY (language_id) REFERENCES languages(id) NOT VALID;
