@@ -22,13 +22,13 @@ public class LanguageControllerImpl implements LanguageController{
     @Override
     @GetMapping("/")
     public ResponseEntity<List<LanguageResponse>> findAll() {
-        return ResponseEntity.status(HttpStatus.OK).body(service.findAll());
+        return ResponseEntity.ok(service.findAll());
     }
 
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<LanguageResponse> findById(@PathVariable Integer id) {
-        return ResponseEntity.status(HttpStatus.OK).body(service.findById(id));
+        return ResponseEntity.ok(service.findById(id));
     }
 
 }

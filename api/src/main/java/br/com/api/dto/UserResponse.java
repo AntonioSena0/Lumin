@@ -11,6 +11,7 @@ public record UserResponse(
         Long id,
         String name,
         String email,
+        LanguageResponse nativeLanguage,
         LanguageResponse chosenLanguage,
         LocalDateTime createdAt,
         LocalDateTime updatedAt

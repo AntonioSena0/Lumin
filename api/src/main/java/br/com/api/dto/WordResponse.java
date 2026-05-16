@@ -11,7 +11,8 @@ public record WordResponse(
         String original,
         String translated,
         String description,
-        LanguageResponse language,
+        LanguageResponse from_language,
+        LanguageResponse to_language,
         LocalDateTime createdAt
 
 ) {}

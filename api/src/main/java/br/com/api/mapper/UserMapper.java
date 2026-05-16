@@ -10,14 +10,15 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class UserMapper {
 
-    public User toUser(UserRequest request, Language language){
+    public User toUser(UserRequest request, Language nativeLanguage, Language chosenLanguage){
 
         return User
                 .builder()
                 .name(request.name())
                 .email(request.email())
                 .password(request.password())
-                .chosenLanguage(language)
+                .nativeLanguage(nativeLanguage)
+                .chosenLanguage(chosenLanguage)
                 .build();
 
     }
@@ -41,6 +42,7 @@ public class UserMapper {
                 .id(user.getId())
                 .name(user.getName())
                 .email(user.getEmail())
+                .nativeLanguage(LanguageMapper.toLanguageResponse(user.getNativeLanguage()))
                 .chosenLanguage(LanguageMapper.toLanguageResponse(user.getChosenLanguage()))
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())

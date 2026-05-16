@@ -17,6 +17,9 @@ public record UserRequest(
         @Size(min = 8, max = 100, message = "A senha deve ter de 8 à 100 caracteres")
         String password,
 
+        @NotNull(message = "A língua nativa é obrigatória")
+        Integer nativeLanguage,
+
         @NotNull(message = "A linguagem de preferência é obrigatória")
         Integer chosenLanguage
 

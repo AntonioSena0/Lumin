@@ -9,14 +9,15 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class WordMapper {
 
-    public Word toWord(WordRequest request, Language language){
+    public Word toWord(WordRequest request, Language from_language, Language to_language){
 
         return Word
                 .builder()
                 .original(request.original())
                 .translated(request.translated())
                 .description(request.description())
-                .language(language)
+                .fromLanguage(from_language)
+                .toLanguage(to_language)
                 .build();
 
     }
@@ -29,7 +30,8 @@ public class WordMapper {
                 .original(word.getOriginal())
                 .translated(word.getTranslated())
                 .description(word.getDescription())
-                .language(LanguageMapper.toLanguageResponse(word.getLanguage()))
+                .from_language(LanguageMapper.toLanguageResponse(word.getFromLanguage()))
+                .to_language(LanguageMapper.toLanguageResponse(word.getToLanguage()))
                 .createdAt(word.getCreatedAt())
                 .build();
 

@@ -5,6 +5,7 @@ CREATE TABLE words (
     translated VARCHAR(100) NOT NULL UNIQUE,
     description VARCHAR(200),
     created_at timestamp,
-    language_id INTEGER
+    from_language_id INTEGER,
+    to_language_id INTEGER
 
 );

@@ -49,10 +49,13 @@ public class UserServiceImpl implements UserService{
             throw new RuntimeException("Verifique os dados informados");
         }
 
-        Language language = languageRepository.findById(request.chosenLanguage())
-                .orElseThrow(() -> new RuntimeException("Lingua não encontrada"));
+        Language nativeLanguage = languageRepository.findById(request.nativeLanguage())
+                .orElseThrow(() -> new RuntimeException("Língua nativa não encontrada"));
 
-        return UserMapper.toUserResponse(repository.save(UserMapper.toUser(request, language)));
+        Language chosenLanguage = languageRepository.findById(request.chosenLanguage())
+                .orElseThrow(() -> new RuntimeException("Língua escolhida para tradução não encontrada"));
+
+        return UserMapper.toUserResponse(repository.save(UserMapper.toUser(request, nativeLanguage, chosenLanguage)));
 
     }
 
@@ -74,10 +77,15 @@ public class UserServiceImpl implements UserService{
         existingUser.setEmail(request.email());
         existingUser.setPassword(request.password());
 
-        Language language = languageRepository.findById(request.chosenLanguage())
-                .orElseThrow(() -> new RuntimeException("Lingua não encontrada"));
+        Language nativeLanguage = languageRepository.findById(request.chosenLanguage())
+                .orElseThrow(() -> new RuntimeException("Língua nativa não encontrada"));
 
-        existingUser.setChosenLanguage(language);
+        existingUser.setNativeLanguage(nativeLanguage);
+
+        Language chosenLanguage = languageRepository.findById(request.chosenLanguage())
+                .orElseThrow(() -> new RuntimeException("Língua escolhida para tradução não encontrada"));
+
+        existingUser.setChosenLanguage(chosenLanguage);
 
         return UserMapper.toUserResponse(repository.save(existingUser));
 
@@ -107,9 +115,16 @@ public class UserServiceImpl implements UserService{
             existingUser.setPassword(request.password());
         }
 
+        if(request.nativeLanguage() != null){
+            Language language = languageRepository.findById(request.nativeLanguage())
+                    .orElseThrow(() -> new RuntimeException("Língua nativa não encontrada"));
+
+            existingUser.setNativeLanguage(language);
+        }
+
         if(request.chosenLanguage() != null){
             Language language = languageRepository.findById(request.chosenLanguage())
-                    .orElseThrow(() -> new RuntimeException("Lingua não encontrada"));
+                    .orElseThrow(() -> new RuntimeException("Língua escolhida para tradução não encontrada"));
 
             existingUser.setChosenLanguage(language);
         }
@@ -120,6 +135,9 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public void delete(Long id){
+
+        User existingUser = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
         repository.deleteById(id);
 

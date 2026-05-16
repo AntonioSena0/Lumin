@@ -17,10 +17,6 @@ public record WordRequest (
         String translated,
 
         @Size(max = 200, message = "A descrição tem mais de 200 caracteres")
-        String description,
-
-        @NotNull(message = "A língua não pode ser nula")
-        @NotEmpty(message = "Para salvar uma palavra você precisa detectar um objeto")
-        Integer language
+        String description
 
 ){}

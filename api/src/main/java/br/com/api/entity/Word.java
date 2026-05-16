@@ -28,8 +28,12 @@ public class Word {
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "language_id", nullable = false, updatable = false)
-    private Language language;
+    @JoinColumn(name = "from_language_id", nullable = false, updatable = false)
+    private Language fromLanguage;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "to_language_id", nullable = false, updatable = false)
+    private Language toLanguage;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

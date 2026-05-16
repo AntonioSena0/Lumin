@@ -25,7 +25,7 @@ public class UserControllerImpl implements UserController{
     @GetMapping("/")
     public ResponseEntity<List<UserResponse>> findAll(){
 
-        return ResponseEntity.status(HttpStatus.OK).body(service.findAll());
+        return ResponseEntity.ok(service.findAll());
 
     }
 
@@ -33,7 +33,7 @@ public class UserControllerImpl implements UserController{
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> findById(@PathVariable Long id){
 
-        return ResponseEntity.status(HttpStatus.OK).body(service.findById(id));
+        return ResponseEntity.ok(service.findById(id));
 
     }
 
@@ -49,7 +49,7 @@ public class UserControllerImpl implements UserController{
     @PutMapping("/{id}")
     public ResponseEntity<UserResponse> update(@PathVariable Long id, @RequestBody @Valid UserUpdateRequest request){
 
-        return ResponseEntity.status(HttpStatus.OK).body(service.update(id, request));
+        return ResponseEntity.ok(service.update(id, request));
 
     }
 
@@ -57,7 +57,7 @@ public class UserControllerImpl implements UserController{
     @PatchMapping("/{id}")
     public ResponseEntity<UserResponse> parcialUpdate(@PathVariable Long id, @RequestBody @Valid UserUpdateRequest request){
 
-        return ResponseEntity.status(HttpStatus.OK).body(service.parcialUpdate(id, request));
+        return ResponseEntity.ok(service.parcialUpdate(id, request));
 
     }
 
