@@ -2,6 +2,7 @@
   <img src="mobile/assets/images/icon.png" alt="Logo do Lumin" width="200" />
 </div>
 
+## Aplicativo de aprendizado de idiomas com tradução em tempo real de objetos do mundo real.
 
 ---
 
@@ -11,6 +12,10 @@ O **Lumin** é um aplicativo de aprendizado de idiomas que transforma o seu dia 
 Com a câmera do celular, o app traduz objetos do mundo real em tempo real, conectando o que você vê ao vocabulário em outro idioma (ex: “mesa” → “table” sobre o objeto real).
 
 O objetivo é ajudar as pessoas a aprender vocabulário de forma natural, usando o contexto visual do cotidiano (casa, rua, escola, trabalho), sem depender apenas de listas de palavras.
+
+---
+
+> Status: Em desenvolvimento (MVP).
 
 ---
 
@@ -33,13 +38,35 @@ O objetivo é ajudar as pessoas a aprender vocabulário de forma natural, usando
 
 ## Funcionalidades
 
-- (Em desenvolvimento)
+- Gerenciamento de perfil
+- Busca de palavras
+- Salvar ou excluir palavras
+- Inserção de descrição em palavras existentes
+- Geração e exclusão de exercícios escritos
 
 ---
 
 ## Como rodar:
 
-- (Em desenvolvimento)
+### API:
+
+**Crie um arquivo `.env` baseado no `.env.example`**
+**Certifique-se de que você definiu as variáveis de ambiente no arquivo `.env`**
+
+```bash
+cd api
+docker compose up --build
+```
+
+---
+
+### App/Mobile:
+
+```bash
+cd mobile
+npm i
+npx expo start
+```
 
 ---
 
