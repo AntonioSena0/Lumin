@@ -1,6 +1,6 @@
 package br.com.api.service;
 
-import br.com.api.dto.LanguageResponse;
+import br.com.api.dto.response.LanguageResponse;
 import br.com.api.mapper.LanguageMapper;
 import br.com.api.repository.LanguageRepository;
 import lombok.AllArgsConstructor;

@@ -1,8 +1,8 @@
 package br.com.api.service;
 
-import br.com.api.dto.UserRequest;
-import br.com.api.dto.UserResponse;
-import br.com.api.dto.UserUpdateRequest;
+import br.com.api.dto.request.UserRequest;
+import br.com.api.dto.response.UserResponse;
+import br.com.api.dto.request.UserUpdateRequest;
 
 import java.util.List;
 

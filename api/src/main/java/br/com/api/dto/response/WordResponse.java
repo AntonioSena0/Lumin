@@ -1,4 +1,4 @@
-package br.com.api.dto;
+package br.com.api.dto.response;
 
 import lombok.Builder;
 

@@ -1,7 +1,7 @@
 package br.com.api.mapper;
 
-import br.com.api.dto.WordRequest;
-import br.com.api.dto.WordResponse;
+import br.com.api.dto.request.WordRequest;
+import br.com.api.dto.response.WordResponse;
 import br.com.api.entity.Language;
 import br.com.api.entity.Word;
 import lombok.experimental.UtilityClass;

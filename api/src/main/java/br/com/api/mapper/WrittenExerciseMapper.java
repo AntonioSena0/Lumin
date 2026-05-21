@@ -1,6 +1,6 @@
 package br.com.api.mapper;
 
-import br.com.api.dto.WrittenExerciseResponse;
+import br.com.api.dto.response.WrittenExerciseResponse;
 import br.com.api.entity.WrittenExercise;
 import lombok.experimental.UtilityClass;
 
@@ -13,6 +13,7 @@ public class WrittenExerciseMapper {
                 .builder()
                 .id(writtenExercise.getId())
                 .title(writtenExercise.getTitle())
+                .instruction(writtenExercise.getInstruction())
                 .prompt(writtenExercise.getPrompt())
                 .lastPracticed(writtenExercise.getLastPracticed())
                 .user(UserMapper.toUserResponse(writtenExercise.getUser()))

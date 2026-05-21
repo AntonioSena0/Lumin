@@ -1,7 +1,6 @@
-package br.com.api.dto;
+package br.com.api.dto.request;
 
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public record LanguageRequest (

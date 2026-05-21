@@ -2,10 +2,8 @@ package br.com.api.entity;
 
 import br.com.api.domain.Checkable;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -17,6 +15,7 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@SuperBuilder
 public abstract class Exercise implements Checkable {
 
     @Id
@@ -25,6 +24,9 @@ public abstract class Exercise implements Checkable {
 
     @Column(nullable = false)
     private String title;
+
+    @Column(nullable = false)
+    private String instruction;
 
     @Column(nullable = false)
     private String prompt;

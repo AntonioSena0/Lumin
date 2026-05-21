@@ -1,8 +1,8 @@
 package br.com.api.controller;
 
-import br.com.api.dto.WordRequest;
-import br.com.api.dto.WordResponse;
-import br.com.api.dto.WordUpdateRequest;
+import br.com.api.dto.request.WordRequest;
+import br.com.api.dto.response.WordResponse;
+import br.com.api.dto.request.WordUpdateRequest;
 import br.com.api.service.WordService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;

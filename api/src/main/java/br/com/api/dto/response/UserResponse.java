@@ -1,6 +1,5 @@
-package br.com.api.dto;
+package br.com.api.dto.response;
 
-import br.com.api.entity.Language;
 import lombok.Builder;
 
 import java.time.LocalDateTime;

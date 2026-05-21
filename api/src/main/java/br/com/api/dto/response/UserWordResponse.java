@@ -1,4 +1,4 @@
-package br.com.api.dto;
+package br.com.api.dto.response;
 
 import br.com.api.entity.UserWordId;
 import lombok.Builder;

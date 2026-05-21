@@ -1,6 +1,6 @@
 package br.com.api.mapper;
 
-import br.com.api.dto.UserWordResponse;
+import br.com.api.dto.response.UserWordResponse;
 import br.com.api.entity.UserWord;
 import lombok.experimental.UtilityClass;
 

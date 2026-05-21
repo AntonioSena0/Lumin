@@ -1,10 +1,8 @@
 package br.com.api.controller;
 
-import br.com.api.dto.UserRequest;
-import br.com.api.dto.UserResponse;
-import br.com.api.dto.UserUpdateRequest;
-import br.com.api.entity.User;
-import br.com.api.mapper.UserMapper;
+import br.com.api.dto.request.UserRequest;
+import br.com.api.dto.response.UserResponse;
+import br.com.api.dto.request.UserUpdateRequest;
 import br.com.api.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;

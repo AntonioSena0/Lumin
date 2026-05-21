@@ -1,6 +1,6 @@
 package br.com.api.controller;
 
-import br.com.api.dto.LanguageResponse;
+import br.com.api.dto.response.LanguageResponse;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;

@@ -1,10 +1,12 @@
 package br.com.api.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import br.com.api.domain.WrittenType;
+import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.hibernate.type.SqlTypes;
 
 import java.util.List;
@@ -15,19 +17,35 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-@Builder
+@SuperBuilder
 public class WrittenExercise extends Exercise{
+
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "sub_type")
+    public WrittenType subType;
 
     @Column(name = "correct_answer", nullable = false)
     private String correctAnswer;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(nullable = false, columnDefinition = "jsonb")
+    @Column(columnDefinition = "jsonb")
     private List<String> options;
 
     @Override
     public boolean checkAnswer(String answer) {
-        return answer != null && answer.trim().equalsIgnoreCase(correctAnswer.trim());
+
+        if (answer == null) return false;
+
+        return answer.trim()
+                .toLowerCase()
+                .replaceAll("\\.$", "")
+                .equalsIgnoreCase(correctAnswer
+                                    .trim()
+                                    .toLowerCase()
+                                    .replaceAll("\\.$", "")
+                );
+
     }
 
     @Override

@@ -1,7 +1,7 @@
 package br.com.api.mapper;
 
-import br.com.api.dto.LanguageRequest;
-import br.com.api.dto.LanguageResponse;
+import br.com.api.dto.request.LanguageRequest;
+import br.com.api.dto.response.LanguageResponse;
 import br.com.api.entity.Language;
 import lombok.experimental.UtilityClass;
 

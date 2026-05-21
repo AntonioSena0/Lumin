@@ -1,6 +1,6 @@
 package br.com.api.mapper;
 
-import br.com.api.dto.SpeakingExerciseResponse;
+import br.com.api.dto.response.SpeakingExerciseResponse;
 import br.com.api.entity.SpeakingExercise;
 import lombok.experimental.UtilityClass;
 

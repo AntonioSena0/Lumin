@@ -1,9 +1,8 @@
 package br.com.api.controller;
 
-import br.com.api.dto.LanguageResponse;
+import br.com.api.dto.response.LanguageResponse;
 import br.com.api.service.LanguageService;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

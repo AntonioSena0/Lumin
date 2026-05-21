@@ -1,6 +1,5 @@
-package br.com.api.dto;
+package br.com.api.dto.request;
 
-import br.com.api.entity.Language;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 
