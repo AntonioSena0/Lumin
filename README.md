@@ -1,6 +1,4 @@
-<div style="display: flex; justify-content: center;">
-  <img src="mobile/assets/images/icon.png" alt="Logo do Lumin" width="200" />
-</div>
+# Lumin
 
 ## Aplicativo de aprendizado de idiomas com tradução em tempo real de objetos do mundo real.
 
@@ -8,7 +6,7 @@
 
 ## Sobre o Projeto
 
-O **Lumin** é um aplicativo de aprendizado de idiomas que transforma o seu dia a dia em uma sala de aula.  
+O **Lumin** é um aplicativo de aprendizado de idiomas que transforma o seu dia a dia em uma sala de aula.
 Com a câmera do celular, o app traduz objetos do mundo real em tempo real, conectando o que você vê ao vocabulário em outro idioma (ex: “mesa” → “table” sobre o objeto real).
 
 O objetivo é ajudar as pessoas a aprender vocabulário de forma natural, usando o contexto visual do cotidiano (casa, rua, escola, trabalho), sem depender apenas de listas de palavras.
@@ -22,8 +20,8 @@ O objetivo é ajudar as pessoas a aprender vocabulário de forma natural, usando
 ## Stack Principal
 
 #### Languages and Frameworks:
-![React Native](https://img.shields.io/badge/React_Native-%2361DAFB.svg?logo=react&logoColor=white)
-![Expo](https://img.shields.io/badge/Expo-000020.svg?logo=expo&logoColor=#D00000)
+![Dart](https://img.shields.io/badge/Dart-0175C2.svg?logo=dart&logoColor=white)
+![Flutter](https://img.shields.io/badge/Flutter-02569B.svg?logo=flutter&logoColor=white)
 ![Java](https://img.shields.io/badge/Java-%23ED8B00.svg?logo=openjdk&logoColor=white)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-%236DB33F.svg?logo=springboot&logoColor=white)
 
@@ -62,11 +60,7 @@ docker compose up --build
 
 ### App/Mobile:
 
-```bash
-cd mobile
-npm i
-npx expo start
-```
+> Em Desenvolvimento
 
 ---
 
