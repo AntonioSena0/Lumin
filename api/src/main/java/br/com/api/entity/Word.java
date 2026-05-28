@@ -35,6 +35,10 @@ public class Word {
     @JoinColumn(name = "to_language_id", nullable = false, updatable = false)
     private Language toLanguage;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
