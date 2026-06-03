@@ -11,8 +11,8 @@ public class UserWordMapper {
 
         return UserWordResponse
                 .builder()
-                .id(userWord.getId())
-                .user(UserMapper.toUserResponse(userWord.getUser()))
+                .userId(userWord.getId().getUserId())
+                .wordId(userWord.getId().getWordId())
                 .word(WordMapper.toWordResponse(userWord.getWord()))
                 .lastPracticed(userWord.getLastPracticed())
                 .createdAt(userWord.getCreatedAt())

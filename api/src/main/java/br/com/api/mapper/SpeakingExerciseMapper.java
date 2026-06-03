@@ -14,8 +14,6 @@ public class SpeakingExerciseMapper {
                 .id(speakingExercise.getId())
                 .title(speakingExercise.getTitle())
                 .prompt(speakingExercise.getPrompt())
-                .lastPracticed(speakingExercise.getLastPracticed())
-                .user(UserMapper.toUserResponse(speakingExercise.getUser()))
                 .language(LanguageMapper.toLanguageResponse(speakingExercise.getLanguage()))
                 .word(WordMapper.toWordResponse(speakingExercise.getWord()))
                 .requiredWords(speakingExercise.getRequiredWords())

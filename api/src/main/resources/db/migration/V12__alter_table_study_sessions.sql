@@ -1,0 +1,1 @@
+ALTER TABLE study_sessions ADD CONSTRAINT fk_users_study_sessions FOREIGN KEY (user_id) REFERENCES users(id) NOT VALID;

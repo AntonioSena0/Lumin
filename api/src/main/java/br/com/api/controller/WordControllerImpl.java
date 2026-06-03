@@ -2,7 +2,6 @@ package br.com.api.controller;
 
 import br.com.api.dto.request.WordRequest;
 import br.com.api.dto.response.WordResponse;
-import br.com.api.dto.request.WordUpdateRequest;
 import br.com.api.service.WordService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -41,12 +40,6 @@ public class WordControllerImpl implements WordController{
     @PostMapping("/save/{userId}")
     public ResponseEntity<WordResponse> save(@RequestBody @Valid WordRequest request, @PathVariable Long userId) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.save(request, userId));
-    }
-
-    @Override
-    @PatchMapping("/update/{wordId}")
-    public ResponseEntity<WordResponse> update(@RequestBody @Valid WordUpdateRequest request, @PathVariable Long wordId) {
-        return ResponseEntity.ok(service.update(request, wordId));
     }
 
     @Override

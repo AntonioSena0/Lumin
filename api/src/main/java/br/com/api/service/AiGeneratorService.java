@@ -1,9 +1,11 @@
 package br.com.api.service;
 
-import br.com.api.dto.response.WrittenExerciseAiResponse;
+import br.com.api.dto.response.StudySessionAiResponse;
+import br.com.api.entity.Word;
 
 public interface AiGeneratorService {
 
-    WrittenExerciseAiResponse generateWrittenExercise(String word, String from_language, String to_language);
+    String generateDescription(String original, String translated, String category, String language);
+    StudySessionAiResponse generateStudySession(Word word, String fromLanguage, String toLanguage);
 
 }

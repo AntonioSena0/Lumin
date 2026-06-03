@@ -14,6 +14,7 @@ public record WordResponse(
         CategoryResponse category,
         LanguageResponse from_language,
         LanguageResponse to_language,
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt
 
 ) {}

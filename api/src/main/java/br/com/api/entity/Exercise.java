@@ -28,15 +28,8 @@ public abstract class Exercise implements Checkable {
     @Column(nullable = false)
     private String instruction;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String prompt;
-
-    @Column(name = "last_practiced")
-    private LocalDateTime lastPracticed;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "language_id", nullable = false)
@@ -45,6 +38,10 @@ public abstract class Exercise implements Checkable {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "word_id", nullable = false)
     private Word word;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "session_id")
+    private StudySession session;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

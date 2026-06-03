@@ -11,11 +11,9 @@ public record SpeakingExerciseResponse (
         Long id,
         String title,
         String prompt,
-        LocalDateTime lastPracticed,
-        UserResponse user,
         LanguageResponse language,
         WordResponse word,
         List<String> requiredWords,
         LocalDateTime createdAt
 
-) {}
+) implements ExerciseResponse {}

@@ -8,8 +8,8 @@ import java.time.LocalDateTime;
 @Builder
 public record UserWordResponse(
 
-        UserWordId id,
-        UserResponse user,
+        Long userId,
+        Long wordId,
         WordResponse word,
         LocalDateTime lastPracticed,
         LocalDateTime createdAt

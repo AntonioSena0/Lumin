@@ -1,6 +1,11 @@
 package br.com.api.service;
 
-import br.com.api.dto.response.SpeakingExerciseResponse;
+import br.com.api.dto.response.SpeakingExerciseAiResponse;
+import br.com.api.entity.Language;
+import br.com.api.entity.SpeakingExercise;
+import br.com.api.entity.Word;
+import br.com.api.factory.ExerciseFactory;
+import br.com.api.repository.SpeakingExerciseRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -8,30 +13,18 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class SpeakingExerciseServiceImpl implements SpeakingExerciseService{
+public class SpeakingExerciseServiceImpl implements SpeakingExerciseService {
+
+    private final SpeakingExerciseRepository repository;
+    private final ExerciseFactory factory;
 
     @Override
-    public List<SpeakingExerciseResponse> findByUserId(Long userId) {
-        return List.of();
-    }
+    public List<SpeakingExercise> saveAllSpeakingExercises(List<SpeakingExerciseAiResponse> exercises, Language language, Word word) {
 
-    @Override
-    public SpeakingExerciseResponse generateSpeakingExercise() {
-        return null;
-    }
-
-    @Override
-    public boolean checkAnswer(Long exerciseId, String answer) {
-        return false;
-    }
-
-    @Override
-    public String getCorrectAnswer(Long exerciseId) {
-        return "";
-    }
-
-    @Override
-    public void updateLastPracticed(Long exerciseId) {
+        return repository.saveAll(exercises.stream()
+                .map(speaking -> factory.createSpeaking(speaking, language, word))
+                .toList());
 
     }
+
 }

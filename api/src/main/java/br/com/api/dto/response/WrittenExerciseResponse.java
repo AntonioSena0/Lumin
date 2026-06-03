@@ -1,5 +1,6 @@
 package br.com.api.dto.response;
 
+import br.com.api.domain.WrittenType;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -12,11 +13,10 @@ public record WrittenExerciseResponse(
         String title,
         String instruction,
         String prompt,
-        LocalDateTime lastPracticed,
-        UserResponse user,
+        WrittenType subType,
         LanguageResponse language,
         WordResponse word,
         List<String> options,
         LocalDateTime createdAt
 
-) {}
+) implements ExerciseResponse{}

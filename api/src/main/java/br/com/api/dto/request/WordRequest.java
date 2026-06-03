@@ -16,9 +16,6 @@ public record WordRequest (
         @Size(max = 100, message = "A tradução tem mais de 100 caracteres")
         String translated,
 
-        @Size(max = 200, message = "A descrição tem mais de 200 caracteres")
-        String description,
-
         @NotNull(message = "A categoria não pode ser nula")
         Integer categoryId
 

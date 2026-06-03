@@ -15,8 +15,7 @@ public class WrittenExerciseMapper {
                 .title(writtenExercise.getTitle())
                 .instruction(writtenExercise.getInstruction())
                 .prompt(writtenExercise.getPrompt())
-                .lastPracticed(writtenExercise.getLastPracticed())
-                .user(UserMapper.toUserResponse(writtenExercise.getUser()))
+                .subType(writtenExercise.subType)
                 .language(LanguageMapper.toLanguageResponse(writtenExercise.getLanguage()))
                 .word(WordMapper.toWordResponse(writtenExercise.getWord()))
                 .options(writtenExercise.getOptions())
@@ -24,5 +23,4 @@ public class WrittenExerciseMapper {
                 .build();
 
     }
-
 }

@@ -2,7 +2,6 @@ package br.com.api.service;
 
 import br.com.api.dto.request.WordRequest;
 import br.com.api.dto.response.WordResponse;
-import br.com.api.dto.request.WordUpdateRequest;
 import br.com.api.entity.*;
 import br.com.api.mapper.WordMapper;
 import br.com.api.repository.*;
@@ -16,6 +15,7 @@ import java.util.Optional;
 @AllArgsConstructor
 public class WordServiceImpl implements WordService {
 
+    private final AiGeneratorService aiService;
     private final WordRepository repository;
     private final UserRepository userRepository;
     private final UserWordRepository userWordRepository;
@@ -72,7 +72,12 @@ public class WordServiceImpl implements WordService {
         Category category = categoryRepository.findById(request.categoryId())
                 .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
 
-        Word newWord = repository.save(WordMapper.toWord(request, fromLanguage, toLanguage, category));
+        Word newWord = repository.save(WordMapper.toWord(
+                request,
+                aiService.generateDescription(request.original(), request.translated(), category.getName(), fromLanguage.getName()),
+                fromLanguage,
+                toLanguage,category
+        ));
 
         UserWord userWord = new UserWord();
         userWord.setId(new UserWordId(existingUser.getId(), newWord.getId()));
@@ -83,25 +88,6 @@ public class WordServiceImpl implements WordService {
         userWordRepository.save(userWord);
 
         return WordMapper.toWordResponse(newWord);
-
-    }
-
-    @Override
-    public WordResponse update(WordUpdateRequest request, Long wordId) {
-
-        Word existingWord = repository.findById(wordId)
-                .orElseThrow(() -> new RuntimeException("Palavra não encontrada"));
-
-        if(request.description() != null && !request.description().isEmpty()){
-            existingWord.setDescription(request.description());
-        }
-
-        if(request.categoryId() != null){
-            existingWord.setCategory(categoryRepository.findById(request.categoryId())
-                    .orElseThrow(() -> new RuntimeException("Categoria não encontrada")));
-        }
-
-        return WordMapper.toWordResponse(repository.save(existingWord));
 
     }
 

@@ -1,16 +1,14 @@
 package br.com.api.service;
 
-import br.com.api.dto.request.ExerciseCheckRequest;
-import br.com.api.dto.response.WrittenExerciseCheckResponse;
-import br.com.api.dto.response.WrittenExerciseResponse;
+import br.com.api.dto.response.WrittenExerciseAiResponse;
+import br.com.api.entity.Language;
+import br.com.api.entity.Word;
+import br.com.api.entity.WrittenExercise;
 
 import java.util.List;
 
 public interface WrittenExerciseService {
 
-    List<WrittenExerciseResponse> findByUserId(Long userId);
-    WrittenExerciseResponse generateNewExercise(Long userId, Long wordId);
-    WrittenExerciseCheckResponse validate(Long id, ExerciseCheckRequest answer);
-    void delete(Long exerciseId);
+    List<WrittenExercise> saveAllWrittenExercises(List<WrittenExerciseAiResponse> exercises, Language language, Word word);
 
 }

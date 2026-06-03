@@ -6,6 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -36,6 +37,12 @@ public class User {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "to_language_id", nullable = false)
     private Language chosenLanguage;
+
+    @OneToMany(mappedBy = "user")
+    private List<UserWord> words;
+
+    @OneToMany(mappedBy = "user")
+    private List<StudySession> sessions;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

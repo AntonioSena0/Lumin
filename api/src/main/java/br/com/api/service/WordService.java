@@ -2,7 +2,6 @@ package br.com.api.service;
 
 import br.com.api.dto.request.WordRequest;
 import br.com.api.dto.response.WordResponse;
-import br.com.api.dto.request.WordUpdateRequest;
 
 import java.util.List;
 
@@ -12,7 +11,6 @@ public interface WordService {
     WordResponse findById(Long wordId);
     List<WordResponse> search(String q);
     WordResponse save(WordRequest request, Long userId);
-    WordResponse update(WordUpdateRequest request, Long wordId);
     void unsave(Long wordId, Long userId);
 
 }

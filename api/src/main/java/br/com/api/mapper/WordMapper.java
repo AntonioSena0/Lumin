@@ -10,13 +10,13 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class WordMapper {
 
-    public Word toWord(WordRequest request, Language from_language, Language to_language, Category category){
+    public Word toWord(WordRequest request, String description, Language from_language, Language to_language, Category category){
 
         return Word
                 .builder()
                 .original(request.original())
                 .translated(request.translated())
-                .description(request.description())
+                .description(description)
                 .category(category)
                 .fromLanguage(from_language)
                 .toLanguage(to_language)
@@ -36,6 +36,7 @@ public class WordMapper {
                 .to_language(LanguageMapper.toLanguageResponse(word.getToLanguage()))
                 .category(CategoryMapper.toCategoryResponse(word.getCategory()))
                 .createdAt(word.getCreatedAt())
+                .updatedAt(word.getUpdatedAt())
                 .build();
 
     }
