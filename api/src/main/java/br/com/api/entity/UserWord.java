@@ -28,7 +28,7 @@ public class UserWord {
     @JoinColumn(name = "word_id", nullable = false)
     private Word word;
 
-    @Column(name = "last_practiced", nullable = false)
+    @Column(name = "last_practiced")
     private LocalDateTime lastPracticed;
 
     @CreationTimestamp

@@ -45,7 +45,7 @@ public class UserServiceImpl implements UserService{
             throw new RuntimeException("Nome de usuário já cadastrado");
         }
 
-        if(repository.findByEmail(request.name()).isPresent()){
+        if(repository.findByEmail(request.email()).isPresent()){
             throw new RuntimeException("Verifique os dados informados");
         }
 

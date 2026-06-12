@@ -13,6 +13,7 @@ import lombok.experimental.UtilityClass;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 @UtilityClass
 public class UserMapper {
@@ -44,9 +45,8 @@ public class UserMapper {
 
     public UserResponse toUserResponse(User user){
 
-        List<UserWordResponse> safeWords = (user.getWords() != null) ? user.getWords().stream()
-                .map(UserWordMapper::toUserWordResponse)
-                .toList() : List.of();
+        List<UserWordResponse> safeWords = sortByLastPracticed(user.getWords());
+
         List<StudySessionResponse> safeSessions = (user.getSessions() != null ? user.getSessions().stream()
                 .map(StudySessionMapper::toStudySessionResponse)
                 .toList() : List.of());
@@ -63,6 +63,30 @@ public class UserMapper {
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
                 .build();
+
+    }
+
+    public List<UserWordResponse> sortByLastPracticed(List<UserWord> words){
+
+         if (words == null || words.isEmpty()) {
+             return List.of();
+         }
+
+        return words.stream()
+                .sorted((w1, w2) -> {
+                    if(w1.getLastPracticed() == null && w2.getLastPracticed() == null){
+                        return 0;
+                    }
+                    if(w1.getLastPracticed() == null){
+                        return 1;
+                    }
+                    if(w2.getLastPracticed() == null){
+                        return -1;
+                    }
+                    return w2.getLastPracticed().compareTo(w1.getLastPracticed());
+                })
+                .map(UserWordMapper::toUserWordResponse)
+                .toList();
 
     }
 

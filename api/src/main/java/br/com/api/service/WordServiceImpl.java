@@ -55,6 +55,14 @@ public class WordServiceImpl implements WordService {
 
             Word word = existingWord.get();
 
+            Optional<UserWord> relation = userWordRepository.findById(new UserWordId(existingUser.getId(), word.getId()));
+
+            if(relation.isPresent()){
+                UserWord userWord = relation.get();
+                return WordMapper.toWordResponse(userWord.getWord());
+            }
+
+
             UserWord userWord = new UserWord();
             userWord.setId(new UserWordId(existingUser.getId(), word.getId()));
             userWord.setUser(existingUser);
