@@ -11,6 +11,7 @@ import br.com.api.repository.UserRepository;
 import br.com.api.repository.WordRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -30,17 +31,18 @@ public class StudySessionServiceImpl implements StudySessionService{
 
     @Override
     public StudySessionResponse findById(Long id) {
-        return StudySessionMapper.toStudySessionResponse(repository.findById(id)
+        return StudySessionMapper.toStudySessionResponse(repository.findByIdWithExercises(id)
                 .orElseThrow(() -> new RuntimeException("Sessão não encontrada")));
     }
 
     @Override
+    @Transactional
     public StudySessionResponse startSession(Long userId, Long wordId) {
 
-        User existingUser = userRepository.findById(userId)
+        User existingUser = userRepository.findByIdWithRelations(userId)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado para criar a sessão"));
 
-        Word existingWord = wordRepository.findById(wordId)
+        Word existingWord = wordRepository.findByIdWithRelations(wordId)
                 .orElseThrow(() -> new RuntimeException("Palavra não encontrada"));
 
         StudySessionAiResponse aiResponse = aiService.generateStudySession(
@@ -66,15 +68,16 @@ public class StudySessionServiceImpl implements StudySessionService{
     }
 
     @Override
+    @Transactional
     public StudySessionResponse finishSession(Long id) {
 
-        StudySession session = repository.findById(id)
+        StudySession session = repository.findByIdWithExercises(id)
                 .orElseThrow(() -> new RuntimeException("Sessão não encontrada"));
 
         session.setStatus(SessionStatus.FINISHED);
         session.setFinishedAt(LocalDateTime.now());
 
-        return StudySessionMapper.toStudySessionResponse(repository.save(session));
+        return StudySessionMapper.toStudySessionResponse(session);
 
     }
 }

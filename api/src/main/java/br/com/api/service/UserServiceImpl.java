@@ -10,6 +10,7 @@ import br.com.api.repository.LanguageRepository;
 import br.com.api.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public List<UserResponse> findAll() {
-        return repository.findAll()
+        return repository.findAllWithRelations()
                 .stream()
                 .map(UserMapper::toUserResponse)
                 .toList();
@@ -32,13 +33,14 @@ public class UserServiceImpl implements UserService{
     public UserResponse findById(Long id) {
 
         return UserMapper.toUserResponse(
-                repository.findById(id)
+                repository.findByIdWithRelations(id)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"))
         );
 
     }
 
     @Override
+    @Transactional
     public UserResponse create(UserRequest request) {
 
         if(repository.findByName(request.name()).isPresent()){
@@ -60,9 +62,10 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    @Transactional
     public UserResponse update(Long id, UserUpdateRequest request){
 
-        User existingUser = repository.findById(id)
+        User existingUser = repository.findByIdWithRelations(id)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
         if(repository.existsByNameAndIdNot(request.name(), id)){
@@ -87,14 +90,15 @@ public class UserServiceImpl implements UserService{
 
         existingUser.setChosenLanguage(chosenLanguage);
 
-        return UserMapper.toUserResponse(repository.save(existingUser));
+        return UserMapper.toUserResponse(existingUser);
 
     }
 
     @Override
+    @Transactional
     public UserResponse parcialUpdate(Long id, UserUpdateRequest request){
 
-        User existingUser = repository.findById(id)
+        User existingUser = repository.findByIdWithRelations(id)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
         if(request.name() != null){
@@ -129,15 +133,17 @@ public class UserServiceImpl implements UserService{
             existingUser.setChosenLanguage(language);
         }
 
-        return UserMapper.toUserResponse(repository.save(existingUser));
+        return UserMapper.toUserResponse(existingUser);
 
     }
 
     @Override
+    @Transactional
     public void delete(Long id){
 
-        User existingUser = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+        if(!repository.existsById(id)){
+            throw new RuntimeException("Usuário não encontrado");
+        }
 
         repository.deleteById(id);
 

@@ -3,6 +3,7 @@ package br.com.api.entity;
 import br.com.api.domain.SessionStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -45,6 +46,7 @@ public class StudySession {
     private User user;
 
     @OneToMany(mappedBy = "session", cascade = CascadeType.ALL)
+    @BatchSize(size = 10)
     private List<Exercise> exercises;
 
     @CreationTimestamp

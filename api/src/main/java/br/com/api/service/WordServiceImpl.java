@@ -7,6 +7,7 @@ import br.com.api.mapper.WordMapper;
 import br.com.api.repository.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +24,7 @@ public class WordServiceImpl implements WordService {
 
     @Override
     public List<WordResponse> findAll() {
-        return repository.findAll()
+        return repository.findAllWithRelations()
                 .stream()
                 .map(WordMapper::toWordResponse)
                 .toList();
@@ -31,7 +32,7 @@ public class WordServiceImpl implements WordService {
 
     @Override
     public WordResponse findById(Long wordId) {
-        return WordMapper.toWordResponse(repository.findById(wordId)
+        return WordMapper.toWordResponse(repository.findByIdWithRelations(wordId)
                 .orElseThrow(() -> new RuntimeException("Palavra não encontrada")));
     }
 
@@ -44,9 +45,10 @@ public class WordServiceImpl implements WordService {
     }
 
     @Override
+    @Transactional
     public WordResponse save(WordRequest request, Long userId) {
 
-        User existingUser = userRepository.findById(userId)
+        User existingUser = userRepository.findByIdWithRelations(userId)
                 .orElseThrow(() -> new RuntimeException("Usuário que tentou realizar a ação não existe"));
 
         Optional<Word> existingWord = repository.findByOriginalAndTranslated(request.original(), request.translated());
@@ -100,12 +102,14 @@ public class WordServiceImpl implements WordService {
     }
 
     @Override
+    @Transactional
     public void unsave(Long wordId, Long userId) {
 
-        UserWord existingUserWord = userWordRepository.findById(new UserWordId(userId, wordId))
-                .orElseThrow(() -> new RuntimeException("Tentando remover palavra que ainda não foi salva"));
+        if(!userWordRepository.existsById(new UserWordId(userId, wordId))){
+            throw new RuntimeException("Tentando remover palavra que ainda não foi salva");
+        }
 
-        userWordRepository.delete(existingUserWord);
+        userWordRepository.deleteById(new UserWordId(userId, wordId));
 
     }
 }

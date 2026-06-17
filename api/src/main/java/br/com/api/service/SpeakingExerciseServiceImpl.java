@@ -8,6 +8,7 @@ import br.com.api.factory.ExerciseFactory;
 import br.com.api.repository.SpeakingExerciseRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -19,6 +20,7 @@ public class SpeakingExerciseServiceImpl implements SpeakingExerciseService {
     private final ExerciseFactory factory;
 
     @Override
+    @Transactional
     public List<SpeakingExercise> saveAllSpeakingExercises(List<SpeakingExerciseAiResponse> exercises, Language language, Word word) {
 
         return repository.saveAll(exercises.stream()

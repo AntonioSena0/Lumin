@@ -2,6 +2,7 @@ package br.com.api.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -9,7 +10,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "users")
+@Table(name = "users", indexes = {
+        @Index(name = "idx_user_name", columnList = "name", unique = true),
+        @Index(name = "idx_user_email", columnList = "email", unique = true)
+})
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -39,9 +43,11 @@ public class User {
     private Language chosenLanguage;
 
     @OneToMany(mappedBy = "user")
+    @BatchSize(size = 10)
     private List<UserWord> words;
 
     @OneToMany(mappedBy = "user")
+    @BatchSize(size = 10)
     private List<StudySession> sessions;
 
     @CreationTimestamp
