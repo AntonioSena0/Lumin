@@ -15,6 +15,9 @@ public class UserWordMapper {
                 .wordId(userWord.getId().getWordId())
                 .word(WordMapper.toWordResponse(userWord.getWord()))
                 .lastPracticed(userWord.getLastPracticed())
+                .correctAnswers(userWord.getCorrectAnswers())
+                .incorrectAnswers(userWord.getCorrectAnswers())
+                .level(userWord.getLevel())
                 .createdAt(userWord.getCreatedAt())
                 .build();
 

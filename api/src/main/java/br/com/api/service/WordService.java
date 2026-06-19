@@ -9,7 +9,7 @@ public interface WordService {
 
     List<WordResponse> findAll();
     WordResponse findById(Long wordId);
-    List<WordResponse> search(String q);
+    List<WordResponse> search(String q, Integer languageId);
     WordResponse save(WordRequest request, Long userId);
     void unsave(Long wordId, Long userId);
 

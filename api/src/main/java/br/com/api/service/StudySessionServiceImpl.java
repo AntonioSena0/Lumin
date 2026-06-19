@@ -31,7 +31,7 @@ public class StudySessionServiceImpl implements StudySessionService{
 
     @Override
     public StudySessionResponse findById(Long id) {
-        return StudySessionMapper.toStudySessionResponse(repository.findByIdWithExercises(id)
+        return StudySessionMapper.toStudySessionResponse(repository.findByIdWithRelations(id)
                 .orElseThrow(() -> new RuntimeException("Sessão não encontrada")));
     }
 
@@ -71,7 +71,7 @@ public class StudySessionServiceImpl implements StudySessionService{
     @Transactional
     public StudySessionResponse finishSession(Long id) {
 
-        StudySession session = repository.findByIdWithExercises(id)
+        StudySession session = repository.findByIdWithRelations(id)
                 .orElseThrow(() -> new RuntimeException("Sessão não encontrada"));
 
         session.setStatus(SessionStatus.FINISHED);

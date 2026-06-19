@@ -31,9 +31,9 @@ public class WordControllerImpl implements WordController{
     }
 
     @Override
-    @GetMapping("/search={q}")
-    public ResponseEntity<List<WordResponse>> search(@PathVariable String q) {
-        return ResponseEntity.ok(service.search(q));
+    @GetMapping("/{languageId}/search={q}")
+    public ResponseEntity<List<WordResponse>> search(@PathVariable Integer languageId, @PathVariable String q) {
+        return ResponseEntity.ok(service.search(q, languageId));
     }
 
     @Override

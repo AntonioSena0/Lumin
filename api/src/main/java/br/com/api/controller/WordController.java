@@ -10,7 +10,7 @@ public interface WordController {
 
     ResponseEntity<List<WordResponse>> findAll();
     ResponseEntity<WordResponse> findById(Long wordId);
-    ResponseEntity<List<WordResponse>> search(String q);
+    ResponseEntity<List<WordResponse>> search( Integer languageId, String q);
     ResponseEntity<WordResponse> save(WordRequest request, Long userId);
     ResponseEntity<Void> unsave(Long wordId, Long userId);
 

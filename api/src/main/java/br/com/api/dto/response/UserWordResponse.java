@@ -1,5 +1,6 @@
 package br.com.api.dto.response;
 
+import br.com.api.domain.WordDomainLevel;
 import br.com.api.entity.UserWordId;
 import lombok.Builder;
 
@@ -12,6 +13,9 @@ public record UserWordResponse(
         Long wordId,
         WordResponse word,
         LocalDateTime lastPracticed,
+        Long correctAnswers,
+        Long incorrectAnswers,
+        WordDomainLevel level,
         LocalDateTime createdAt
 
 ) {}

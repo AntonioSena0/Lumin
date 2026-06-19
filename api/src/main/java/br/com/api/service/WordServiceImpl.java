@@ -1,5 +1,6 @@
 package br.com.api.service;
 
+import br.com.api.domain.WordDomainLevel;
 import br.com.api.dto.request.WordRequest;
 import br.com.api.dto.response.WordResponse;
 import br.com.api.entity.*;
@@ -37,8 +38,8 @@ public class WordServiceImpl implements WordService {
     }
 
     @Override
-    public List<WordResponse> search(String q) {
-        return repository.findByOriginalContains(q)
+    public List<WordResponse> search(String q, Integer languageId) {
+        return repository.findByOriginalContains(q, languageId)
                 .stream()
                 .map(WordMapper::toWordResponse)
                 .toList();
@@ -70,6 +71,9 @@ public class WordServiceImpl implements WordService {
             userWord.setUser(existingUser);
             userWord.setWord(word);
             userWord.setLastPracticed(null);
+            userWord.setCorrectAnswers(0L);
+            userWord.setIncorrectAnswers(0L);
+            userWord.setLevel(WordDomainLevel.BASIC);
 
             userWordRepository.save(userWord);
 
@@ -94,6 +98,9 @@ public class WordServiceImpl implements WordService {
         userWord.setUser(existingUser);
         userWord.setWord(newWord);
         userWord.setLastPracticed(null);
+        userWord.setCorrectAnswers(0L);
+        userWord.setIncorrectAnswers(0L);
+        userWord.setLevel(WordDomainLevel.BASIC);
 
         userWordRepository.save(userWord);
 
