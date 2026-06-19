@@ -13,6 +13,9 @@ import java.util.Optional;
 @Repository
 public interface StudySessionRepository extends JpaRepository<StudySession, Long> {
 
+    @QueryHints(
+            @QueryHint(name = "javax.persistence.query.timeout", value = "2000")
+    )
     @Query("SELECT ss FROM StudySession ss " +
             "JOIN FETCH ss.user " +
             "JOIN FETCH ss.exercises " +
