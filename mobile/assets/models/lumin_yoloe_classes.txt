@@ -1,0 +1,439 @@
+acoustic guitar
+adapter
+adhesive tape
+air conditioner
+air fryer
+airplane
+alarm clock
+anchor
+antenna
+apple
+apple pie
+apron
+armchair
+ashtray
+avocado
+baby bottle
+backpack
+badge
+bag
+baguette
+ball
+balloon
+banana
+bar soap
+baseball
+basket
+basketball
+bathtub
+battery
+beach umbrella
+bean
+beanie
+bed
+beer bottle
+bell
+bell pepper
+belt
+bench
+bicycle
+binder
+binoculars
+bird
+blackboard
+blanket
+bleach
+blender
+blouse
+blueberry
+board
+boat
+book
+booklet
+bookmark
+bookshelf
+boot
+bottle
+bowl
+box
+bracelet
+bracelet watch
+bread
+briefcase
+broccoli
+broom
+brush
+bucket
+bucket hat
+bunk bed
+bus
+butter
+button
+cabbage
+cabinet
+cable
+cactus
+cake
+calculator
+calendar
+camera
+can
+can opener
+candle
+candy
+cap
+capsule
+car
+car key
+car seat
+card
+cardboard box
+carpet
+carrot
+cart
+cat
+ceiling
+cell phone
+chair
+charger
+charging cable
+cheese
+chessboard
+chicken
+chili pepper
+chocolate
+clock
+cloth
+clothes hanger
+coat
+coffee
+coffee maker
+coin
+colander
+comb
+computer
+computer tower
+conditioner
+cone
+cookie
+cookie jar
+cork
+corkscrew
+cotton swab
+couch
+cow
+crayon
+credit card
+cup
+curtain
+cushion
+cutting board
+deodorant
+desk
+detergent
+diary
+dining table
+dishwasher
+dog
+doll
+donut
+door
+doormat
+drawer
+dress
+drill
+dustpan
+earphones
+earring
+egg
+electric fan
+electric kettle
+envelope
+eraser
+extension cord
+face mask
+fan
+fanny pack
+faucet
+file cabinet
+file folder
+fire extinguisher
+fire hydrant
+fish
+flash drive
+flashlight
+floor
+floss
+flour
+flower
+flower pot
+folder
+food container
+football
+fork
+fridge
+frisbee
+frying pan
+game controller
+garbage bag
+garlic
+gas stove
+gift
+gift bag
+glass
+glasses
+glove
+glue stick
+goggles
+grape
+grater
+green bean
+guitar
+hair brush
+hair dryer
+hamburger
+hammer
+hand sanitizer
+hand soap
+hand towel
+handbag
+hanger
+hard drive
+hat
+headphones
+headset
+helmet
+highlighter
+hoodie
+horse
+hot dog
+house
+ice cream
+id card
+iron
+jacket
+jam
+jar
+jeans
+jug
+juice
+jump rope
+kettle
+key
+keyboard
+keychain
+kitchen towel
+knife
+ladder
+ladle
+lamp
+lanyard
+laptop
+laundry basket
+leaf
+lego brick
+lemon
+lettuce
+light
+light bulb
+light switch
+lighter
+lime
+lipstick
+lock
+luggage
+lunch bag
+lunch box
+magazine
+makeup brush
+mango
+map
+marker
+mask
+measuring cup
+meat
+mechanical pencil
+medicine
+memory card
+microphone
+microwave
+milk
+mirror
+monitor
+mop
+motorcycle
+mouse
+mug
+nail polish
+napkin
+necklace
+newspaper
+nightstand
+notebook
+onion
+orange
+orange juice
+oven
+paint brush
+paint bucket
+pajamas
+palette
+pan
+paper
+paper clip
+passport
+peach
+pear
+pen
+pencil
+pepper shaker
+perfume
+person
+phone
+photo frame
+pillow
+pineapple
+pizza
+plant
+plastic bag
+plate
+pliers
+plug
+popcorn
+popsicle
+pot
+potato
+potted plant
+power bank
+power outlet
+prayer beads
+presentation remote
+pressure cooker
+printer
+projector
+protractor
+pumpkin
+purse
+radio
+raincoat
+receipt
+red pepper
+refrigerator
+remote
+rice
+ring
+rolling pin
+router
+rubber band
+rug
+ruler
+safety pin
+salt shaker
+sandwich
+sauce bottle
+scarf
+school bag
+scissors
+screen
+screw
+screwdriver
+serving spoon
+shampoo
+sheep
+shelf
+shirt
+shoe
+shopping bag
+shorts
+shovel
+shower
+side table
+sink
+skateboard
+skirt
+smartphone
+smartwatch
+soap
+soap dispenser
+sock
+soda can
+sofa
+soundbar
+speaker
+sponge
+spoon
+spray bottle
+stapler
+sticker
+stop sign
+storage box
+stove
+straw
+strawberry
+street sign
+sugar
+suitcase
+sunglasses
+switch
+t-shirt
+table
+tablet
+tablet pen
+tape
+tea
+tea bag
+teapot
+teddy bear
+television
+tennis racket
+thermometer
+thermos
+ticket
+tie
+tissue
+tissue box
+toaster
+toilet
+tomato
+tomato sauce
+toolbox
+toothbrush
+toothpaste
+toothpick
+towel
+toy
+toy car
+toy train
+traffic light
+train
+trash can
+tree
+tripod
+trophy
+truck
+tuna can
+umbrella
+usb drive
+vacuum cleaner
+vase
+vegetable peeler
+vest
+video game console
+vinegar
+wall
+wallet
+washing machine
+watch
+water
+water bottle
+water dispenser
+watermelon
+wheel
+whiteboard
+window
+wire
+wrench
+wristwatch
+yogurt
+zebra
+zipper
