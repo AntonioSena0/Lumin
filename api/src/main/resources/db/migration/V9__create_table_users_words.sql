@@ -1,4 +1,4 @@
-CREATE TYPE word_domain_level AS ENUM('BASIC', 'INTERMEDIATE', 'ADVANCED');
+CREATE TYPE word_domain_level AS ENUM('DISCOVERED', 'PRACTICING', 'FAMILIAR');
 
 CREATE TABLE users_words (
 
@@ -6,9 +6,10 @@ CREATE TABLE users_words (
     word_id BIGINT NOT NULL,
     PRIMARY KEY(user_id, word_id),
     last_practiced timestamp,
-    correct_answers BIGINT NOT NULL,
-    incorrect_answers BIGINT NOT NULL,
-    level word_domain_level NOT NULL,
+    is_saved BOOLEAN NOT NULL DEFAULT false,
+    correct_answers BIGINT NOT NULL DEFAULT 0,
+    incorrect_answers BIGINT NOT NULL DEFAULT 0,
+    level word_domain_level NOT NULL DEFAULT 'DISCOVERED',
     created_at timestamp
 
 );

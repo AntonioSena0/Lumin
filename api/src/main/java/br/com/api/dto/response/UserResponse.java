@@ -13,8 +13,6 @@ public record UserResponse(
         String email,
         LanguageResponse nativeLanguage,
         LanguageResponse chosenLanguage,
-        List<UserWordResponse> words,
-        List<StudySessionResponse> sessions,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 

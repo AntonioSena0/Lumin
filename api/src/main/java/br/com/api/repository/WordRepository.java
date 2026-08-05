@@ -1,5 +1,6 @@
 package br.com.api.repository;
 
+import br.com.api.entity.Category;
 import br.com.api.entity.Word;
 import jakarta.persistence.QueryHint;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -38,8 +39,8 @@ public interface WordRepository extends JpaRepository<Word, Long> {
             "JOIN FETCH w.fromLanguage " +
             "JOIN FETCH w.toLanguage " +
             "JOIN FETCH w.category " +
-            "WHERE w.original = :original AND w.translated = :translated")
-    Optional<Word> findByOriginalAndTranslated(String original, String translated);
+            "WHERE w.original = :original AND w.translated = :translated AND w.category = :category")
+    Optional<Word> findByOriginalAndTranslatedAndCategory(@Param("original") String original, @Param("translated") String translated, @Param("category") Category category);
 
     @QueryHints(
             @QueryHint(name = "javax.persistence.query.timeout", value = "2000")

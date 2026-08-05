@@ -32,16 +32,19 @@ public class UserWord {
     @JoinColumn(name = "word_id", nullable = false)
     private Word word;
 
+    @Column(name = "is_saved", nullable = false)
+    private boolean isSaved = false;
+
     @Column(name = "correct_answers", nullable = false)
-    private Long correctAnswers;
+    private Long correctAnswers = 0L;
 
     @Column(name = "incorrect_answers", nullable = false)
-    private Long incorrectAnswers;
+    private Long incorrectAnswers = 0L;
 
     @JdbcType(PostgreSQLEnumJdbcType.class)
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private WordDomainLevel level;
+    private WordDomainLevel level = WordDomainLevel.DISCOVERED;
 
     @Column(name = "last_practiced")
     private LocalDateTime lastPracticed;

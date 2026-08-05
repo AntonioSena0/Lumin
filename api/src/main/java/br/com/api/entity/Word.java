@@ -29,6 +29,7 @@ public class Word {
     @Column(nullable = false)
     private String translated;
 
+    @Column(nullable = false)
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

@@ -3,7 +3,7 @@ CREATE TABLE words (
     id BIGSERIAL PRIMARY KEY,
     original VARCHAR(100) NOT NULL,
     translated VARCHAR(100) NOT NULL UNIQUE,
-    description VARCHAR(200),
+    description VARCHAR(200) NOT NULL,
     created_at timestamp,
     updated_at timestamp,
     from_language_id INTEGER NOT NULL,

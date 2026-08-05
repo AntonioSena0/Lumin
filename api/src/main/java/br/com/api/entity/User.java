@@ -42,14 +42,6 @@ public class User {
     @JoinColumn(name = "to_language_id", nullable = false)
     private Language chosenLanguage;
 
-    @OneToMany(mappedBy = "user")
-    @BatchSize(size = 10)
-    private List<UserWord> words;
-
-    @OneToMany(mappedBy = "user")
-    @BatchSize(size = 10)
-    private List<StudySession> sessions;
-
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

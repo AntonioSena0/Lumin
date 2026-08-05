@@ -11,12 +11,12 @@ public class UserWordMapper {
 
         return UserWordResponse
                 .builder()
-                .userId(userWord.getId().getUserId())
-                .wordId(userWord.getId().getWordId())
+                .user(UserMapper.toUserResponse(userWord.getUser()))
                 .word(WordMapper.toWordResponse(userWord.getWord()))
                 .lastPracticed(userWord.getLastPracticed())
                 .correctAnswers(userWord.getCorrectAnswers())
-                .incorrectAnswers(userWord.getCorrectAnswers())
+                .incorrectAnswers(userWord.getIncorrectAnswers())
+                .isSaved(userWord.isSaved())
                 .level(userWord.getLevel())
                 .createdAt(userWord.getCreatedAt())
                 .build();

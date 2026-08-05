@@ -52,7 +52,10 @@ public class WordServiceImpl implements WordService {
         User existingUser = userRepository.findByIdWithRelations(userId)
                 .orElseThrow(() -> new RuntimeException("Usuário que tentou realizar a ação não existe"));
 
-        Optional<Word> existingWord = repository.findByOriginalAndTranslated(request.original(), request.translated());
+        Category existingCategory = categoryRepository.findById(request.categoryId())
+                .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
+
+        Optional<Word> existingWord = repository.findByOriginalAndTranslatedAndCategory(request.original(), request.translated(), existingCategory);
 
         if(existingWord.isPresent()){
 
@@ -62,6 +65,10 @@ public class WordServiceImpl implements WordService {
 
             if(relation.isPresent()){
                 UserWord userWord = relation.get();
+                if(userWord.isSaved()){
+                    return WordMapper.toWordResponse(userWord.getWord());
+                }
+                userWord.setSaved(true);
                 return WordMapper.toWordResponse(userWord.getWord());
             }
 
@@ -70,10 +77,7 @@ public class WordServiceImpl implements WordService {
             userWord.setId(new UserWordId(existingUser.getId(), word.getId()));
             userWord.setUser(existingUser);
             userWord.setWord(word);
-            userWord.setLastPracticed(null);
-            userWord.setCorrectAnswers(0L);
-            userWord.setIncorrectAnswers(0L);
-            userWord.setLevel(WordDomainLevel.BASIC);
+            userWord.setSaved(true);
 
             userWordRepository.save(userWord);
 
@@ -83,24 +87,20 @@ public class WordServiceImpl implements WordService {
 
         Language fromLanguage = existingUser.getNativeLanguage();
         Language toLanguage = existingUser.getChosenLanguage();
-        Category category = categoryRepository.findById(request.categoryId())
-                .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
 
         Word newWord = repository.save(WordMapper.toWord(
                 request,
-                aiService.generateDescription(request.original(), request.translated(), category.getName(), fromLanguage.getName()),
+                aiService.generateDescription(request.original(), request.translated(), existingCategory.getName(), fromLanguage.getName()),
                 fromLanguage,
-                toLanguage,category
+                toLanguage,
+                existingCategory
         ));
 
         UserWord userWord = new UserWord();
         userWord.setId(new UserWordId(existingUser.getId(), newWord.getId()));
         userWord.setUser(existingUser);
         userWord.setWord(newWord);
-        userWord.setLastPracticed(null);
-        userWord.setCorrectAnswers(0L);
-        userWord.setIncorrectAnswers(0L);
-        userWord.setLevel(WordDomainLevel.BASIC);
+        userWord.setSaved(true);
 
         userWordRepository.save(userWord);
 
@@ -111,12 +111,11 @@ public class WordServiceImpl implements WordService {
     @Override
     @Transactional
     public void unsave(Long wordId, Long userId) {
+    
+        UserWord existingUserWord = userWordRepository.findById(new UserWordId(userId, wordId))
+                .orElseThrow(() -> new RuntimeException("Tentando remover palavra que ainda não foi salva"));
 
-        if(!userWordRepository.existsById(new UserWordId(userId, wordId))){
-            throw new RuntimeException("Tentando remover palavra que ainda não foi salva");
-        }
-
-        userWordRepository.deleteById(new UserWordId(userId, wordId));
+        existingUserWord.setSaved(false);
 
     }
 }

@@ -9,12 +9,12 @@ import java.time.LocalDateTime;
 @Builder
 public record UserWordResponse(
 
-        Long userId,
-        Long wordId,
+        UserResponse user,
         WordResponse word,
         LocalDateTime lastPracticed,
         Long correctAnswers,
         Long incorrectAnswers,
+        boolean isSaved,
         WordDomainLevel level,
         LocalDateTime createdAt
 

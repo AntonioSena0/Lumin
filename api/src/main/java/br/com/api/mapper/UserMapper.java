@@ -45,12 +45,6 @@ public class UserMapper {
 
     public UserResponse toUserResponse(User user){
 
-        List<UserWordResponse> safeWords = sortByLastPracticed(user.getWords());
-
-        List<StudySessionResponse> safeSessions = (user.getSessions() != null ? user.getSessions().stream()
-                .map(StudySessionMapper::toStudySessionResponse)
-                .toList() : List.of());
-
         return UserResponse
                 .builder()
                 .id(user.getId())
@@ -58,35 +52,9 @@ public class UserMapper {
                 .email(user.getEmail())
                 .nativeLanguage(LanguageMapper.toLanguageResponse(user.getNativeLanguage()))
                 .chosenLanguage(LanguageMapper.toLanguageResponse(user.getChosenLanguage()))
-                .words(safeWords)
-                .sessions(safeSessions)
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
                 .build();
-
-    }
-
-    public List<UserWordResponse> sortByLastPracticed(List<UserWord> words){
-
-         if (words == null || words.isEmpty()) {
-             return List.of();
-         }
-
-        return words.stream()
-                .sorted((w1, w2) -> {
-                    if(w1.getLastPracticed() == null && w2.getLastPracticed() == null){
-                        return 0;
-                    }
-                    if(w1.getLastPracticed() == null){
-                        return 1;
-                    }
-                    if(w2.getLastPracticed() == null){
-                        return -1;
-                    }
-                    return w2.getLastPracticed().compareTo(w1.getLastPracticed());
-                })
-                .map(UserWordMapper::toUserWordResponse)
-                .toList();
 
     }
 
