@@ -10,7 +10,7 @@ public record LanguageRequest (
         String name,
 
         @NotEmpty(message = "O código da língua é obrigatório")
-        @Size(max = 3, message = "O código da língua só pode ter até 3 caracteres")
+        @Size(max = 5, message = "O código da língua só pode ter até 5 caracteres")
         String code
 
 ) {}

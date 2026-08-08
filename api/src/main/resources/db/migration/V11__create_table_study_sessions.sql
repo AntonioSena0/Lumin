@@ -12,4 +12,4 @@ CREATE TABLE study_sessions(
     updated_at timestamp,
     user_id BIGINT NOT NULL
 
-)
+);

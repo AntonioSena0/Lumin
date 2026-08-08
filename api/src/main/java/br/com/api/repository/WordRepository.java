@@ -49,7 +49,8 @@ public interface WordRepository extends JpaRepository<Word, Long> {
             "JOIN FETCH w.fromLanguage " +
             "JOIN FETCH w.toLanguage " +
             "JOIN FETCH w.category " +
-            "WHERE w.original LIKE :q AND w.fromLanguage.id = :languageId")
+            "WHERE LOWER(w.original) LIKE LOWER(CONCAT('%', :q, '%')) " +
+            "AND w.fromLanguage.id = :languageId")
     List<Word> findByOriginalContains(@Param("q") String q, @Param("languageId") Integer languageId);
 
 }
