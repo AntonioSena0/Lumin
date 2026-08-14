@@ -23,8 +23,8 @@ public class UserMapper {
         return User
                 .builder()
                 .name(request.name())
-                .email(request.email())
-                .password(request.password())
+                .email(request.email().trim())
+                .password(request.password().trim())
                 .nativeLanguage(nativeLanguage)
                 .chosenLanguage(chosenLanguage)
                 .build();

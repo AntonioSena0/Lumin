@@ -9,6 +9,6 @@ import java.util.List;
 
 public interface WrittenExerciseService {
 
-    List<WrittenExercise> saveAllWrittenExercises(List<WrittenExerciseAiResponse> exercises, Language language, Word word);
+    List<WrittenExercise> createAllWrittenExercises(List<WrittenExerciseAiResponse> exercises, Language language, Word word);
 
 }

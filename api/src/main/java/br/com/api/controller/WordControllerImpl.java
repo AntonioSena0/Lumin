@@ -43,7 +43,7 @@ public class WordControllerImpl implements WordController{
     }
 
     @Override
-    @DeleteMapping("/unsave/{wordId}/{userId}")
+    @PatchMapping("/unsave/{wordId}/{userId}")
     public ResponseEntity<Void> unsave(@PathVariable Long wordId, @PathVariable Long userId) {
 
         service.unsave(wordId, userId);

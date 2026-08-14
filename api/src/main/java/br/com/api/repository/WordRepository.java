@@ -53,4 +53,6 @@ public interface WordRepository extends JpaRepository<Word, Long> {
             "AND w.fromLanguage.id = :languageId")
     List<Word> findByOriginalContains(@Param("q") String q, @Param("languageId") Integer languageId);
 
+    List<Word> findTop10ByCategoryIdAndToLanguageIdAndIdNot(Integer categoryId, Integer toLanguageId, Long id);
+
 }

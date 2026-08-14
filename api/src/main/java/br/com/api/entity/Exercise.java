@@ -1,10 +1,13 @@
 package br.com.api.entity;
 
 import br.com.api.domain.Checkable;
+import br.com.api.domain.ExerciseCorrect;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.time.LocalDateTime;
 
@@ -30,6 +33,17 @@ public abstract class Exercise implements Checkable {
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String prompt;
+
+    @Column(nullable = false)
+    private boolean completed;
+
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ExerciseCorrect correct;
+
+    @Column(nullable = false, name = "order_index")
+    private Integer orderIndex;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "language_id", nullable = false)

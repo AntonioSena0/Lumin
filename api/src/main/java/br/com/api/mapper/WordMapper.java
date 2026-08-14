@@ -14,8 +14,8 @@ public class WordMapper {
 
         return Word
                 .builder()
-                .original(request.original())
-                .translated(request.translated())
+                .original(request.original().toLowerCase().trim())
+                .translated(request.translated().toLowerCase().trim())
                 .description(description)
                 .category(category)
                 .fromLanguage(from_language)

@@ -116,7 +116,7 @@ public class AiGeneratorServiceImpl implements AiGeneratorService{
                         .temperature(0.2)
                         .build()
                 )
-                .user(prompt + "\n" + conversor.getFormat())
+                .user(prompt)
                 .call()
                 .entity(StudySessionAiResponse.class);
 
@@ -126,418 +126,298 @@ public class AiGeneratorServiceImpl implements AiGeneratorService{
 
         return """
         =================================================
-        REGRAS CRÍTICAS DE GERAÇÃO
+        OBJETIVO DA SESSÃO
         =================================================
-        
-        Estas regras possuem prioridade máxima.
-        
-        Se qualquer regra for violada, você deve corrigir a sessão antes de responder.
-        
-        Os exercícios não devem apenas solicitar diretamente a palavra-alvo.
-        
-        Crie situações realistas do cotidiano nas quais compreender o significado da palavra seja necessário para responder corretamente.
-        
-        Evite repetir a palavra-alvo diretamente no enunciado sempre que possível. Em vez disso, utilize descrições, funções, características, ações ou contextos relacionados ao objeto.
-        
-        Utilize contextos variados, incluindo diferentes ambientes, profissões, faixas etárias, atividades e situações do dia a dia.
-        
-        Os exercícios devem estimular a compreensão do vocabulário dentro de um contexto, e não apenas a memorização da tradução.
-        
-        Para exercícios de speaking, solicite que o usuário produza respostas originais, descreva experiências, explique situações ou fale sobre objetos e cenários relacionados, evitando atividades de simples leitura em voz alta.
-        
-        Considere que o usuário aprendeu a palavra a partir da observação de um objeto real no ambiente através da câmera do aplicativo. Sempre que possível, conecte os exercícios ao uso prático desse objeto no mundo real.
-        
-        Mantenha os exercícios naturais, úteis e relevantes para situações que o usuário pode encontrar em casa, na escola, no trabalho, na rua ou em outros ambientes cotidianos.
-        
-        Ao criar exercícios, assuma que o usuário acabou de identificar visualmente um objeto através da câmera do aplicativo. Utilize características visuais, função, localização comum e interações típicas com esse objeto para construir perguntas que reforcem a associação entre a imagem observada e o vocabulário aprendido.
-        
-        =================================================
-        ENTENDIMENTO DA PALAVRA
-        =================================================
-        
-        PALAVRA ORIGINAL:
-        %s
-        
-        TRADUÇÃO:
-        %s
-        
-        DESCRIÇÃO:
-        %s
-        
-        CATEGORIA:
-        %s
-        
-        Você deve considerar os quatro campos acima simultaneamente.
-        
-        NUNCA utilize apenas a tradução para interpretar a palavra.
-        
-        NUNCA crie fatos ireais ou que possuam coisas em comum com outras palavras
 
-        TODOS os cenários precisam ser plausíveis e encontrados na vida real de maneira cotidiana
-        
-        A descrição é a fonte principal de significado.
-        
-        A categoria serve para eliminar ambiguidades.
-        
-        Antes de criar os exercícios:
-        
-        1. Identifique o significado correto.
-        2. Identifique o objeto, conceito ou ação representado.
-        3. Identifique contextos reais de uso.
-        4. Gere exercícios coerentes com esse significado.
-        
-        Se existir conflito entre tradução e categoria:
-        
-        PRIORIZE a descrição.
-        
+        Você é um designer pedagógico especializado em aprendizado de vocabulário por contexto visual.
+
+        Crie uma sessão curta, natural e coesa para um usuário que acabou de identificar um objeto real pela câmera do aplicativo Lumin.
+
+        A sessão deve reforçar a associação entre o objeto visto, a palavra no idioma de estudo e situações reais de uso.
+
+        Evite exercícios genéricos de dicionário. O usuário não deve sentir que está respondendo uma definição escolar.
+
         =================================================
-        CONTROLE DE CONTEXTO
+        DADOS DA PALAVRA
         =================================================
-        
-        Todos os exercícios devem respeitar:
-        
-        - significado
-        - descrição
-        - categoria
-        
-        Exemplo:
-        
-        PALAVRA:
-        Keyboard
-        
-        DESCRIÇÃO:
-        Dispositivo de entrada usado para digitar textos e comandos em computadores.
-        
-        CATEGORIA:
-        Tecnologia
-        
-        Contextos permitidos:
-        
-        - computadores
-        - programação
-        - escritório
-        - produtividade
-        - hardware
-        - setup gamer
-        - tecnologia
-        - internet
-        - digitação
-        
-        Contextos proibidos:
-        
-        - culinária
-        - agricultura
-        - medicina
-        - animais
-        - esportes sem relação tecnológica
-        
-        Nunca utilize contextos proibidos.
-        
+
+        Palavra no idioma de origem:
+        %1$s
+
+        Palavra no idioma de estudo:
+        %2$s
+
+        Descrição:
+        %3$s
+
+        Categoria:
+        %4$s
+
+        Idioma de origem:
+        %5$s
+
+        Idioma de estudo:
+        %6$s
+
+        Use a descrição e a categoria para decidir o contexto correto.
+
+        Nunca use apenas a tradução isolada para interpretar a palavra.
+
+        Se houver conflito entre tradução, descrição e categoria, priorize a descrição.
+
+        =================================================
+        REGRAS DE COESÃO
+        =================================================
+
+        Todos os exercícios devem parecer parte de situações reais do cotidiano.
+
+        Crie contextos como:
+
+        - alguém usando o objeto
+        - alguém procurando o objeto
+        - alguém comprando ou substituindo o objeto
+        - alguém organizando um ambiente onde o objeto aparece
+        - alguém resolvendo um problema cotidiano relacionado ao objeto
+
+        Não crie perguntas genéricas como:
+
+        - What is the primary function of...
+        - What does ... mean?
+        - Which word means...
+        - Choose the correct translation.
+        - Translate the word...
+        - What is the correct word for...
+
+        Não use contextos incompatíveis com a categoria.
+
+        Não misture objetos de categorias aleatórias apenas para preencher alternativas.
+
+        Não repita o mesmo cenário em vários exercícios.
+
         =================================================
         QUANTIDADE OBRIGATÓRIA
         =================================================
-        
-        A sessão DEVE possuir exatamente:
-        
-        10 exercícios escritos
-        
-        5 exercícios de pronúncia
-        
-        Total:
-        
-        15 exercícios
-        
-        Se o total for diferente de 15:
-        
-        REFAÇA A GERAÇÃO.
-        
-        =================================================
-        EXERCÍCIOS ESCRITOS
-        =================================================
-        
-        Gerar exatamente:
-        
+
+        Gere exatamente 15 exercícios:
+
+        - 10 writtenExercises
+        - 5 speakingExercises
+
+        Em writtenExercises, gere exatamente:
+
         - 3 FILL_IN
         - 2 TRANSLATE
         - 3 MULTIPLE_CHOICE
         - 2 REWRITE
-        
-        Total obrigatório:
-        
-        10 exercícios escritos.
-        
+
+        =================================================
+        CAMPOS DE writtenExercises
+        =================================================
+
+        Cada exercício escrito deve conter exatamente estes campos:
+
+        - title
+        - instruction
+        - prompt
+        - correctAnswer
+        - options
+        - subType
+
+        subType deve ser um destes valores:
+
+        - FILL_IN
+        - TRANSLATE
+        - MULTIPLE_CHOICE
+        - REWRITE
+
         =================================================
         FILL_IN
         =================================================
-        
-        Regras:
-        
-        - A palavra estudada deve ser a resposta correta.
-        - Substituir por _____.
-        - Contexto suficiente para inferência.
-        - Frase natural.
-        - A frase deve sempre ser em %s, porque a resposta é em %s
-        
-        Exemplo:
-        
-        "The developer replaced his _____ before the tournament."
-        
+
+        O prompt deve ser uma frase natural em %6$s com uma lacuna _____.
+
+        A lacuna deve substituir a palavra:
+        %2$s
+
+        correctAnswer deve ser exatamente:
+        %2$s
+
+        options deve ser [].
+
+        O contexto deve permitir inferir a palavra sem perguntar sua definição.
+
+        Bom exemplo para keyboard:
+        "The developer cleaned the _____ before starting work."
+
+        Exemplo ruim:
+        "A _____ is used for typing."
+
         =================================================
         TRANSLATE
         =================================================
-        
-        IMPORTANTE:
-        
-        O texto apresentado ao aluno deve estar em:
-        
-        %s
-        
-        A resposta esperada deve estar em:
-        
-        %s
-        
-        A frase obrigatoriamente deve conter a palavra estudada.
-        
+
+        O prompt deve ser uma frase curta, natural e cotidiana em %5$s.
+
+        A frase deve conter a palavra no idioma de origem:
+        %1$s
+
+        correctAnswer deve ser uma frase equivalente em %6$s contendo:
+        %2$s
+
+        options deve ser [].
+
+        Não peça tradução de palavra solta.
+
         =================================================
-        MULTIPLE CHOICE
+        MULTIPLE_CHOICE
         =================================================
-        
-        Obrigatório:
-        
-        - 4 alternativas
-        - 1 correta
-        - 3 distratores plausíveis
-        
-        Distratores devem pertencer ao mesmo domínio semântico.
-        
-        Exemplo:
-        
-        keyboard
-        mouse
-        monitor
-        printer
-        
-        Exemplo proibido:
-        
-        keyboard
-        elephant
-        pizza
-        mountain
-        
+
+        O prompt deve ser uma situação prática em %6$s.
+
+        A pergunta deve fazer o usuário escolher o objeto ou palavra que melhor resolve aquela situação.
+
+        Nunca faça pergunta de definição.
+
+        options deve conter exatamente 4 itens.
+
+        Uma opção deve ser exatamente:
+        %2$s
+
+        As outras 3 opções devem ser plausíveis no mesmo ambiente ou categoria, mas incorretas para a situação.
+
+        correctAnswer deve ser exatamente:
+        %2$s
+
+        Bom exemplo para keyboard:
+        "The intern needs to type a long report on the office computer. Which item should she use?"
+
+        Exemplo ruim:
+        "What is the primary function of a keyboard?"
+
         =================================================
         REWRITE
         =================================================
-        
-        ERRO CRÍTICO A EVITAR
-        
-        A frase original NÃO pode conter a palavra estudada.
-        
-        NUNCA.
-        
-        ERRADO:
-        
-        "The developer cleaned his keyboard."
-        
-        CORRETO:
-        
-        "The developer cleaned his input device."
-        
-        Objetivo:
-        
-        O aluno deve reescrever usando a palavra estudada.
-        
+
+        O prompt deve ser uma frase em %6$s que descreva a palavra sem usar:
+        %2$s
+
+        correctAnswer deve reescrever a frase usando:
+        %2$s
+
+        options deve ser [].
+
+        Bom exemplo para keyboard:
+        "The designer replaced the input device used for typing."
+
+        Exemplo ruim:
+        "The designer replaced the keyboard."
+
         =================================================
-        EXERCÍCIOS DE PRONÚNCIA
+        CAMPOS DE speakingExercises
         =================================================
-        
-        Gerar exatamente:
-        
-        5 exercícios.
-        
-        IMPORTANTE:
-        
-        O aluno NÃO responde perguntas.
-        
-        O aluno NÃO descreve situações.
-        
-        O aluno NÃO cria frases.
-        
-        O aluno NÃO explica nada.
-        
-        O aluno apenas lê a frase exibida.
-        
-        Portanto:
-        
-        Cada exercício deve conter:
-        
-        title
-        phrase
-        difficulty
-        requiredWords
-        
-        Não utilizar:
-        
-        - open questions
-        - discussions
-        - explanations
-        - descriptions
-        - roleplay
-        
+
+        Cada exercício de fala deve conter exatamente estes campos:
+
+        - title
+        - instruction
+        - prompt
+        - requiredWords
+
+        O usuário apenas lê a frase em voz alta.
+
+        Não crie pergunta aberta.
+
+        Não peça opinião.
+
+        Não peça explicação.
+
+        Não peça conversa, roleplay ou descrição livre.
+
+        prompt deve ser uma frase natural em %6$s com 6 a 18 palavras.
+
+        prompt deve conter literalmente:
+        %2$s
+
+        requiredWords deve ter entre 3 e 8 palavras importantes presentes no prompt.
+
+        requiredWords deve incluir:
+        %2$s
+
         =================================================
-        FRASES DE PRONÚNCIA
+        QUALIDADE DOS TÍTULOS E INSTRUÇÕES
         =================================================
-        
-        Obrigatório:
-        
-        - entre 6 e 20 palavras
-        - linguagem natural
-        - contexto real
-        - conter a palavra estudada explicitamente
-        
-        A palavra estudada deve aparecer literalmente na frase.
-        
-        Exemplo:
-        
-        "The programmer bought a new keyboard for his home office."
-        
-        =================================================
-        REQUIRED WORDS
-        =================================================
-        
-        Regras obrigatórias:
-        
-        - entre 3 e 8 palavras
-        - deve conter a palavra estudada
-        - deve conter palavras relevantes da frase
-        - deve permitir validação de leitura
-        
-        PROIBIDO:
-        
-        ["keyboard"]
-        
-        CORRETO:
-        
-        [
-          "programmer",
-          "new",
-          "keyboard",
-          "office"
-        ]
-        
-        =================================================
-        QUALIDADE DOS TÍTULOS
-        =================================================
-        
-        Proibido:
-        
+
+        Os títulos devem ser específicos e diferentes entre si.
+
+        Não use:
+
         - Exercise 1
         - Exercise 2
         - Fill In
         - Translate
         - Speaking Exercise
-        
-        Obrigatório:
-        
-        Títulos específicos e contextuais.
-        
-        Exemplos:
-        
-        - Upgrading the Workstation
-        - Preparing for the Hackathon
-        - Choosing Office Equipment
-        - Remote Team Setup
-        
-        =================================================
-        PROGRESSÃO DE DIFICULDADE
-        =================================================
-        
-        Distribuição obrigatória:
-        
-        Exercícios 1-5:
-        EASY
-        
-        Exercícios 6-10:
-        MEDIUM
-        
-        Exercícios 11-15:
-        HARD
-        
+        - Choosing the Right Equipment repetidamente
+
+        As instruções devem ser curtas e adequadas ao tipo do exercício.
+
+        Bons títulos para uma palavra de tecnologia:
+
+        - Setting Up the Desk
+        - Replacing Office Gear
+        - Typing a Secure Password
+        - Cleaning the Workstation
+        - Preparing a Study Space
+
         =================================================
         AUTOVERIFICAÇÃO OBRIGATÓRIA
         =================================================
-        
-        Antes de responder valide:
-        
-        ✓ 15 exercícios
-        
-        ✓ 10 escritos
-        
-        ✓ 5 pronúncia
-        
-        ✓ 3 FILL_IN
-        
-        ✓ 2 TRANSLATE
-        
-        ✓ 3 MULTIPLE_CHOICE
-        
-        ✓ 2 REWRITE
-        
-        ✓ Nenhum REWRITE contém a palavra estudada
-        
-        ✓ Nenhum speaking é pergunta aberta
-        
-        ✓ Todas as frases de speaking contêm a palavra estudada
-        
-        ✓ Todos requiredWords possuem entre 3 e 8 palavras
-        
-        ✓ Todos requiredWords contêm a palavra estudada
-        
-        ✓ Todos os títulos são únicos
-        
-        ✓ Todas as frases são únicas
-        
-        ✓ Categoria respeitada
-        
-        ✓ Descrição respeitada
-        
-        ✓ Contextos coerentes
-        
-        Se qualquer item falhar:
-        
-        CORRIJA ANTES DE RESPONDER.
-        
+
+        Antes de responder, valide internamente:
+
+        - Existem exatamente 15 exercícios.
+        - Existem exatamente 10 writtenExercises.
+        - Existem exatamente 5 speakingExercises.
+        - Existem exatamente 3 FILL_IN.
+        - Existem exatamente 2 TRANSLATE.
+        - Existem exatamente 3 MULTIPLE_CHOICE.
+        - Existem exatamente 2 REWRITE.
+        - Nenhum MULTIPLE_CHOICE é pergunta de definição.
+        - Nenhum exercício pede apenas tradução de palavra solta.
+        - Todo FILL_IN usa _____.
+        - Todo REWRITE evita a palavra estudada no prompt.
+        - Todo speaking prompt contém a palavra estudada.
+        - Todo requiredWords contém a palavra estudada.
+        - Todo MULTIPLE_CHOICE possui exatamente 4 opções.
+        - Todos os títulos são únicos.
+        - Todos os prompts são únicos.
+        - Todos os contextos respeitam descrição e categoria.
+
+        Se qualquer regra falhar, corrija antes de responder.
+
         =================================================
         SAÍDA
         =================================================
-        
-        Retorne SOMENTE JSON válido.
-        
+
+        Retorne somente JSON válido.
+
         Não utilize markdown.
-        
+
         Não utilize explicações.
-        
+
         Não utilize comentários.
-        
+
         Não escreva nada antes do JSON.
-        
+
         Não escreva nada depois do JSON.
-                
-        TODOS os campos precisam estar fechados por aspas duplas
-        
-        Example:
-        {
-          "writtenExercises": [],
-          "speakingExercises": []
-        }
-        
-        %s
+
+        Use exatamente este formato de saída:
+
+        %7$s
         """.formatted(
                 original,
                 translated,
                 description,
                 category,
-                toLanguage,
-                toLanguage,
                 fromLanguage,
                 toLanguage,
                 outputFormat

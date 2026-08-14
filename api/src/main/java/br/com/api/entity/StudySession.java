@@ -47,6 +47,7 @@ public class StudySession {
 
     @OneToMany(mappedBy = "session", cascade = CascadeType.ALL)
     @BatchSize(size = 10)
+    @OrderBy("orderIndex ASC")
     private List<Exercise> exercises;
 
     @CreationTimestamp

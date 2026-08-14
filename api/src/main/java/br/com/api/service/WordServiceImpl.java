@@ -55,7 +55,10 @@ public class WordServiceImpl implements WordService {
         Category existingCategory = categoryRepository.findById(request.categoryId())
                 .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
 
-        Optional<Word> existingWord = repository.findByOriginalAndTranslatedAndCategory(request.original(), request.translated(), existingCategory);
+        String original = request.original().toLowerCase().trim();
+        String translated = request.translated().toLowerCase().trim();
+
+        Optional<Word> existingWord = repository.findByOriginalAndTranslatedAndCategory(original, translated, existingCategory);
 
         if(existingWord.isPresent()){
 
@@ -90,7 +93,7 @@ public class WordServiceImpl implements WordService {
 
         Word newWord = repository.save(WordMapper.toWord(
                 request,
-                aiService.generateDescription(request.original(), request.translated(), existingCategory.getName(), fromLanguage.getName()),
+                aiService.generateDescription(original, translated, existingCategory.getName(), fromLanguage.getName()),
                 fromLanguage,
                 toLanguage,
                 existingCategory

@@ -3,10 +3,9 @@ package br.com.api.dto.response;
 import lombok.Builder;
 
 @Builder
-public record WrittenExerciseCheckResponse(
+public record SpeakingExerciseCheckResponse(
 
         Long id,
-        boolean correct,
-        String correctAnswer
+        boolean correct
 
 ) implements ExerciseCheckResponse {}

@@ -1,5 +1,8 @@
 package br.com.api.controller;
 
+import br.com.api.dto.request.ExerciseCheckRequest;
+import br.com.api.dto.response.ExerciseCheckResponse;
+import br.com.api.dto.response.ExerciseResponse;
 import br.com.api.dto.response.StudySessionResponse;
 import br.com.api.service.StudySessionService;
 import lombok.AllArgsConstructor;
@@ -27,8 +30,20 @@ public class StudySessionControllerImpl implements StudySessionController{
     }
 
     @Override
-    @PatchMapping("/finish/{id}")
-    public ResponseEntity<StudySessionResponse> finishSession(@PathVariable Long id) {
-        return ResponseEntity.ok(service.finishSession(id));
+    @GetMapping("/{id}/current-exercise")
+    public ResponseEntity<ExerciseResponse> currentExercise(@PathVariable Long id){
+        return ResponseEntity.ok(service.currentExercise(id));
+    }
+
+    @Override
+    @PostMapping("/{id}/exercises/{exerciseId}/answer")
+    public ResponseEntity<ExerciseCheckResponse> finishExercise(@PathVariable Long id, @PathVariable Long exerciseId, @RequestBody ExerciseCheckRequest request){
+        return ResponseEntity.ok(service.finishExercise(id, exerciseId, request));
+    }
+
+    @Override
+    @PatchMapping("/finish/{id}/{userId}")
+    public ResponseEntity<StudySessionResponse> finishSession(@PathVariable Long id, @PathVariable Long userId) {
+        return ResponseEntity.ok(service.finishSession(id, userId));
     }
 }

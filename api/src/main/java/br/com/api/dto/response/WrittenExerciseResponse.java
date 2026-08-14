@@ -1,5 +1,6 @@
 package br.com.api.dto.response;
 
+import br.com.api.domain.ExerciseCorrect;
 import br.com.api.domain.WrittenType;
 import lombok.Builder;
 
@@ -13,6 +14,8 @@ public record WrittenExerciseResponse(
         String title,
         String instruction,
         String prompt,
+        boolean completed,
+        ExerciseCorrect correct,
         WrittenType subType,
         LanguageResponse language,
         WordResponse word,

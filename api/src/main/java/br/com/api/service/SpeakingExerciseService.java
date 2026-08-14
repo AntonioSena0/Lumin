@@ -9,6 +9,6 @@ import java.util.List;
 
 public interface SpeakingExerciseService {
 
-    List<SpeakingExercise> saveAllSpeakingExercises(List<SpeakingExerciseAiResponse> exercises, Language language, Word word);
+    List<SpeakingExercise> createAllSpeakingExercises(List<SpeakingExerciseAiResponse> exercises, Language language, Word word);
 
 }

@@ -1,5 +1,6 @@
 package br.com.api.mapper;
 
+import br.com.api.dto.response.SpeakingExerciseCheckResponse;
 import br.com.api.dto.response.SpeakingExerciseResponse;
 import br.com.api.entity.SpeakingExercise;
 import lombok.experimental.UtilityClass;
@@ -14,10 +15,22 @@ public class SpeakingExerciseMapper {
                 .id(speakingExercise.getId())
                 .title(speakingExercise.getTitle())
                 .prompt(speakingExercise.getPrompt())
+                .completed(speakingExercise.isCompleted())
+                .correct(speakingExercise.getCorrect())
                 .language(LanguageMapper.toLanguageResponse(speakingExercise.getLanguage()))
                 .word(WordMapper.toWordResponse(speakingExercise.getWord()))
                 .requiredWords(speakingExercise.getRequiredWords())
                 .createdAt(speakingExercise.getCreatedAt())
+                .build();
+
+    }
+
+    public SpeakingExerciseCheckResponse toSpeakingExerciseCheckResponse(SpeakingExercise speakingExercise, boolean correct){
+
+        return SpeakingExerciseCheckResponse
+                .builder()
+                .id(speakingExercise.getId())
+                .correct(correct)
                 .build();
 
     }

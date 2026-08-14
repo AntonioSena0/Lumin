@@ -12,9 +12,10 @@ public record StudySessionResponse(
         Long id,
         Integer totalExercises,
         Integer score,
+        Integer currentIndex,
         SessionStatus status,
         LocalDateTime finishedAt,
-        Long userId,
+        UserResponse user,
         List<ExerciseResponse> exercises,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
