@@ -35,6 +35,7 @@ public class StudySessionServiceImpl implements StudySessionService{
     private final WordRepository wordRepository;
     private final WrittenExerciseService writtenExerciseService;
     private final SpeakingExerciseService speakingExerciseService;
+    private final UserLanguageProgressService userLanguageProgressService;
     private final ExerciseGenerationValidator validator;
     private final ExerciseGenerationNormalizer normalizer;
 
@@ -47,8 +48,8 @@ public class StudySessionServiceImpl implements StudySessionService{
             try{
                 StudySessionAiResponse response = aiService.generateStudySession(
                         word,
-                        user.getNativeLanguage().getName(),
-                        user.getChosenLanguage().getName()
+                        word.getFromLanguage().getName(),
+                        word.getToLanguage().getName()
                 );
 
                 validator.validateBaseResponse(response);
@@ -83,8 +84,8 @@ public class StudySessionServiceImpl implements StudySessionService{
 
         StudySessionAiResponse aiResponse = generateValidStudySession(existingWord, existingUser);
 
-        List<WrittenExercise> writtenExercises = writtenExerciseService.createAllWrittenExercises(aiResponse.writtenExercises(), existingUser.getChosenLanguage(), existingWord);
-        List<SpeakingExercise> speakingExercises = speakingExerciseService.createAllSpeakingExercises(aiResponse.speakingExercises(), existingUser.getChosenLanguage(), existingWord);
+        List<WrittenExercise> writtenExercises = writtenExerciseService.createAllWrittenExercises(aiResponse.writtenExercises(), existingWord.getToLanguage(), existingWord);
+        List<SpeakingExercise> speakingExercises = speakingExerciseService.createAllSpeakingExercises(aiResponse.speakingExercises(), existingWord.getToLanguage(), existingWord);
 
         List<Exercise> exercises = new ArrayList<>();
 
@@ -180,6 +181,14 @@ public class StudySessionServiceImpl implements StudySessionService{
         if(session.getCurrentIndex() < session.getTotalExercises()){
             throw new RuntimeException("Sessão de estudo não pode ser finalizada");
         }
+
+        if (session.getExercises().isEmpty()) {
+            throw new RuntimeException("Sessão sem exercícios");
+        }
+
+        Word sessionWord = session.getExercises().getFirst().getWord();
+
+        userLanguageProgressService.registerFinishedSession(session.getUser(), sessionWord.getToLanguage(), session.getScore(), session.getTotalExercises());
 
         session.setStatus(SessionStatus.FINISHED);
         session.setFinishedAt(LocalDateTime.now());

@@ -1,6 +1,5 @@
 package br.com.api.service;
 
-import br.com.api.domain.WordDomainLevel;
 import br.com.api.dto.request.WordRequest;
 import br.com.api.dto.response.WordResponse;
 import br.com.api.entity.*;
