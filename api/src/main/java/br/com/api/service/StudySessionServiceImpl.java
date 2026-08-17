@@ -36,6 +36,7 @@ public class StudySessionServiceImpl implements StudySessionService{
     private final WrittenExerciseService writtenExerciseService;
     private final SpeakingExerciseService speakingExerciseService;
     private final UserLanguageProgressService userLanguageProgressService;
+    private final UserWordProgressService userWordProgressService;
     private final ExerciseGenerationValidator validator;
     private final ExerciseGenerationNormalizer normalizer;
 
@@ -148,6 +149,9 @@ public class StudySessionServiceImpl implements StudySessionService{
         }
 
         boolean correct = exercise.checkAnswer(request.answer());
+
+        userWordProgressService.registerAnswer(studySession.getUser(), exercise.getWord(), correct);
+
         studySession.setCurrentIndex(studySession.getCurrentIndex() + 1);
         exercise.setCompleted(true);
 
