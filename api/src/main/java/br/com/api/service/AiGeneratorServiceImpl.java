@@ -1,5 +1,6 @@
 package br.com.api.service;
 
+import br.com.api.domain.UserLanguageLevel;
 import br.com.api.dto.response.StudySessionAiResponse;
 import br.com.api.entity.Word;
 import org.springframework.ai.chat.client.ChatClient;
@@ -92,7 +93,7 @@ public class AiGeneratorServiceImpl implements AiGeneratorService{
     }
 
     @Override
-    public StudySessionAiResponse generateStudySession(Word word, String fromLanguage, String toLanguage){
+    public StudySessionAiResponse generateStudySession(Word word, String fromLanguage, String toLanguage, UserLanguageLevel level){
 
         var conversor = new BeanOutputConverter<>(StudySessionAiResponse.class);
 
@@ -103,6 +104,7 @@ public class AiGeneratorServiceImpl implements AiGeneratorService{
                 word.getCategory().getName(),
                 fromLanguage,
                 toLanguage,
+                level,
                 conversor.getFormat()
         );
 
@@ -122,20 +124,20 @@ public class AiGeneratorServiceImpl implements AiGeneratorService{
 
     }
 
-    private String buildStudySessionPrompt(String original, String translated, String description, String category, String fromLanguage, String toLanguage, String outputFormat) {
+    private String buildStudySessionPrompt(String original, String translated, String description, String category, String fromLanguage, String toLanguage, UserLanguageLevel level, String outputFormat) {
 
         return """
         =================================================
         OBJETIVO DA SESSÃO
         =================================================
 
-        Você é um designer pedagógico especializado em aprendizado de vocabulário por contexto visual.
+        Você é um designer pedagógico do aplicativo Lumin, especializado em aprendizado de vocabulário por contexto visual.
 
-        Crie uma sessão curta, natural e coesa para um usuário que acabou de identificar um objeto real pela câmera do aplicativo Lumin.
+        Crie uma sessão curta, natural, coesa e variada para um usuário que acabou de identificar um objeto real pela câmera.
 
         A sessão deve reforçar a associação entre o objeto visto, a palavra no idioma de estudo e situações reais de uso.
 
-        Evite exercícios genéricos de dicionário. O usuário não deve sentir que está respondendo uma definição escolar.
+        O usuário deve sentir que está praticando algo que poderia acontecer no cotidiano, não respondendo um questionário de dicionário.
 
         =================================================
         DADOS DA PALAVRA
@@ -171,6 +173,10 @@ public class AiGeneratorServiceImpl implements AiGeneratorService{
 
         Todos os exercícios devem parecer parte de situações reais do cotidiano.
 
+        Cada exercício deve usar um cenário, uma ação principal e uma construção de frase diferentes.
+
+        Não repita o mesmo lugar, personagem, problema, título ou estrutura de prompt.
+
         Crie contextos como:
 
         - alguém usando o objeto
@@ -178,6 +184,11 @@ public class AiGeneratorServiceImpl implements AiGeneratorService{
         - alguém comprando ou substituindo o objeto
         - alguém organizando um ambiente onde o objeto aparece
         - alguém resolvendo um problema cotidiano relacionado ao objeto
+        - alguém preparando uma tarefa
+        - alguém limpando, guardando ou carregando o objeto
+        - alguém escolhendo o item correto em uma situação prática
+
+        Escolha apenas contextos compatíveis com a descrição e a categoria da palavra.
 
         Não crie perguntas genéricas como:
 
@@ -194,6 +205,8 @@ public class AiGeneratorServiceImpl implements AiGeneratorService{
 
         Não repita o mesmo cenário em vários exercícios.
 
+        Priorize variedade. Se dois exercícios parecerem versões pequenas um do outro, reescreva um deles com outro cenário.
+
         =================================================
         QUANTIDADE OBRIGATÓRIA
         =================================================
@@ -209,6 +222,43 @@ public class AiGeneratorServiceImpl implements AiGeneratorService{
         - 2 TRANSLATE
         - 3 MULTIPLE_CHOICE
         - 2 REWRITE
+
+        =================================================
+        NÍVEL DO USUÁRIO
+        =================================================
+        
+        Nível atual no idioma de estudo:
+        %7$s
+        
+        Adapte a dificuldade de todos os exercícios ao nível %7$s.
+        
+        Regras por nível:
+        
+        N1:
+        - Use frases curtas.
+        - Use vocabulário simples e direto.
+        - Use situações óbvias do cotidiano.
+        - Evite frases longas.
+        - Evite expressões idiomáticas.
+        - Evite phrasal verbs.
+        - Evite estruturas com muitas orações.
+        - O usuário deve conseguir entender o contexto com pouca inferência.
+        
+        N2:
+        - Use frases de tamanho médio.
+        - Use contexto cotidiano com inferência leve.
+        - Use vocabulário comum, mas menos óbvio que N1.
+        - Pode usar conectores simples.
+        - Pode variar mais os cenários.
+        - Evite linguagem muito técnica ou abstrata.
+        
+        N3:
+        - Use frases mais naturais e completas.
+        - Use contexto com mais nuance.
+        - Pode usar vocabulário mais específico da categoria.
+        - Pode usar reformulações mais exigentes.
+        - Pode usar frases maiores em TRANSLATE e REWRITE.
+        - Ainda mantenha o exercício claro e útil.
 
         =================================================
         CAMPOS DE writtenExercises
@@ -233,6 +283,18 @@ public class AiGeneratorServiceImpl implements AiGeneratorService{
         =================================================
         FILL_IN
         =================================================
+       
+        Para N1:
+        - frase com 5 a 10 palavras
+        - lacuna em contexto direto
+        
+        Para N2:
+        - frase com 8 a 15 palavras
+        - contexto cotidiano com leve inferência
+        
+        Para N3:
+        - frase com 12 a 20 palavras
+        - contexto mais natural
 
         O prompt deve ser uma frase natural em %6$s com uma lacuna _____.
 
@@ -256,6 +318,15 @@ public class AiGeneratorServiceImpl implements AiGeneratorService{
         TRANSLATE
         =================================================
 
+        Para N1:
+        - frase curta e literal
+        
+        Para N2:
+        - frase cotidiana média
+        
+        Para N3:
+        - frase mais natural, sem ser excessivamente longa
+
         O prompt deve ser uma frase curta, natural e cotidiana em %5$s.
 
         A frase deve conter a palavra no idioma de origem:
@@ -271,6 +342,16 @@ public class AiGeneratorServiceImpl implements AiGeneratorService{
         =================================================
         MULTIPLE_CHOICE
         =================================================
+        
+        Para N1:
+        - situação direta
+        - distratores claramente diferentes
+        
+        Para N2:
+        - distratores plausíveis da mesma categoria
+        
+        Para N3:
+        - distratores mais próximos, mas ainda claramente incorretos
 
         O prompt deve ser uma situação prática em %6$s.
 
@@ -297,6 +378,15 @@ public class AiGeneratorServiceImpl implements AiGeneratorService{
         =================================================
         REWRITE
         =================================================
+        
+        Para N1:
+        - reformulação simples
+        
+        Para N2:
+        - reformulação natural
+        
+        Para N3:
+        - reformulação mais completa
 
         O prompt deve ser uma frase em %6$s que descreva a palavra sem usar:
         %2$s
@@ -315,6 +405,15 @@ public class AiGeneratorServiceImpl implements AiGeneratorService{
         =================================================
         CAMPOS DE speakingExercises
         =================================================
+        
+        Para N1:
+        - 6 a 10 palavras
+        
+        Para N2:
+        - 8 a 15 palavras
+        
+        Para N3:
+        - 12 a 18 palavras
 
         Cada exercício de fala deve conter exatamente estes campos:
 
@@ -388,9 +487,13 @@ public class AiGeneratorServiceImpl implements AiGeneratorService{
         - Todo speaking prompt contém a palavra estudada.
         - Todo requiredWords contém a palavra estudada.
         - Todo MULTIPLE_CHOICE possui exatamente 4 opções.
+        - Todo MULTIPLE_CHOICE possui %2$s em options.
         - Todos os títulos são únicos.
         - Todos os prompts são únicos.
         - Todos os contextos respeitam descrição e categoria.
+        - Nenhum cenário principal se repete.
+        - Nenhum prompt é apenas uma variação superficial de outro.
+        - A dificuldade respeita o nível %7$s.
 
         Se qualquer regra falhar, corrija antes de responder.
 
@@ -412,7 +515,7 @@ public class AiGeneratorServiceImpl implements AiGeneratorService{
 
         Use exatamente este formato de saída:
 
-        %7$s
+        %8$s
         """.formatted(
                 original,
                 translated,
@@ -420,6 +523,7 @@ public class AiGeneratorServiceImpl implements AiGeneratorService{
                 category,
                 fromLanguage,
                 toLanguage,
+                level,
                 outputFormat
         );
     }

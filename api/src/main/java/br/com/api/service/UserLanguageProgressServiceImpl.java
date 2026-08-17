@@ -56,6 +56,12 @@ public class UserLanguageProgressServiceImpl implements UserLanguageProgressServ
 
     @Override
     @Transactional
+    public UserLanguageLevel getOrCreateLevel(User user, Language language){
+        return getOrCreateEntity(user, language).getLevel();
+    }
+
+    @Override
+    @Transactional
     public void registerFinishedSession(User user, Language language, Integer score, Integer totalExercises) {
 
         UserLanguageProgress userLanguageProgress = getOrCreateEntity(user, language);

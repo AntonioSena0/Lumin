@@ -50,7 +50,8 @@ public class StudySessionServiceImpl implements StudySessionService{
                 StudySessionAiResponse response = aiService.generateStudySession(
                         word,
                         word.getFromLanguage().getName(),
-                        word.getToLanguage().getName()
+                        word.getToLanguage().getName(),
+                        userLanguageProgressService.getOrCreateLevel(user, word.getToLanguage())
                 );
 
                 validator.validateBaseResponse(response);
