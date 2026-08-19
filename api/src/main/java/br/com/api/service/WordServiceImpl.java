@@ -1,8 +1,10 @@
 package br.com.api.service;
 
 import br.com.api.dto.request.WordRequest;
+import br.com.api.dto.response.UserWordListResponse;
 import br.com.api.dto.response.WordResponse;
 import br.com.api.entity.*;
+import br.com.api.mapper.UserWordMapper;
 import br.com.api.mapper.WordMapper;
 import br.com.api.repository.*;
 import lombok.AllArgsConstructor;
@@ -46,7 +48,7 @@ public class WordServiceImpl implements WordService {
 
     @Override
     @Transactional
-    public WordResponse save(WordRequest request, Long userId) {
+    public UserWordListResponse save(WordRequest request, Long userId) {
 
         User existingUser = userRepository.findByIdWithRelations(userId)
                 .orElseThrow(() -> new RuntimeException("Usuário que tentou realizar a ação não existe"));
@@ -68,10 +70,10 @@ public class WordServiceImpl implements WordService {
             if(relation.isPresent()){
                 UserWord userWord = relation.get();
                 if(userWord.isSaved()){
-                    return WordMapper.toWordResponse(userWord.getWord());
+                    return UserWordMapper.toUserWordListResponse(userWord);
                 }
                 userWord.setSaved(true);
-                return WordMapper.toWordResponse(userWord.getWord());
+                return UserWordMapper.toUserWordListResponse(userWord);
             }
 
 
@@ -83,7 +85,7 @@ public class WordServiceImpl implements WordService {
 
             userWordRepository.save(userWord);
 
-            return WordMapper.toWordResponse(word);
+            return UserWordMapper.toUserWordListResponse(userWord);
 
         }
 
@@ -106,18 +108,23 @@ public class WordServiceImpl implements WordService {
 
         userWordRepository.save(userWord);
 
-        return WordMapper.toWordResponse(newWord);
+        return UserWordMapper.toUserWordListResponse(userWord);
 
     }
 
     @Override
     @Transactional
-    public void unsave(Long wordId, Long userId) {
+    public UserWordListResponse unsave(Long wordId, Long userId) {
     
         UserWord existingUserWord = userWordRepository.findById(new UserWordId(userId, wordId))
                 .orElseThrow(() -> new RuntimeException("Tentando remover palavra que ainda não foi salva"));
 
+        if(!existingUserWord.isSaved()){
+            return UserWordMapper.toUserWordListResponse(existingUserWord);
+        }
+
         existingUserWord.setSaved(false);
 
+        return UserWordMapper.toUserWordListResponse(existingUserWord);
     }
 }

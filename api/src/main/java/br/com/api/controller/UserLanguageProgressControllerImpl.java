@@ -16,16 +16,19 @@ public class UserLanguageProgressControllerImpl implements UserLanguageProgressC
 
     private final UserLanguageProgressService service;
 
+    @Override
     @GetMapping("/{userId}/{languageId}")
     public ResponseEntity<UserLanguageProgressResponse> findById(@PathVariable Long userId, @PathVariable Integer languageId){
         return ResponseEntity.ok(service.findById(userId, languageId));
     }
 
+    @Override
     @GetMapping("/{userId}")
     public ResponseEntity<List<UserLanguageProgressResponse>> findByUserId(@PathVariable Long userId){
         return ResponseEntity.ok(service.findByUserId(userId));
     }
 
+    @Override
     @PostMapping("/{userId}/{languageId}")
     public ResponseEntity<UserLanguageProgressResponse> getOrCreate(@PathVariable Long userId, @PathVariable Integer languageId){
         return ResponseEntity.status(HttpStatus.CREATED).body(service.getOrCreate(userId, languageId));

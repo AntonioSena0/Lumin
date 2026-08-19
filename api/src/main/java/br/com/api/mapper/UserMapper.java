@@ -1,19 +1,10 @@
 package br.com.api.mapper;
 
 import br.com.api.dto.request.UserRequest;
-import br.com.api.dto.response.StudySessionResponse;
 import br.com.api.dto.response.UserResponse;
-import br.com.api.dto.request.UserUpdateRequest;
-import br.com.api.dto.response.UserWordResponse;
 import br.com.api.entity.Language;
 import br.com.api.entity.User;
-import br.com.api.entity.UserWord;
-import br.com.api.entity.Word;
 import lombok.experimental.UtilityClass;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
 
 @UtilityClass
 public class UserMapper {
@@ -27,18 +18,6 @@ public class UserMapper {
                 .password(request.password().trim())
                 .nativeLanguage(nativeLanguage)
                 .chosenLanguage(chosenLanguage)
-                .build();
-
-    }
-
-    public User toUser(UserUpdateRequest request, Language language){
-
-        return User
-                .builder()
-                .name(request.name())
-                .email(request.email())
-                .password(request.password())
-                .chosenLanguage(language)
                 .build();
 
     }

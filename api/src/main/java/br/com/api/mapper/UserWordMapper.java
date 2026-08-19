@@ -1,23 +1,40 @@
 package br.com.api.mapper;
 
-import br.com.api.dto.response.UserWordResponse;
+import br.com.api.dto.response.UserWordListResponse;
 import br.com.api.entity.UserWord;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class UserWordMapper {
 
-    public UserWordResponse toUserWordResponse(UserWord userWord){
+    public UserWordListResponse toUserWordListResponse(UserWord userWord){
 
-        return UserWordResponse
+        long correctAnswers = userWord.getCorrectAnswers();
+        long incorrectAnswers = userWord.getIncorrectAnswers();
+        long totalAnswers = correctAnswers + incorrectAnswers;
+
+        double accuracy = totalAnswers == 0
+                ? 0.0
+                : (double) correctAnswers / totalAnswers;
+
+        return UserWordListResponse
                 .builder()
-                .user(UserMapper.toUserResponse(userWord.getUser()))
-                .word(WordMapper.toWordResponse(userWord.getWord()))
-                .lastPracticed(userWord.getLastPracticed())
-                .correctAnswers(userWord.getCorrectAnswers())
-                .incorrectAnswers(userWord.getIncorrectAnswers())
+                .wordId(userWord.getWord().getId())
+                .original(userWord.getWord().getOriginal())
+                .translated(userWord.getWord().getTranslated())
+                .description(userWord.getWord().getDescription())
+                .categoryId(userWord.getWord().getCategory().getId())
+                .categoryName(userWord.getWord().getCategory().getName())
+                .fromLanguageId(userWord.getWord().getFromLanguage().getId())
+                .fromLanguageCode(userWord.getWord().getFromLanguage().getCode())
+                .toLanguageId(userWord.getWord().getToLanguage().getId())
+                .toLanguageCode(userWord.getWord().getToLanguage().getCode())
                 .isSaved(userWord.isSaved())
                 .level(userWord.getLevel())
+                .correctAnswers(userWord.getCorrectAnswers())
+                .incorrectAnswers(userWord.getIncorrectAnswers())
+                .accuracy(accuracy)
+                .lastPracticed(userWord.getLastPracticed())
                 .createdAt(userWord.getCreatedAt())
                 .build();
 

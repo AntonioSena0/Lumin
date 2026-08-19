@@ -10,9 +10,9 @@ import br.com.api.mapper.UserLanguageProgressMapper;
 import br.com.api.repository.LanguageRepository;
 import br.com.api.repository.UserLanguageProgressRepository;
 import br.com.api.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,7 +28,7 @@ public class UserLanguageProgressServiceImpl implements UserLanguageProgressServ
     @Override
     public UserLanguageProgressResponse findById(Long userId, Integer languageId) {
         return UserLanguageProgressMapper.toUserLanguageProgressResponse(repository.findById(new UserLanguageProgressId(userId, languageId))
-                .orElseThrow(() -> new RuntimeException("progresso não encontrado")));
+                .orElseThrow(() -> new RuntimeException("Progresso não encontrado")));
     }
 
     @Override

@@ -3,7 +3,6 @@ package br.com.api.repository;
 import br.com.api.entity.Category;
 import br.com.api.entity.Word;
 import jakarta.persistence.QueryHint;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.QueryHints;
