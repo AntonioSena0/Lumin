@@ -33,7 +33,7 @@ public class UserWordMapper {
                 .level(userWord.getLevel())
                 .correctAnswers(userWord.getCorrectAnswers())
                 .incorrectAnswers(userWord.getIncorrectAnswers())
-                .accuracy(accuracy)
+                .accuracy(Math.round(accuracy * 100.0) / 100.0)
                 .lastPracticed(userWord.getLastPracticed())
                 .createdAt(userWord.getCreatedAt())
                 .build();
