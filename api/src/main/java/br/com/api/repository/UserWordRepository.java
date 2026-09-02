@@ -1,5 +1,6 @@
 package br.com.api.repository;
 
+import br.com.api.domain.WordDomainLevel;
 import br.com.api.entity.UserWord;
 import br.com.api.entity.UserWordId;
 import br.com.api.repository.projection.CategoryProgressProjection;
@@ -10,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,6 +55,12 @@ public interface UserWordRepository extends JpaRepository<UserWord, UserWordId>,
     long countByUserIdAndLastPracticedIsNotNull(Long userId);
 
     long countByUserIdAndIncorrectAnswersGreaterThan(Long userId, Long incorrectAnswers);
+
+    long countByUserIdAndLevel(Long userId, WordDomainLevel level);
+
+    @Query("SELECT MAX(uw.lastPracticed) FROM UserWord uw " +
+            "WHERE uw.user.id = :userId")
+    LocalDateTime findLastPracticedByUserId(@Param("userId") Long userId);
 
     @Query("SELECT uw FROM UserWord uw " +
             "JOIN FETCH uw.word w " +
