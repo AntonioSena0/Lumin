@@ -2,6 +2,7 @@ package br.com.api.mapper;
 
 import br.com.api.dto.request.UserRequest;
 import br.com.api.dto.response.UserResponse;
+import br.com.api.entity.Avatar;
 import br.com.api.entity.Language;
 import br.com.api.entity.User;
 import lombok.experimental.UtilityClass;
@@ -9,7 +10,7 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class UserMapper {
 
-    public User toUser(UserRequest request, Language nativeLanguage, Language chosenLanguage){
+    public User toUser(UserRequest request, Language nativeLanguage, Language chosenLanguage, Avatar avatar){
 
         return User
                 .builder()
@@ -18,6 +19,7 @@ public class UserMapper {
                 .password(request.password().trim())
                 .nativeLanguage(nativeLanguage)
                 .chosenLanguage(chosenLanguage)
+                .avatar(avatar)
                 .build();
 
     }
@@ -31,6 +33,7 @@ public class UserMapper {
                 .email(user.getEmail())
                 .nativeLanguage(LanguageMapper.toLanguageResponse(user.getNativeLanguage()))
                 .chosenLanguage(LanguageMapper.toLanguageResponse(user.getChosenLanguage()))
+                .avatar(AvatarMapper.toAvatarResponse(user.getAvatar()))
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
                 .build();

@@ -1,5 +1,6 @@
 package br.com.api.controller;
 
+import br.com.api.dto.request.AvatarChangeRequest;
 import br.com.api.dto.request.UserRequest;
 import br.com.api.dto.response.UserResponse;
 import br.com.api.dto.request.UserUpdateRequest;
@@ -14,6 +15,7 @@ public interface UserController {
     ResponseEntity<UserResponse> create(UserRequest request);
     ResponseEntity<UserResponse> update(Long id, UserUpdateRequest request);
     ResponseEntity<UserResponse> parcialUpdate(Long id, UserUpdateRequest request);
+    ResponseEntity<UserResponse> changeAvatar(Long id, AvatarChangeRequest request);
     ResponseEntity<Void> delete(Long id);
 
 }

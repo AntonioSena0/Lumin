@@ -2,12 +2,10 @@ package br.com.api.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Table(name = "users", indexes = {
@@ -41,6 +39,10 @@ public class User {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "to_language_id", nullable = false)
     private Language chosenLanguage;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "avatar_id", nullable = false)
+    private Avatar avatar;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

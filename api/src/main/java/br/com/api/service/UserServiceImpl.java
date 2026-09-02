@@ -1,11 +1,14 @@
 package br.com.api.service;
 
+import br.com.api.dto.request.AvatarChangeRequest;
 import br.com.api.dto.request.UserRequest;
 import br.com.api.dto.response.UserResponse;
 import br.com.api.dto.request.UserUpdateRequest;
+import br.com.api.entity.Avatar;
 import br.com.api.entity.Language;
 import br.com.api.entity.User;
 import br.com.api.mapper.UserMapper;
+import br.com.api.repository.AvatarRepository;
 import br.com.api.repository.LanguageRepository;
 import br.com.api.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -20,6 +23,7 @@ public class UserServiceImpl implements UserService{
 
     private final UserRepository repository;
     private final LanguageRepository languageRepository;
+    private final AvatarRepository avatarRepository;
 
     @Override
     public List<UserResponse> findAll() {
@@ -57,7 +61,10 @@ public class UserServiceImpl implements UserService{
         Language chosenLanguage = languageRepository.findById(request.chosenLanguage())
                 .orElseThrow(() -> new RuntimeException("Língua escolhida para tradução não encontrada"));
 
-        return UserMapper.toUserResponse(repository.save(UserMapper.toUser(request, nativeLanguage, chosenLanguage)));
+        Avatar avatar = avatarRepository.findById(1)
+                .orElseThrow(() -> new RuntimeException("Erro ao criar usuário"));
+
+        return UserMapper.toUserResponse(repository.save(UserMapper.toUser(request, nativeLanguage, chosenLanguage, avatar)));
 
     }
 
@@ -135,6 +142,25 @@ public class UserServiceImpl implements UserService{
 
         return UserMapper.toUserResponse(existingUser);
 
+    }
+
+    @Override
+    @Transactional
+    public UserResponse changeAvatar(Long id, AvatarChangeRequest request) {
+
+        Avatar avatar = avatarRepository.findById(request.avatarId())
+                .orElseThrow(() -> new RuntimeException("Avatar não encontrado"));
+
+        User existingUser = repository.findByIdWithRelations(id)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        if(existingUser.getAvatar() == avatar){
+            return UserMapper.toUserResponse(existingUser);
+        }
+
+        existingUser.setAvatar(avatar);
+
+        return UserMapper.toUserResponse(existingUser);
     }
 
     @Override

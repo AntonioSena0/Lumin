@@ -12,6 +12,7 @@ public record UserResponse(
         String email,
         LanguageResponse nativeLanguage,
         LanguageResponse chosenLanguage,
+        AvatarResponse avatar,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 

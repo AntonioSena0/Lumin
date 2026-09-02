@@ -1,5 +1,6 @@
 package br.com.api.controller;
 
+import br.com.api.dto.request.AvatarChangeRequest;
 import br.com.api.dto.request.UserRequest;
 import br.com.api.dto.response.UserResponse;
 import br.com.api.dto.request.UserUpdateRequest;
@@ -57,6 +58,12 @@ public class UserControllerImpl implements UserController{
 
         return ResponseEntity.ok(service.parcialUpdate(id, request));
 
+    }
+
+    @Override
+    @PatchMapping("/{id}/change-avatar")
+    public ResponseEntity<UserResponse> changeAvatar(@PathVariable Long id, @RequestBody AvatarChangeRequest request) {
+        return ResponseEntity.ok(service.changeAvatar(id, request));
     }
 
     @Override
