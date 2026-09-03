@@ -31,15 +31,19 @@ public class UserWord {
     @JoinColumn(name = "word_id", nullable = false)
     private Word word;
 
+    @Builder.Default
     @Column(name = "is_saved", nullable = false)
     private boolean isSaved = false;
 
+    @Builder.Default
     @Column(name = "correct_answers", nullable = false)
     private Long correctAnswers = 0L;
 
+    @Builder.Default
     @Column(name = "incorrect_answers", nullable = false)
     private Long incorrectAnswers = 0L;
 
+    @Builder.Default
     @JdbcType(PostgreSQLEnumJdbcType.class)
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

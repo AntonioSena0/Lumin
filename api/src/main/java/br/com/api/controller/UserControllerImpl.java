@@ -62,7 +62,7 @@ public class UserControllerImpl implements UserController{
 
     @Override
     @PatchMapping("/{id}/change-avatar")
-    public ResponseEntity<UserResponse> changeAvatar(@PathVariable Long id, @RequestBody AvatarChangeRequest request) {
+    public ResponseEntity<UserResponse> changeAvatar(@PathVariable Long id, @RequestBody @Valid AvatarChangeRequest request) {
         return ResponseEntity.ok(service.changeAvatar(id, request));
     }
 

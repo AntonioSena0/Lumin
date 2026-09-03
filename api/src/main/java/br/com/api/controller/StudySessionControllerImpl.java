@@ -5,6 +5,7 @@ import br.com.api.dto.response.ExerciseCheckResponse;
 import br.com.api.dto.response.ExerciseResponse;
 import br.com.api.dto.response.StudySessionResponse;
 import br.com.api.service.StudySessionService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,7 +38,7 @@ public class StudySessionControllerImpl implements StudySessionController{
 
     @Override
     @PostMapping("/{id}/exercises/{exerciseId}/answer")
-    public ResponseEntity<ExerciseCheckResponse> finishExercise(@PathVariable Long id, @PathVariable Long exerciseId, @RequestBody ExerciseCheckRequest request){
+    public ResponseEntity<ExerciseCheckResponse> finishExercise(@PathVariable Long id, @PathVariable Long exerciseId, @RequestBody @Valid ExerciseCheckRequest request){
         return ResponseEntity.ok(service.finishExercise(id, exerciseId, request));
     }
 

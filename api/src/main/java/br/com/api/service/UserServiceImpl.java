@@ -154,7 +154,7 @@ public class UserServiceImpl implements UserService{
         User existingUser = repository.findByIdWithRelations(id)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
-        if(existingUser.getAvatar() == avatar){
+        if(existingUser.getAvatar().getId().equals(avatar.getId())){
             return UserMapper.toUserResponse(existingUser);
         }
 

@@ -37,15 +37,19 @@ public class UserLanguageProgress {
     @Column(nullable = false)
     private UserLanguageLevel level;
 
+    @Builder.Default
     @Column(nullable = false)
     private Long xp = 0L;
 
+    @Builder.Default
     @Column(name = "total_sessions", nullable = false)
     private Long totalSessions = 0L;
 
+    @Builder.Default
     @Column(name = "total_correct_answers", nullable = false)
     private Long totalCorrectAnswers = 0L;
 
+    @Builder.Default
     @Column(name = "total_incorrect_answers", nullable = false)
     private Long totalIncorrectAnswers = 0L;
 

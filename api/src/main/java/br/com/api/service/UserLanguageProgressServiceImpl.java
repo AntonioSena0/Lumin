@@ -27,13 +27,13 @@ public class UserLanguageProgressServiceImpl implements UserLanguageProgressServ
 
     @Override
     public UserLanguageProgressResponse findById(Long userId, Integer languageId) {
-        return UserLanguageProgressMapper.toUserLanguageProgressResponse(repository.findById(new UserLanguageProgressId(userId, languageId))
+        return UserLanguageProgressMapper.toUserLanguageProgressResponse(repository.findByIdWithRelations(userId, languageId)
                 .orElseThrow(() -> new RuntimeException("Progresso não encontrado")));
     }
 
     @Override
     public List<UserLanguageProgressResponse> findByUserId(Long userId) {
-        return repository.findByIdUserId(userId).stream()
+        return repository.findByIdUserIdWithRelations(userId).stream()
                 .map(UserLanguageProgressMapper::toUserLanguageProgressResponse)
                 .toList();
     }
@@ -87,7 +87,7 @@ public class UserLanguageProgressServiceImpl implements UserLanguageProgressServ
     }
 
     private UserLanguageProgress getOrCreateEntity(User user, Language language) {
-        return repository.findById(new UserLanguageProgressId(user.getId(), language.getId()))
+        return repository.findByIdWithRelations(user.getId(), language.getId())
                 .orElseGet(() -> {
                     UserLanguageProgress progress = new UserLanguageProgress();
                     progress.setId(new UserLanguageProgressId(user.getId(), language.getId()));

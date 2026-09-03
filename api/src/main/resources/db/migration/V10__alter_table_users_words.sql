@@ -1,2 +1,0 @@
-ALTER TABLE users_words ADD CONSTRAINT fk_users_words_users FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
-ALTER TABLE users_words ADD CONSTRAINT fk_users_words_words FOREIGN KEY (word_id) REFERENCES words(id) ON DELETE CASCADE;

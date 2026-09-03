@@ -11,6 +11,7 @@ public record ProfileSummaryResponse(
         Long userId,
         String userName,
         String email,
+        AvatarResponse avatar,
         LanguageResponse nativeLanguage,
         LanguageResponse chosenLanguage,
         Long savedWords,

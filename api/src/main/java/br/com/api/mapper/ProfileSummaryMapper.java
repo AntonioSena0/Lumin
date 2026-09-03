@@ -19,6 +19,7 @@ public class ProfileSummaryMapper {
                 .userId(user.getId())
                 .userName(user.getName())
                 .email(user.getEmail())
+                .avatar(AvatarMapper.toAvatarResponse(user.getAvatar()))
                 .nativeLanguage(LanguageMapper.toLanguageResponse(user.getNativeLanguage()))
                 .chosenLanguage(LanguageMapper.toLanguageResponse(user.getChosenLanguage()))
                 .savedWords(savedWords)

@@ -16,9 +16,17 @@ public interface StudySessionRepository extends JpaRepository<StudySession, Long
     @QueryHints(
             @QueryHint(name = "javax.persistence.query.timeout", value = "2000")
     )
-    @Query("SELECT ss FROM StudySession ss " +
-            "JOIN FETCH ss.user " +
-            "JOIN FETCH ss.exercises " +
+    @Query("SELECT DISTINCT ss FROM StudySession ss " +
+            "JOIN FETCH ss.user u " +
+            "JOIN FETCH u.nativeLanguage " +
+            "JOIN FETCH u.chosenLanguage " +
+            "JOIN FETCH u.avatar " +
+            "JOIN FETCH ss.exercises e " +
+            "JOIN FETCH e.language " +
+            "JOIN FETCH e.word w " +
+            "JOIN FETCH w.category " +
+            "JOIN FETCH w.fromLanguage " +
+            "JOIN FETCH w.toLanguage " +
             "WHERE ss.id = :id")
     Optional<StudySession> findByIdWithRelations(@Param("id") Long id);
 

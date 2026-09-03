@@ -16,7 +16,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT u FROM User u " +
             "JOIN FETCH u.nativeLanguage " +
-            "JOIN FETCH u.chosenLanguage ")
+            "JOIN FETCH u.chosenLanguage " +
+            "JOIN FETCH u.avatar")
     List<User> findAllWithRelations();
 
     @QueryHints(
@@ -25,6 +26,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT u FROM User u " +
             "JOIN FETCH u.nativeLanguage " +
             "JOIN FETCH u.chosenLanguage " +
+            "JOIN FETCH u.avatar " +
             "WHERE u.id = :id")
     Optional<User> findByIdWithRelations(@Param("id") Long id);
 

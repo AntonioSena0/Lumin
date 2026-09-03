@@ -1,2 +1,0 @@
-ALTER TABLE users_languages_progress ADD CONSTRAINT fk_users_languages_progress_users FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE;
-ALTER TABLE users_languages_progress ADD CONSTRAINT fk_users_languages_progress_languages FOREIGN KEY(language_id) REFERENCES languages(id);
