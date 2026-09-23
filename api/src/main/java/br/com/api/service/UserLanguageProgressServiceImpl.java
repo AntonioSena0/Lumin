@@ -98,6 +98,7 @@ public class UserLanguageProgressServiceImpl implements UserLanguageProgressServ
                     progress.setTotalSessions(0L);
                     progress.setTotalCorrectAnswers(0L);
                     progress.setTotalIncorrectAnswers(0L);
+                    progress.setPlacementTestCompleted(false);
                     return repository.save(progress);
                 });
     }

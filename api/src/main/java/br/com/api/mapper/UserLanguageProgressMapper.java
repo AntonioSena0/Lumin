@@ -17,6 +17,8 @@ public class UserLanguageProgressMapper {
                 .totalSessions(progress.getTotalSessions())
                 .totalCorrectAnswers(progress.getTotalCorrectAnswers())
                 .totalIncorrectAnswers(progress.getTotalIncorrectAnswers())
+                .placementTestCompleted(progress.isPlacementTestCompleted())
+                .placementTestCompletedAt(progress.getPlacementTestCompletedAt())
                 .lastPracticed(progress.getLastPracticed())
                 .createdAt(progress.getCreatedAt())
                 .updatedAt(progress.getUpdatedAt())

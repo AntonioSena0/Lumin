@@ -53,6 +53,13 @@ public class UserLanguageProgress {
     @Column(name = "total_incorrect_answers", nullable = false)
     private Long totalIncorrectAnswers = 0L;
 
+    @Builder.Default
+    @Column(name = "placement_test_completed", nullable = false)
+    private boolean placementTestCompleted = false;
+
+    @Column(name = "placement_test_completed_at")
+    private LocalDateTime placementTestCompletedAt;
+
     @Column(name = "last_practiced")
     private LocalDateTime lastPracticed;
 

@@ -15,6 +15,8 @@ public record UserLanguageProgressResponse(
         Long totalSessions,
         Long totalCorrectAnswers,
         Long totalIncorrectAnswers,
+        boolean placementTestCompleted,
+        LocalDateTime placementTestCompletedAt,
         LocalDateTime lastPracticed,
         LocalDateTime createdAt,
         LocalDateTime updatedAt

@@ -8,6 +8,8 @@ CREATE TABLE users_languages_progress(
     total_sessions BIGINT NOT NULL DEFAULT 0,
     total_correct_answers BIGINT NOT NULL DEFAULT 0,
     total_incorrect_answers BIGINT NOT NULL DEFAULT 0,
+    placement_test_completed BOOLEAN NOT NULL DEFAULT false,
+    placement_test_completed_at timestamp,
     last_practiced timestamp,
     created_at timestamp,
     updated_at timestamp,
