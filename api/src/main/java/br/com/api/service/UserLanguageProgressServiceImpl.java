@@ -66,28 +66,16 @@ public class UserLanguageProgressServiceImpl implements UserLanguageProgressServ
 
         UserLanguageProgress userLanguageProgress = getOrCreateEntity(user, language);
 
-        userLanguageProgress.setTotalCorrectAnswers(userLanguageProgress.getTotalCorrectAnswers() + score);
-        userLanguageProgress.setTotalIncorrectAnswers(userLanguageProgress.getTotalIncorrectAnswers() + (totalExercises - score));
+        Long gain = score * 10L + 20L;
+        long newXp = userLanguageProgress.getXp() + gain;
+        UserLanguageLevel newLevel = UserLanguageProgress.levelFor(newXp, userLanguageProgress.getLevel());
 
-        Long earnedXp = score * 10L + 20L;
-
-        userLanguageProgress.setXp(userLanguageProgress.getXp() + earnedXp);
-        userLanguageProgress.setTotalSessions(userLanguageProgress.getTotalSessions() + 1);
-
-        if(userLanguageProgress.getXp() >= 1000 && userLanguageProgress.getLevel() == UserLanguageLevel.N1){
-            userLanguageProgress.setLevel(UserLanguageLevel.N2);
-        }
-
-        if(userLanguageProgress.getXp() >= 3000 && userLanguageProgress.getLevel() == UserLanguageLevel.N2){
-            userLanguageProgress.setLevel(UserLanguageLevel.N3);
-        }
-
-        userLanguageProgress.setLastPracticed(LocalDateTime.now());
+        repository.updateProgress(gain, score, totalExercises, newLevel,  user.getId(), language.getId());
 
     }
 
     private UserLanguageProgress getOrCreateEntity(User user, Language language) {
-        return repository.findByIdWithRelations(user.getId(), language.getId())
+        return repository.findById(new UserLanguageProgressId(user.getId(), language.getId()))
                 .orElseGet(() -> {
                     UserLanguageProgress progress = new UserLanguageProgress();
                     progress.setId(new UserLanguageProgressId(user.getId(), language.getId()));

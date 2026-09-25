@@ -71,4 +71,9 @@ public class UserLanguageProgress {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    public static UserLanguageLevel levelFor(long newXp, UserLanguageLevel current) {
+        UserLanguageLevel byXp = newXp >= 3000 ? UserLanguageLevel.N3 : newXp >= 1000 ? UserLanguageLevel.N2 : UserLanguageLevel.N1;
+        return byXp.ordinal() > current.ordinal() ? byXp : current;
+    }
+
 }

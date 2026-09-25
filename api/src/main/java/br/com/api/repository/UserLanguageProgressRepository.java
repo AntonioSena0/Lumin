@@ -1,8 +1,10 @@
 package br.com.api.repository;
 
+import br.com.api.domain.UserLanguageLevel;
 import br.com.api.entity.UserLanguageProgress;
 import br.com.api.entity.UserLanguageProgressId;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -31,4 +33,9 @@ public interface UserLanguageProgressRepository extends JpaRepository<UserLangua
             "WHERE ulp.id.userId = :userId " +
             "AND ulp.id.languageId = :languageId")
     Optional<UserLanguageProgress> findByIdWithRelations(@Param("userId") Long userId, @Param("languageId") Integer languageId);
+
+    @Modifying(clearAutomatically = true)
+    @Query("UPDATE UserLanguageProgress ulp SET ulp.xp = ulp.xp + :gain, ulp.totalCorrectAnswers = ulp.totalCorrectAnswers + :score, ulp.totalIncorrectAnswers = ulp.totalIncorrectAnswers + (:total - :score), ulp.level = :newLevel, ulp.totalSessions = ulp.totalSessions + 1, ulp.updatedAt = CURRENT_TIMESTAMP, ulp.lastPracticed = CURRENT_TIMESTAMP WHERE ulp.id.userId = :userId AND ulp.id.languageId = :languageId")
+    void updateProgress(@Param("gain") Long gain, @Param("score") Integer score, @Param("total") Integer total,  @Param("newLevel")UserLanguageLevel newLevel, @Param("userId") Long userId, @Param("languageId") Integer languageId);
+
 }
