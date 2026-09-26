@@ -1,15 +1,18 @@
 package br.com.api.service;
 
+import br.com.api.domain.VoiceType;
 import br.com.api.dto.request.AvatarChangeRequest;
 import br.com.api.dto.request.UserRequest;
 import br.com.api.dto.response.UserResponse;
 import br.com.api.dto.request.UserUpdateRequest;
 import br.com.api.entity.Avatar;
 import br.com.api.entity.Language;
+import br.com.api.entity.Setting;
 import br.com.api.entity.User;
 import br.com.api.mapper.UserMapper;
 import br.com.api.repository.AvatarRepository;
 import br.com.api.repository.LanguageRepository;
+import br.com.api.repository.SettingRepository;
 import br.com.api.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +27,7 @@ public class UserServiceImpl implements UserService{
     private final UserRepository repository;
     private final LanguageRepository languageRepository;
     private final AvatarRepository avatarRepository;
+    private final SettingRepository settingRepository;
 
     @Override
     public List<UserResponse> findAll() {
@@ -64,7 +68,18 @@ public class UserServiceImpl implements UserService{
         Avatar avatar = avatarRepository.findById(1)
                 .orElseThrow(() -> new RuntimeException("Erro ao criar usuário"));
 
-        return UserMapper.toUserResponse(repository.save(UserMapper.toUser(request, nativeLanguage, chosenLanguage, avatar)));
+        User savedUser = repository.save(UserMapper.toUser(request, nativeLanguage, chosenLanguage, avatar));
+
+        settingRepository.save(Setting
+            .builder()
+            .user(savedUser)
+            .appLanguage(nativeLanguage)
+            .notifyDaily(true)
+            .notifyReview(true)
+            .voice(VoiceType.FEMALE)
+            .build());
+
+        return UserMapper.toUserResponse(savedUser);
 
     }
 
