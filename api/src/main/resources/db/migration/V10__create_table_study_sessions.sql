@@ -10,5 +10,5 @@ CREATE TABLE study_sessions(
     user_id BIGINT NOT NULL,
     created_at timestamp,
     updated_at timestamp,
-    CONSTRAINT fk_users_study_sessions FOREIGN KEY (user_id) REFERENCES users(id)
+    CONSTRAINT fk_users_study_sessions FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
