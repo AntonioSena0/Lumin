@@ -93,7 +93,7 @@ public class AiGeneratorServiceImpl implements AiGeneratorService{
     }
 
     @Override
-    public StudySessionAiResponse generateStudySession(Word word, String fromLanguage, String toLanguage, UserLanguageLevel level){
+    public StudySessionAiResponse generateStudySession(Word word, String fromLanguage, String toLanguage, UserLanguageLevel level, String weakContext){
 
         var conversor = new BeanOutputConverter<>(StudySessionAiResponse.class);
 
@@ -105,6 +105,7 @@ public class AiGeneratorServiceImpl implements AiGeneratorService{
                 fromLanguage,
                 toLanguage,
                 level,
+                weakContext,
                 conversor.getFormat()
         );
 
@@ -124,7 +125,7 @@ public class AiGeneratorServiceImpl implements AiGeneratorService{
 
     }
 
-    private String buildStudySessionPrompt(String original, String translated, String description, String category, String fromLanguage, String toLanguage, UserLanguageLevel level, String outputFormat) {
+    private String buildStudySessionPrompt(String original, String translated, String description, String category, String fromLanguage, String toLanguage, UserLanguageLevel level, String weakContext, String outputFormat) {
 
         return """
         =================================================
@@ -468,6 +469,17 @@ public class AiGeneratorServiceImpl implements AiGeneratorService{
         - Preparing a Study Space
 
         =================================================
+        REVISÃO ESPAÇADA (opcional)
+        =================================================
+        
+        Palavras fracas recentes do usuário:
+        %8$s
+        
+        Se for "Nenhuma", ignore essa sessão
+        Se não for "Nenhuma" e couber natural, inclua no máximo 1-2 exercícios (prefira TRANSLATE ou MULTIPLE_CHOICE)
+        revisando 1 dessas palavras, sem tirar o foco da palavra principal %2$s. Não force, não liste todas.
+
+        =================================================
         AUTOVERIFICAÇÃO OBRIGATÓRIA
         =================================================
 
@@ -515,7 +527,7 @@ public class AiGeneratorServiceImpl implements AiGeneratorService{
 
         Use exatamente este formato de saída:
 
-        %8$s
+        %9$s
         """.formatted(
                 original,
                 translated,
@@ -524,6 +536,7 @@ public class AiGeneratorServiceImpl implements AiGeneratorService{
                 fromLanguage,
                 toLanguage,
                 level,
+                weakContext,
                 outputFormat
         );
     }

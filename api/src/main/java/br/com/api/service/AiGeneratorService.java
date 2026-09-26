@@ -7,6 +7,6 @@ import br.com.api.entity.Word;
 public interface AiGeneratorService {
 
     String generateDescription(String original, String translated, String category, String language);
-    StudySessionAiResponse generateStudySession(Word word, String fromLanguage, String toLanguage, UserLanguageLevel level);
+    StudySessionAiResponse generateStudySession(Word word, String fromLanguage, String toLanguage, UserLanguageLevel level, String weakContext);
 
 }

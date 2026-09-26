@@ -24,10 +24,10 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class PlacementQuestionServiceImpl implements PlacementQuestionService{
 
-    private PlacementQuestionRepository repository;
-    private UserRepository userRepository;
-    private LanguageRepository languageRepository;
-    private UserLanguageProgressRepository userLanguageProgressRepository;
+    private final PlacementQuestionRepository repository;
+    private final UserRepository userRepository;
+    private final LanguageRepository languageRepository;
+    private final UserLanguageProgressRepository userLanguageProgressRepository;
 
     @Override
     public List<PlacementQuestionResponse> findByLanguage(Integer languageId) {

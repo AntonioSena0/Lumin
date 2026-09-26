@@ -82,4 +82,12 @@ public interface UserWordRepository extends JpaRepository<UserWord, UserWordId>,
             "ORDER BY uw.incorrectAnswers DESC, uw.lastPracticed DESC")
     List<UserWord> findWeakRecentWordsByUserId(@Param("userId") Long userId, Pageable pageable);
 
+    @Query("SELECT uw FROM UserWord uw " +
+            "JOIN FETCH uw.word w " +
+            "WHERE uw.user.id = :userId " +
+            "AND w.toLanguage.id = :languageId " +
+            "AND uw.incorrectAnswers > 0 " +
+            "ORDER BY uw.incorrectAnswers DESC")
+    List<UserWord> findWeakByUserAndToLanguage(@Param("userId") Long userId, @Param("languageId") Integer languageId, Pageable pageable);
+
 }

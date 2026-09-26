@@ -15,7 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 public class PlacementQuestionControllerImpl implements PlacementQuestionController {
 
-    private PlacementQuestionService service;
+    private final PlacementQuestionService service;
 
     @Override
     @GetMapping("/languages/{languageId}")

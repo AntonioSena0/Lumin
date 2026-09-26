@@ -14,15 +14,18 @@ import br.com.api.mapper.StudySessionMapper;
 import br.com.api.normalizer.ExerciseGenerationNormalizer;
 import br.com.api.repository.StudySessionRepository;
 import br.com.api.repository.UserRepository;
+import br.com.api.repository.UserWordRepository;
 import br.com.api.repository.WordRepository;
 import br.com.api.validator.ExerciseGenerationValidator;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -33,6 +36,7 @@ public class StudySessionServiceImpl implements StudySessionService{
     private final StudySessionFactory factory;
     private final UserRepository userRepository;
     private final WordRepository wordRepository;
+    private final UserWordRepository userWordRepository;
     private final WrittenExerciseService writtenExerciseService;
     private final SpeakingExerciseService speakingExerciseService;
     private final UserLanguageProgressService userLanguageProgressService;
@@ -44,6 +48,15 @@ public class StudySessionServiceImpl implements StudySessionService{
 
         RuntimeException lastException = null;
 
+        List<UserWord> weak = userWordRepository.findWeakByUserAndToLanguage(user.getId(), word.getToLanguage().getId(), PageRequest.of(0, 5));
+
+        String formattedWeak = weak
+                .stream()
+                .map(uw -> uw.getWord().getOriginal() + "=" + uw.getWord().getTranslated())
+                .collect(Collectors.joining(", "));
+
+        String weakContext = formattedWeak.isBlank() ? "Nenhuma" : formattedWeak;
+
         for(int attempt = 0; attempt < 2; attempt++){
 
             try{
@@ -51,7 +64,8 @@ public class StudySessionServiceImpl implements StudySessionService{
                         word,
                         word.getFromLanguage().getName(),
                         word.getToLanguage().getName(),
-                        userLanguageProgressService.getOrCreateLevel(user, word.getToLanguage())
+                        userLanguageProgressService.getOrCreateLevel(user, word.getToLanguage()),
+                        weakContext
                 );
 
                 validator.validateBaseResponse(response);
