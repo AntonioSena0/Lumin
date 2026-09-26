@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 @Embeddable
@@ -18,6 +19,9 @@ import java.io.Serializable;
 @Setter
 @EqualsAndHashCode
 public class UserLanguageProgressId implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     @Column(name = "user_id", nullable = false)
     private Long userId;
