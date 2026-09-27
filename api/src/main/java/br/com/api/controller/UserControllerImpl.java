@@ -1,17 +1,20 @@
 package br.com.api.controller;
 
 import br.com.api.dto.request.AvatarChangeRequest;
+import br.com.api.dto.request.UserPutRequest;
 import br.com.api.dto.request.UserRequest;
+import br.com.api.dto.response.PageResponse;
 import br.com.api.dto.response.UserResponse;
-import br.com.api.dto.request.UserUpdateRequest;
+import br.com.api.dto.request.UserPatchRequest;
 import br.com.api.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/lumin/users")
@@ -21,10 +24,12 @@ public class UserControllerImpl implements UserController{
     private final UserService service;
 
     @Override
-    @GetMapping("/")
-    public ResponseEntity<List<UserResponse>> findAll(){
+    @GetMapping
+    public ResponseEntity<PageResponse<UserResponse>> findAll(
+            @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable
+    ){
 
-        return ResponseEntity.ok(service.findAll());
+        return ResponseEntity.ok(PageResponse.from(service.findAll(pageable)));
 
     }
 
@@ -46,7 +51,7 @@ public class UserControllerImpl implements UserController{
 
     @Override
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponse> update(@PathVariable Long id, @RequestBody @Valid UserUpdateRequest request){
+    public ResponseEntity<UserResponse> update(@PathVariable Long id, @RequestBody @Valid UserPutRequest request){
 
         return ResponseEntity.ok(service.update(id, request));
 
@@ -54,7 +59,7 @@ public class UserControllerImpl implements UserController{
 
     @Override
     @PatchMapping("/{id}")
-    public ResponseEntity<UserResponse> parcialUpdate(@PathVariable Long id, @RequestBody @Valid UserUpdateRequest request){
+    public ResponseEntity<UserResponse> parcialUpdate(@PathVariable Long id, @RequestBody @Valid UserPatchRequest request){
 
         return ResponseEntity.ok(service.parcialUpdate(id, request));
 

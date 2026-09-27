@@ -41,7 +41,7 @@ public class UserWordControllerImpl implements UserWordController {
             @RequestParam(required = false) String search,
             @RequestParam(required = false) Boolean onlyPracticed,
             @RequestParam(required = false) Boolean onlyWeak,
-            @PageableDefault(size = 20, sort = "lastPracticed", direction = Sort.Direction.DESC) Pageable pageable
+            @PageableDefault(sort = "lastPracticed", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         UserWordFilterRequest filter = new UserWordFilterRequest(
                 saved,

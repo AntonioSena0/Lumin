@@ -38,7 +38,6 @@ public class ExerciseOptionServiceImpl implements ExerciseOptionService{
                         word.getId()
                 )
                 .stream()
-                .map(Word::getTranslated)
                 .map(this::normalize)
                 .filter(option -> !option.isBlank())
                 .filter(option -> !option.equalsIgnoreCase(word.getTranslated()))

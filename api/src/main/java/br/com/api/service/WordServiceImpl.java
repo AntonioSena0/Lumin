@@ -8,10 +8,11 @@ import br.com.api.mapper.UserWordMapper;
 import br.com.api.mapper.WordMapper;
 import br.com.api.repository.*;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -25,11 +26,9 @@ public class WordServiceImpl implements WordService {
     private final CategoryRepository categoryRepository;
 
     @Override
-    public List<WordResponse> findAll() {
-        return repository.findAllWithRelations()
-                .stream()
-                .map(WordMapper::toWordResponse)
-                .toList();
+    public Page<WordResponse> findAll(Pageable pageable) {
+        return repository.findAllWithRelations(pageable)
+                .map(WordMapper::toWordResponse);
     }
 
     @Override
@@ -39,11 +38,9 @@ public class WordServiceImpl implements WordService {
     }
 
     @Override
-    public List<WordResponse> search(String q, Integer languageId) {
-        return repository.findByOriginalContains(q, languageId)
-                .stream()
-                .map(WordMapper::toWordResponse)
-                .toList();
+    public Page<WordResponse> search(String q, Integer languageId, Pageable pageable) {
+        return repository.findByOriginalContains(q, languageId, pageable)
+                .map(WordMapper::toWordResponse);
     }
 
     @Override

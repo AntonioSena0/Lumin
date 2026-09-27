@@ -2,9 +2,10 @@ package br.com.api.service;
 
 import br.com.api.domain.VoiceType;
 import br.com.api.dto.request.AvatarChangeRequest;
+import br.com.api.dto.request.UserPutRequest;
 import br.com.api.dto.request.UserRequest;
 import br.com.api.dto.response.UserResponse;
-import br.com.api.dto.request.UserUpdateRequest;
+import br.com.api.dto.request.UserPatchRequest;
 import br.com.api.entity.Avatar;
 import br.com.api.entity.Language;
 import br.com.api.entity.Setting;
@@ -15,10 +16,10 @@ import br.com.api.repository.LanguageRepository;
 import br.com.api.repository.SettingRepository;
 import br.com.api.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -30,11 +31,9 @@ public class UserServiceImpl implements UserService{
     private final SettingRepository settingRepository;
 
     @Override
-    public List<UserResponse> findAll() {
-        return repository.findAllWithRelations()
-                .stream()
-                .map(UserMapper::toUserResponse)
-                .toList();
+    public Page<UserResponse> findAll(Pageable pageable) {
+        return repository.findAllWithRelations(pageable)
+                .map(UserMapper::toUserResponse);
     }
 
     @Override
@@ -85,7 +84,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     @Transactional
-    public UserResponse update(Long id, UserUpdateRequest request){
+    public UserResponse update(Long id, UserPutRequest request){
 
         User existingUser = repository.findByIdWithRelations(id)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
@@ -118,7 +117,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     @Transactional
-    public UserResponse parcialUpdate(Long id, UserUpdateRequest request){
+    public UserResponse parcialUpdate(Long id, UserPatchRequest request){
 
         User existingUser = repository.findByIdWithRelations(id)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));

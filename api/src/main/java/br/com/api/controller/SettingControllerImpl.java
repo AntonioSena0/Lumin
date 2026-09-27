@@ -22,7 +22,7 @@ public class SettingControllerImpl implements SettingController{
     }
 
     @Override
-    @PatchMapping()
+    @PatchMapping
     public ResponseEntity<SettingResponse> updateSettings(@RequestBody @Valid SettingUpdateRequest request, @PathVariable Long userId) {
         return ResponseEntity.ok(service.updateByUserId(request, userId));
     }

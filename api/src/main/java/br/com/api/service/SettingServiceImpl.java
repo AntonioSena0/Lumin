@@ -24,28 +24,15 @@ public class SettingServiceImpl implements SettingService {
 
     @Override
     public SettingResponse findByUserId(Long userId) {
-
-        Optional<Setting> setting = repository.findByIdWithLanguage(userId);
-        if (setting.isPresent()){
-            return SettingMapper.toSettingResponse(setting.get());
-        }
-
-        if(userRepository.existsById(userId)){
-            throw new RuntimeException("Configuração não encontrada");
-        } else {
-            throw new RuntimeException("Usuário não encontrado");
-        }
-
+        return SettingMapper.toSettingResponse(repository.findByIdWithLanguage(userId)
+                .orElseThrow(() -> new RuntimeException("Configuração não encontrada")));
     }
 
     @Override
     @Transactional
     public SettingResponse updateByUserId(SettingUpdateRequest request, Long userId) {
 
-        userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-
-        Setting setting = repository.findById(userId)
+        Setting setting = repository.findByIdWithLanguage(userId)
                 .orElseThrow(() -> new RuntimeException("Configuração não encontrada"));
 
         if(request.appLanguage() != null){

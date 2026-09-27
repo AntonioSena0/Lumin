@@ -2,13 +2,14 @@ package br.com.api.repository;
 
 import br.com.api.entity.User;
 import jakarta.persistence.QueryHint;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -18,7 +19,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "JOIN FETCH u.nativeLanguage " +
             "JOIN FETCH u.chosenLanguage " +
             "JOIN FETCH u.avatar")
-    List<User> findAllWithRelations();
+    Page<User> findAllWithRelations(Pageable pageable);
 
     @QueryHints(
             @QueryHint(name = "javax.persistence.query.timeout", value = "2000")

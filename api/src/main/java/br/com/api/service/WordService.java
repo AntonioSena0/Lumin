@@ -3,14 +3,14 @@ package br.com.api.service;
 import br.com.api.dto.request.WordRequest;
 import br.com.api.dto.response.UserWordListResponse;
 import br.com.api.dto.response.WordResponse;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface WordService {
 
-    List<WordResponse> findAll();
+    Page<WordResponse> findAll(Pageable pageable);
     WordResponse findById(Long wordId);
-    List<WordResponse> search(String q, Integer languageId);
+    Page<WordResponse> search(String q, Integer languageId, Pageable pageable);
     UserWordListResponse save(WordRequest request, Long userId);
     UserWordListResponse unsave(Long wordId, Long userId);
 
