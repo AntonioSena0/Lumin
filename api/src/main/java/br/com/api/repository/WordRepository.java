@@ -17,20 +17,23 @@ import java.util.Optional;
 @Repository
 public interface WordRepository extends JpaRepository<Word, Long> {
 
-    @Query("SELECT w FROM Word w " +
+    @Query(value = "SELECT w FROM Word w " +
             "JOIN FETCH w.fromLanguage " +
             "JOIN FETCH w.toLanguage " +
-            "JOIN FETCH w.category")
+            "JOIN FETCH w.category",
+            countQuery = "SELECT COUNT(w) FROM Word w")
     Page<Word> findAllWithRelations(Pageable pageable);
 
     @QueryHints(
             @QueryHint(name = "javax.persistence.query.timeout", value = "2000")
     )
-    @Query("SELECT w FROM Word w " +
+    @Query(value = "SELECT w FROM Word w " +
             "JOIN FETCH w.fromLanguage " +
             "JOIN FETCH w.toLanguage " +
             "JOIN FETCH w.category " +
-            "WHERE w.id = :id")
+            "WHERE w.id = :id",
+            countQuery = "SELECT COUNT(w) FROM Word w " +
+                        "WHERE w.id = :id")
     Optional<Word> findByIdWithRelations(@Param("id") Long id);
 
     @QueryHints(
@@ -46,19 +49,23 @@ public interface WordRepository extends JpaRepository<Word, Long> {
     @QueryHints(
             @QueryHint(name = "javax.persistence.query.timeout", value = "2000")
     )
-    @Query("SELECT w FROM Word w " +
+    @Query(value = "SELECT w FROM Word w " +
             "JOIN FETCH w.fromLanguage " +
             "JOIN FETCH w.toLanguage " +
             "JOIN FETCH w.category " +
             "WHERE LOWER(w.original) LIKE LOWER(CONCAT('%', :q, '%')) " +
-            "AND w.fromLanguage.id = :languageId")
+            "AND w.fromLanguage.id = :languageId",
+            countQuery = "SELECT COUNT(w) FROM Word w " +
+                        "WHERE LOWER(w.original) LIKE LOWER(CONCAT('%', :q, '%')) " +
+                        "AND w.fromLanguage.id = :languageId")
     Page<Word> findByOriginalContains(@Param("q") String q, @Param("languageId") Integer languageId, Pageable pageable);
 
-    @Query("SELECT w.translated FROM Word w " +
+    @Query(value = "SELECT w.translated FROM words w " +
             "WHERE w.id <> :id " +
-            "AND w.toLanguage.id = :toLanguageId " +
-            "AND w.category.id = :categoryId " +
-            "ORDER BY w.id ASC LIMIT 10")
+            "AND w.to_language_id = :toLanguageId " +
+            "AND w.category_id = :categoryId " +
+            "ORDER BY w.id ASC LIMIT 10",
+            nativeQuery = true)
     List<String> findTop10ByCategoryIdAndToLanguageIdAndIdNot(@Param("categoryId") Integer categoryId, @Param("toLanguageId") Integer toLanguageId, @Param("id") Long id);
 
 }

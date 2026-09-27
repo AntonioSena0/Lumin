@@ -15,20 +15,23 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    @Query("SELECT u FROM User u " +
+    @Query(value = "SELECT u FROM User u " +
             "JOIN FETCH u.nativeLanguage " +
             "JOIN FETCH u.chosenLanguage " +
-            "JOIN FETCH u.avatar")
+            "JOIN FETCH u.avatar",
+            countQuery = "SELECT COUNT(u) FROM User u")
     Page<User> findAllWithRelations(Pageable pageable);
 
     @QueryHints(
             @QueryHint(name = "javax.persistence.query.timeout", value = "2000")
     )
-    @Query("SELECT u FROM User u " +
+    @Query(value = "SELECT u FROM User u " +
             "JOIN FETCH u.nativeLanguage " +
             "JOIN FETCH u.chosenLanguage " +
             "JOIN FETCH u.avatar " +
-            "WHERE u.id = :id")
+            "WHERE u.id = :id",
+            countQuery = "SELECT COUNT(u) FROM User u " +
+                        "WHERE u.id = :id")
     Optional<User> findByIdWithRelations(@Param("id") Long id);
 
     @QueryHints(

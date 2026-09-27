@@ -36,7 +36,7 @@ public class AuthControllerImpl implements AuthController{
 
     @Override
     @PostMapping("/register")
-    public ResponseEntity<UserMeResponse> register(@RequestBody UserRequest request) {
+    public ResponseEntity<UserMeResponse> register(@RequestBody @Valid UserRequest request) {
 
         AuthRegisterResponse authRegisterResponse = service.register(request);
 

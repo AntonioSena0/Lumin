@@ -10,6 +10,7 @@ import br.com.api.dto.response.StudySessionResponse;
 import br.com.api.entity.*;
 import br.com.api.exception.BusinessException;
 import br.com.api.exception.NotFoundException;
+import br.com.api.exception.UnauthorizedException;
 import br.com.api.factory.StudySessionFactory;
 import br.com.api.mapper.ExerciseMapper;
 import br.com.api.mapper.StudySessionMapper;
@@ -18,6 +19,7 @@ import br.com.api.repository.StudySessionRepository;
 import br.com.api.repository.UserRepository;
 import br.com.api.repository.UserWordRepository;
 import br.com.api.repository.WordRepository;
+import br.com.api.util.SecurityUtils;
 import br.com.api.validator.ExerciseGenerationValidator;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -86,8 +88,15 @@ public class StudySessionServiceImpl implements StudySessionService{
 
     @Override
     public StudySessionResponse findById(Long id) {
-        return StudySessionMapper.toStudySessionResponse(repository.findByIdWithRelations(id)
-                .orElseThrow(() -> new NotFoundException("SESSION_NOT_FOUND", "Sessão não encontrada")));
+
+        StudySession studySession = repository.findByIdWithRelations(id)
+                .orElseThrow(() -> new NotFoundException("SESSION_NOT_FOUND", "Sessão não encontrada"));
+
+        if(!SecurityUtils.currentUserId().equals(studySession.getUser().getId())){
+            throw new BusinessException("SESSION_NOT_OWNED", "Essa sessão não pertence a você");
+        }
+
+        return StudySessionMapper.toStudySessionResponse(studySession);
     }
 
     @Override
@@ -128,6 +137,10 @@ public class StudySessionServiceImpl implements StudySessionService{
         StudySession studySession = repository.findByIdWithRelations(id)
                 .orElseThrow(() -> new NotFoundException("SESSION_NOT_FOUND", "Sessão de estudos não encontrada"));
 
+        if(!SecurityUtils.currentUserId().equals(studySession.getUser().getId())){
+            throw new BusinessException("SESSION_NOT_OWNED", "Essa sessão não pertence a você");
+        }
+
         List<Exercise> exercises = studySession.getExercises();
 
         if (studySession.getCurrentIndex() >= studySession.getTotalExercises()) {
@@ -146,6 +159,10 @@ public class StudySessionServiceImpl implements StudySessionService{
 
         StudySession studySession = repository.findByIdWithRelations(id)
                 .orElseThrow(() -> new NotFoundException("SESSION_NOT_FOUND", "Sessão de estudos não encontrada"));
+
+        if(!SecurityUtils.currentUserId().equals(studySession.getUser().getId())){
+            throw new BusinessException("SESSION_NOT_OWNED", "Essa sessão não pertence a você");
+        }
 
         if(studySession.getCurrentIndex() >= studySession.getTotalExercises()){
             throw new BusinessException("SESSION_CLOSED", "Sessão de estudo já encerrada");
