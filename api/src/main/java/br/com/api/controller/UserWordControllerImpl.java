@@ -7,6 +7,7 @@ import br.com.api.dto.response.PageResponse;
 import br.com.api.dto.response.UserWordListResponse;
 import br.com.api.service.UserWordQueryService;
 import br.com.api.service.WordService;
+import br.com.api.util.SecurityUtils;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -17,7 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/lumin/users/{userId}/words")
+@RequestMapping("/lumin/me/words")
 @AllArgsConstructor
 public class UserWordControllerImpl implements UserWordController {
 
@@ -26,14 +27,13 @@ public class UserWordControllerImpl implements UserWordController {
 
     @Override
     @GetMapping("/{wordId}")
-    public ResponseEntity<UserWordListResponse> findUserWordById(@PathVariable Long userId, @PathVariable Long wordId) {
-        return ResponseEntity.ok(service.findUserWordById(userId, wordId));
+    public ResponseEntity<UserWordListResponse> findUserWordById(@PathVariable Long wordId) {
+        return ResponseEntity.ok(service.findUserWordById(SecurityUtils.currentUserId(), wordId));
     }
 
     @Override
     @GetMapping
     public ResponseEntity<PageResponse<UserWordListResponse>> findUserWords(
-            @PathVariable Long userId,
             @RequestParam(required = false) Boolean saved,
             @RequestParam(required = false) WordDomainLevel level,
             @RequestParam(required = false) Integer categoryId,
@@ -54,7 +54,7 @@ public class UserWordControllerImpl implements UserWordController {
         );
 
         return ResponseEntity.ok(PageResponse.from(service.findUserWords(
-                userId,
+                SecurityUtils.currentUserId(),
                 filter,
                 pageable
         )));
@@ -62,14 +62,14 @@ public class UserWordControllerImpl implements UserWordController {
 
     @Override
     @PostMapping("/save")
-    public ResponseEntity<UserWordListResponse> save(@RequestBody @Valid WordRequest request, @PathVariable Long userId) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(wordService.save(request, userId));
+    public ResponseEntity<UserWordListResponse> save(@RequestBody @Valid WordRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(wordService.save(request, SecurityUtils.currentUserId()));
     }
 
     @Override
     @PatchMapping("/{wordId}/unsave")
-    public ResponseEntity<UserWordListResponse> unsave(@PathVariable Long wordId, @PathVariable Long userId) {
-        return ResponseEntity.ok(wordService.unsave(wordId, userId));
+    public ResponseEntity<UserWordListResponse> unsave(@PathVariable Long wordId) {
+        return ResponseEntity.ok(wordService.unsave(wordId, SecurityUtils.currentUserId()));
     }
 
 }

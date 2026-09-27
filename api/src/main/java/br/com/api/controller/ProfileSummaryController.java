@@ -5,6 +5,6 @@ import org.springframework.http.ResponseEntity;
 
 public interface ProfileSummaryController {
 
-    ResponseEntity<ProfileSummaryResponse> findByUserId(Long userId);
+    ResponseEntity<ProfileSummaryResponse> findByUserId();
 
 }

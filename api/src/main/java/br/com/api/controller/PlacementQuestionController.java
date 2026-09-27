@@ -10,6 +10,6 @@ import java.util.List;
 public interface PlacementQuestionController {
 
     ResponseEntity<List<PlacementQuestionResponse>> findByLanguageId(Integer languageId);
-    ResponseEntity<PlacementTestResultResponse> submit(Long userId, Integer languageId, PlacementTestSubmitRequest request);
+    ResponseEntity<PlacementTestResultResponse> submit(Integer languageId, PlacementTestSubmitRequest request);
 
 }

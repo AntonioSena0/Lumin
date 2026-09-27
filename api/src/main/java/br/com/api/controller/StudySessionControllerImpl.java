@@ -5,6 +5,7 @@ import br.com.api.dto.response.ExerciseCheckResponse;
 import br.com.api.dto.response.ExerciseResponse;
 import br.com.api.dto.response.StudySessionResponse;
 import br.com.api.service.StudySessionService;
+import br.com.api.util.SecurityUtils;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -12,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("lumin/sessions")
+@RequestMapping("lumin/me/sessions")
 @AllArgsConstructor
 public class StudySessionControllerImpl implements StudySessionController{
 
@@ -25,9 +26,9 @@ public class StudySessionControllerImpl implements StudySessionController{
     }
 
     @Override
-    @PostMapping("/create/{userId}/{wordId}")
-    public ResponseEntity<StudySessionResponse> startSession(@PathVariable Long userId, @PathVariable Long wordId) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.startSession(userId, wordId));
+    @PostMapping("/create/{wordId}")
+    public ResponseEntity<StudySessionResponse> startSession(@PathVariable Long wordId) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.startSession(SecurityUtils.currentUserId(), wordId));
     }
 
     @Override
@@ -43,8 +44,8 @@ public class StudySessionControllerImpl implements StudySessionController{
     }
 
     @Override
-    @PatchMapping("/finish/{id}/{userId}")
-    public ResponseEntity<StudySessionResponse> finishSession(@PathVariable Long id, @PathVariable Long userId) {
-        return ResponseEntity.ok(service.finishSession(id, userId));
+    @PatchMapping("/finish/{id}")
+    public ResponseEntity<StudySessionResponse> finishSession(@PathVariable Long id) {
+        return ResponseEntity.ok(service.finishSession(id, SecurityUtils.currentUserId()));
     }
 }

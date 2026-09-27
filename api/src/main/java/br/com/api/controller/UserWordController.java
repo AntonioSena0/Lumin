@@ -9,10 +9,9 @@ import org.springframework.http.ResponseEntity;
 
 public interface UserWordController {
 
-    ResponseEntity<UserWordListResponse> findUserWordById(Long userId, Long wordId);
+    ResponseEntity<UserWordListResponse> findUserWordById(Long wordId);
 
     ResponseEntity<PageResponse<UserWordListResponse>> findUserWords(
-            Long userId,
             Boolean saved,
             WordDomainLevel level,
             Integer categoryId,
@@ -23,7 +22,7 @@ public interface UserWordController {
             Pageable pageable
     );
 
-    ResponseEntity<UserWordListResponse> save(WordRequest request, Long userId);
-    ResponseEntity<UserWordListResponse> unsave(Long wordId, Long userId);
+    ResponseEntity<UserWordListResponse> save(WordRequest request);
+    ResponseEntity<UserWordListResponse> unsave(Long wordId);
 
 }

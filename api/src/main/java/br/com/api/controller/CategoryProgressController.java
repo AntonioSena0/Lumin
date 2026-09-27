@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface CategoryProgressController {
 
-    ResponseEntity<List<CategoryProgressResponse>> findByUserId(Long userId);
+    ResponseEntity<List<CategoryProgressResponse>> findByUserId();
 
 }

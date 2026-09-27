@@ -13,9 +13,5 @@ public interface UserController {
 
     ResponseEntity<PageResponse<UserResponse>> findAll(Pageable pageable);
     ResponseEntity<UserResponse> findById(Long id);
-    ResponseEntity<UserResponse> update(Long id, UserPutRequest request);
-    ResponseEntity<UserResponse> parcialUpdate(Long id, UserPatchRequest request);
-    ResponseEntity<UserResponse> changeAvatar(Long id, AvatarChangeRequest request);
-    ResponseEntity<Void> delete(Long id);
 
 }

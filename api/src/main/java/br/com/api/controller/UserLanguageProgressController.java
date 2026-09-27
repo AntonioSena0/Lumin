@@ -7,10 +7,10 @@ import java.util.List;
 
 public interface UserLanguageProgressController {
 
-    ResponseEntity<UserLanguageProgressResponse> findById(Long userId, Integer languageId);
+    ResponseEntity<UserLanguageProgressResponse> findById(Integer languageId);
 
-    ResponseEntity<List<UserLanguageProgressResponse>> findByUserId(Long userId);
+    ResponseEntity<List<UserLanguageProgressResponse>> findByUserId();
 
-    ResponseEntity<UserLanguageProgressResponse> getOrCreate(Long userId, Integer languageId);
+    ResponseEntity<UserLanguageProgressResponse> getOrCreate(Integer languageId);
 
 }

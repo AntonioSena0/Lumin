@@ -6,6 +6,6 @@ import org.springframework.http.ResponseEntity;
 
 public interface HomeSummaryController {
 
-    ResponseEntity<HomeSummaryResponse> findByUserId(Long userId);
+    ResponseEntity<HomeSummaryResponse> findByUserId();
 
 }

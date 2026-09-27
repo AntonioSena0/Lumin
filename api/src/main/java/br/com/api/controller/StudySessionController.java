@@ -9,9 +9,9 @@ import org.springframework.http.ResponseEntity;
 public interface StudySessionController {
 
     ResponseEntity<StudySessionResponse> findById(Long id);
-    ResponseEntity<StudySessionResponse> startSession(Long userId, Long wordId);
+    ResponseEntity<StudySessionResponse> startSession(Long wordId);
     ResponseEntity<ExerciseResponse> currentExercise(Long studySessionId);
     ResponseEntity<ExerciseCheckResponse> finishExercise(Long id, Long exerciseId, ExerciseCheckRequest request);
-    ResponseEntity<StudySessionResponse> finishSession(Long id, Long userId);
+    ResponseEntity<StudySessionResponse> finishSession(Long id);
 
 }
