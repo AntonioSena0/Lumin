@@ -18,6 +18,7 @@ import br.com.api.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +30,7 @@ public class UserServiceImpl implements UserService{
     private final LanguageRepository languageRepository;
     private final AvatarRepository avatarRepository;
     private final SettingRepository settingRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public Page<UserResponse> findAll(Pageable pageable) {
@@ -67,7 +69,9 @@ public class UserServiceImpl implements UserService{
         Avatar avatar = avatarRepository.findById(1)
                 .orElseThrow(() -> new RuntimeException("Erro ao criar usuário"));
 
-        User savedUser = repository.save(UserMapper.toUser(request, nativeLanguage, chosenLanguage, avatar));
+        String hashPassword = passwordEncoder.encode(request.password());
+
+        User savedUser = repository.save(UserMapper.toUser(request, hashPassword, nativeLanguage, chosenLanguage, avatar));
 
         settingRepository.save(Setting
             .builder()
@@ -99,7 +103,7 @@ public class UserServiceImpl implements UserService{
 
         existingUser.setName(request.name());
         existingUser.setEmail(request.email());
-        existingUser.setPassword(request.password());
+        existingUser.setPassword(passwordEncoder.encode(request.password()));
 
         Language nativeLanguage = languageRepository.findById(request.nativeLanguage())
                 .orElseThrow(() -> new RuntimeException("Língua nativa não encontrada"));
@@ -137,7 +141,7 @@ public class UserServiceImpl implements UserService{
         }
 
         if(request.password() != null){
-            existingUser.setPassword(request.password());
+            existingUser.setPassword(passwordEncoder.encode(request.password()));
         }
 
         if(request.nativeLanguage() != null){

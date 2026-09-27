@@ -42,14 +42,6 @@ public class UserControllerImpl implements UserController{
     }
 
     @Override
-    @PostMapping("/")
-    public ResponseEntity<UserResponse> create(@RequestBody @Valid UserRequest request){
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.create(request));
-
-    }
-
-    @Override
     @PutMapping("/{id}")
     public ResponseEntity<UserResponse> update(@PathVariable Long id, @RequestBody @Valid UserPutRequest request){
 

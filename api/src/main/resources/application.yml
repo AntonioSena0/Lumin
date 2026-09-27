@@ -41,7 +41,12 @@ spring:
           temperature: 0.7
           maxTokens: ${MAX_TOKENS:2500}
 
+jwt:
+  secret: ${JWT_SECRET}
+  exp-min: ${JWT_EXP_MIN:15}
 
+cookie:
+  secure: ${COOKIE_SECURE:false}
 
 server:
   port: 8080
