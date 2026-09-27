@@ -10,7 +10,8 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "words", indexes = {
         @Index(name = "idx_word_original_translated", columnList = "original, translated"),
-        @Index(name = "idx_word_fromlang_original", columnList = "original, from_language_id")
+        @Index(name = "idx_word_fromlang_original", columnList = "original, from_language_id"),
+        @Index(name = "idx_words_lang_cat", columnList = "to_language_id, category_id")
 })
 @AllArgsConstructor
 @NoArgsConstructor

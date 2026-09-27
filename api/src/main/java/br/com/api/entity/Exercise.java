@@ -12,7 +12,9 @@ import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "exercises")
+@Table(name = "exercises", indexes = {
+        @Index(name = "idx_exercises_session", columnList = "session_id")
+})
 @Inheritance(strategy = InheritanceType.JOINED)
 @Getter
 @Setter

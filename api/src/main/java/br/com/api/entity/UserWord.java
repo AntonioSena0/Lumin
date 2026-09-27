@@ -10,7 +10,10 @@ import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "users_words")
+@Table(name = "users_words", indexes = {
+        @Index(name = "idx_users_words_weak", columnList = "user_id, incorrect_answers"),
+        @Index(name = "idx_users_words_practiced", columnList = "user_id, last_practiced")
+})
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
