@@ -1,6 +1,7 @@
 package br.com.api.mapper;
 
 import br.com.api.dto.request.UserRequest;
+import br.com.api.dto.response.UserMeResponse;
 import br.com.api.dto.response.UserResponse;
 import br.com.api.entity.Avatar;
 import br.com.api.entity.Language;
@@ -27,6 +28,20 @@ public class UserMapper {
     public UserResponse toUserResponse(User user){
 
         return UserResponse
+                .builder()
+                .id(user.getId())
+                .name(user.getName())
+                .nativeLanguage(LanguageMapper.toLanguageResponse(user.getNativeLanguage()))
+                .chosenLanguage(LanguageMapper.toLanguageResponse(user.getChosenLanguage()))
+                .avatar(AvatarMapper.toAvatarResponse(user.getAvatar()))
+                .createdAt(user.getCreatedAt())
+                .build();
+
+    }
+
+    public UserMeResponse toUserMeResponse(User user){
+
+        return UserMeResponse
                 .builder()
                 .id(user.getId())
                 .name(user.getName())

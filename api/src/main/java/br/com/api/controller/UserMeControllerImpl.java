@@ -3,6 +3,7 @@ package br.com.api.controller;
 import br.com.api.dto.request.AvatarChangeRequest;
 import br.com.api.dto.request.UserPatchRequest;
 import br.com.api.dto.request.UserPutRequest;
+import br.com.api.dto.response.UserMeResponse;
 import br.com.api.dto.response.UserResponse;
 import br.com.api.service.UserService;
 import br.com.api.util.SecurityUtils;
@@ -21,15 +22,15 @@ public class UserMeControllerImpl implements UserMeController{
 
     @Override
     @GetMapping
-    public ResponseEntity<UserResponse> findById(){
+    public ResponseEntity<UserMeResponse> findById(){
 
-        return ResponseEntity.ok(service.findById(SecurityUtils.currentUserId()));
+        return ResponseEntity.ok(service.findMe(SecurityUtils.currentUserId()));
 
     }
 
     @Override
     @PutMapping
-    public ResponseEntity<UserResponse> update(@RequestBody @Valid UserPutRequest request){
+    public ResponseEntity<UserMeResponse> update(@RequestBody @Valid UserPutRequest request){
 
         return ResponseEntity.ok(service.update(SecurityUtils.currentUserId(), request));
 
@@ -37,7 +38,7 @@ public class UserMeControllerImpl implements UserMeController{
 
     @Override
     @PatchMapping
-    public ResponseEntity<UserResponse> parcialUpdate(@RequestBody @Valid UserPatchRequest request){
+    public ResponseEntity<UserMeResponse> parcialUpdate(@RequestBody @Valid UserPatchRequest request){
 
         return ResponseEntity.ok(service.parcialUpdate(SecurityUtils.currentUserId(), request));
 
@@ -45,7 +46,7 @@ public class UserMeControllerImpl implements UserMeController{
 
     @Override
     @PatchMapping("/change-avatar")
-    public ResponseEntity<UserResponse> changeAvatar(@RequestBody @Valid AvatarChangeRequest request) {
+    public ResponseEntity<UserMeResponse> changeAvatar(@RequestBody @Valid AvatarChangeRequest request) {
         return ResponseEntity.ok(service.changeAvatar(SecurityUtils.currentUserId(), request));
     }
 

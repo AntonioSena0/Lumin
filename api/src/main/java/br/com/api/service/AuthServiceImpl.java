@@ -4,9 +4,11 @@ import br.com.api.dto.request.LoginRequest;
 import br.com.api.dto.request.UserRequest;
 import br.com.api.dto.response.AuthRegisterResponse;
 import br.com.api.dto.response.TokenPair;
+import br.com.api.dto.response.UserMeResponse;
 import br.com.api.dto.response.UserResponse;
 import br.com.api.entity.RefreshToken;
 import br.com.api.entity.User;
+import br.com.api.exception.UnauthorizedException;
 import br.com.api.repository.RefreshTokenRepository;
 import br.com.api.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -33,7 +35,7 @@ public class AuthServiceImpl implements AuthService{
     @Transactional
     public AuthRegisterResponse register(UserRequest request) {
 
-        UserResponse created = userService.create(request);
+        UserMeResponse created = userService.create(request);
 
         String access = jwtService.issue(created.id());
         RefreshToken refreshToken = refreshTokenRepository.save(RefreshToken
@@ -53,7 +55,7 @@ public class AuthServiceImpl implements AuthService{
                             .refreshJti(refreshToken.getJti().toString())
                             .build()
                 )
-                .userResponse(created)
+                .userMeResponse(created)
                 .build();
 
     }
@@ -88,16 +90,16 @@ public class AuthServiceImpl implements AuthService{
     public TokenPair refresh(String refreshJti) {
 
         if(refreshJti == null){
-            throw new RuntimeException("Sessão inválida");
+            throw new UnauthorizedException();
         }
 
         UUID jti = UUID.fromString(refreshJti);
 
         RefreshToken old = refreshTokenRepository.findById(jti)
-                .orElseThrow(() -> new RuntimeException("Sessão inválida"));
+                .orElseThrow(UnauthorizedException::new);
 
         if(old.isRevoked() || old.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("Sessão expirada");
+            throw new UnauthorizedException();
         }
 
         old.setRevoked(true);

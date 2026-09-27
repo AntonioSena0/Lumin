@@ -6,6 +6,7 @@ import br.com.api.dto.request.PlacementTestSubmitRequest;
 import br.com.api.dto.response.PlacementQuestionResponse;
 import br.com.api.dto.response.PlacementTestResultResponse;
 import br.com.api.entity.*;
+import br.com.api.exception.NotFoundException;
 import br.com.api.mapper.PlacementQuestionMapper;
 import br.com.api.repository.LanguageRepository;
 import br.com.api.repository.PlacementQuestionRepository;
@@ -42,17 +43,17 @@ public class PlacementQuestionServiceImpl implements PlacementQuestionService{
     public PlacementTestResultResponse submit(Long userId, Integer languageId, PlacementTestSubmitRequest request) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new NotFoundException("USER_NOT_FOUND", "Usuário não encontrado"));
 
         Language language = languageRepository.findById(languageId)
-                .orElseThrow(() -> new RuntimeException("Língua não encontrada"));
+                .orElseThrow(() -> new NotFoundException("LANGUAGE_NOT_FOUND", "Língua não encontrada"));
 
         List<PlacementQuestion> questions = repository.findByLanguageIdOrderByLevelAsc(languageId);
         int correct = 0;
         int incorrect = 0;
 
         if (questions.isEmpty()) {
-            throw new RuntimeException("Nenhuma pergunta de nivelamento encontrada para este idioma");
+            throw new NotFoundException("PLACEMENT_EMPTY", "Nenhuma pergunta de nivelamento encontrada para este idioma");
         }
 
         Map<Long, String> answersByQuestionId = request.answers()

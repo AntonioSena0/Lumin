@@ -1,6 +1,7 @@
 package br.com.api.service;
 
 import br.com.api.dto.response.LanguageResponse;
+import br.com.api.exception.NotFoundException;
 import br.com.api.mapper.LanguageMapper;
 import br.com.api.repository.LanguageRepository;
 import lombok.AllArgsConstructor;
@@ -25,7 +26,7 @@ public class LanguageServiceImpl implements LanguageService{
     @Override
     public LanguageResponse findById(Integer id) {
         return LanguageMapper.toLanguageResponse(repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Língua não encontrada")));
+                .orElseThrow(() -> new NotFoundException("LANGUAGE_NOT_FOUND", "Língua não encontrada")));
     }
 
 }

@@ -6,6 +6,7 @@ import br.com.api.entity.Language;
 import br.com.api.entity.User;
 import br.com.api.entity.UserLanguageProgress;
 import br.com.api.entity.UserLanguageProgressId;
+import br.com.api.exception.NotFoundException;
 import br.com.api.mapper.UserLanguageProgressMapper;
 import br.com.api.repository.LanguageRepository;
 import br.com.api.repository.UserLanguageProgressRepository;
@@ -27,7 +28,7 @@ public class UserLanguageProgressServiceImpl implements UserLanguageProgressServ
     @Override
     public UserLanguageProgressResponse findById(Long userId, Integer languageId) {
         return UserLanguageProgressMapper.toUserLanguageProgressResponse(repository.findByIdWithRelations(userId, languageId)
-                .orElseThrow(() -> new RuntimeException("Progresso não encontrado")));
+                .orElseThrow(() -> new NotFoundException("PROGRESS_NOT_FOUND", "Progresso não encontrado")));
     }
 
     @Override
@@ -42,10 +43,10 @@ public class UserLanguageProgressServiceImpl implements UserLanguageProgressServ
     public UserLanguageProgressResponse getOrCreate(Long userId, Integer languageId){
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new NotFoundException("USER_NOT_FOUND", "Usuário não encontrado"));
 
         Language language = languageRepository.findById(languageId)
-                .orElseThrow(() -> new RuntimeException("Língua não encontrada"));
+                .orElseThrow(() -> new NotFoundException("LANGUAGE_NOT_FOUND", "Língua não encontrada"));
 
         UserLanguageProgress userLanguageProgress = getOrCreateEntity(user, language);
 

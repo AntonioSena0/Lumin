@@ -1,6 +1,7 @@
 package br.com.api.service;
 
 import br.com.api.dto.response.AvatarResponse;
+import br.com.api.exception.NotFoundException;
 import br.com.api.mapper.AvatarMapper;
 import br.com.api.repository.AvatarRepository;
 import lombok.AllArgsConstructor;
@@ -25,6 +26,6 @@ public class AvatarServiceImpl implements AvatarService {
     @Override
     public AvatarResponse findById(Integer id) {
         return AvatarMapper.toAvatarResponse(repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Avatar não encontrado")));
+                .orElseThrow(() -> new NotFoundException("AVATAR_NOT_FOUND", "Avatar não encontrado")));
     }
 }

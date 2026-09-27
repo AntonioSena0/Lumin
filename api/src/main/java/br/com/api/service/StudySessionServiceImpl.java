@@ -8,6 +8,8 @@ import br.com.api.dto.response.ExerciseResponse;
 import br.com.api.dto.response.StudySessionAiResponse;
 import br.com.api.dto.response.StudySessionResponse;
 import br.com.api.entity.*;
+import br.com.api.exception.BusinessException;
+import br.com.api.exception.NotFoundException;
 import br.com.api.factory.StudySessionFactory;
 import br.com.api.mapper.ExerciseMapper;
 import br.com.api.mapper.StudySessionMapper;
@@ -79,13 +81,13 @@ public class StudySessionServiceImpl implements StudySessionService{
 
         }
 
-        throw new RuntimeException("Não foi possível gerar uma sessão de estudos válida", lastException);
+        throw new BusinessException("AI_GENERATION_FAILED", "Não foi possível gerar uma sessão de estudos válida");
     }
 
     @Override
     public StudySessionResponse findById(Long id) {
         return StudySessionMapper.toStudySessionResponse(repository.findByIdWithRelations(id)
-                .orElseThrow(() -> new RuntimeException("Sessão não encontrada")));
+                .orElseThrow(() -> new NotFoundException("SESSION_NOT_FOUND", "Sessão não encontrada")));
     }
 
     @Override
@@ -93,10 +95,10 @@ public class StudySessionServiceImpl implements StudySessionService{
     public StudySessionResponse startSession(Long userId, Long wordId) {
 
         User existingUser = userRepository.findByIdWithRelations(userId)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado para criar a sessão"));
+                .orElseThrow(() -> new NotFoundException("USER_NOT_FOUND", "Usuário não encontrado para criar a sessão"));
 
         Word existingWord = wordRepository.findByIdWithRelations(wordId)
-                .orElseThrow(() -> new RuntimeException("Palavra não encontrada"));
+                .orElseThrow(() -> new NotFoundException("WORD_NOT_FOUND", "Palavra não encontrada"));
 
         StudySessionAiResponse aiResponse = generateValidStudySession(existingWord, existingUser);
 
@@ -124,12 +126,12 @@ public class StudySessionServiceImpl implements StudySessionService{
     public ExerciseResponse currentExercise(Long id){
 
         StudySession studySession = repository.findByIdWithRelations(id)
-                .orElseThrow(() -> new RuntimeException("Sessão de estudos não encontrada"));
+                .orElseThrow(() -> new NotFoundException("SESSION_NOT_FOUND", "Sessão de estudos não encontrada"));
 
         List<Exercise> exercises = studySession.getExercises();
 
         if (studySession.getCurrentIndex() >= studySession.getTotalExercises()) {
-            throw new RuntimeException("Sessão finalizada");
+            throw new BusinessException("SESSION_FINISHED", "Sessão finalizada");
         }
 
         Exercise exercise = exercises.get(studySession.getCurrentIndex());
@@ -143,24 +145,24 @@ public class StudySessionServiceImpl implements StudySessionService{
     public ExerciseCheckResponse finishExercise(Long id, Long exerciseId, ExerciseCheckRequest request){
 
         StudySession studySession = repository.findByIdWithRelations(id)
-                .orElseThrow(() -> new RuntimeException("Sessão de estudos não encontrada"));
+                .orElseThrow(() -> new NotFoundException("SESSION_NOT_FOUND", "Sessão de estudos não encontrada"));
 
         if(studySession.getCurrentIndex() >= studySession.getTotalExercises()){
-            throw new RuntimeException("Sessão de estudo já encerrada");
+            throw new BusinessException("SESSION_CLOSED", "Sessão de estudo já encerrada");
         }
 
         Exercise exercise = studySession.getExercises().stream()
                 .filter(e -> e.getId().equals(exerciseId))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("Exercício não pertence a esta sessão"));
+                .orElseThrow(() -> new NotFoundException("EXERCISE_NOT_FOUND", "Exercício não pertence a esta sessão"));
 
 
         if(!studySession.getCurrentIndex().equals(exercise.getOrderIndex())){
-            throw new RuntimeException("Você não pode realizar esse exercício ainda");
+            throw new BusinessException("EXERCISE_ORDER", "Você não pode realizar esse exercício ainda");
         }
 
         if(exercise.isCompleted()){
-            throw new RuntimeException("Exercício já realizado");
+            throw new BusinessException("EXERCISE_DONE", "Exercício já realizado");
         }
 
         boolean correct = exercise.checkAnswer(request.answer());
@@ -187,22 +189,22 @@ public class StudySessionServiceImpl implements StudySessionService{
     public StudySessionResponse finishSession(Long id, Long userId) {
 
         StudySession session = repository.findByIdWithRelations(id)
-                .orElseThrow(() -> new RuntimeException("Sessão não encontrada"));
+                .orElseThrow(() -> new NotFoundException("SESSION_NOT_FOUND", "Sessão não encontrada"));
 
         if(!session.getUser().getId().equals(userId)){
-            throw new RuntimeException("Essa sessão não pertence a você");
+            throw new BusinessException("SESSION_NOT_OWNED", "Essa sessão não pertence a você");
         }
 
         if(session.getStatus() == SessionStatus.FINISHED){
-            throw new RuntimeException("Você já finalizou essa sessão de estudos");
+            throw new BusinessException("SESSION_ALREADY_FINISHED", "Você já finalizou essa sessão de estudos");
         }
 
         if(session.getCurrentIndex() < session.getTotalExercises()){
-            throw new RuntimeException("Sessão de estudo não pode ser finalizada");
+            throw new BusinessException("SESSION_CANNOT_FINISH", "Sessão de estudo não pode ser finalizada");
         }
 
         if (session.getExercises().isEmpty()) {
-            throw new RuntimeException("Sessão sem exercícios");
+            throw new BusinessException("SESSION_EMPTY", "Sessão sem exercícios");
         }
 
         Word sessionWord = session.getExercises().getFirst().getWord();

@@ -4,6 +4,8 @@ import br.com.api.dto.request.WordRequest;
 import br.com.api.dto.response.UserWordListResponse;
 import br.com.api.dto.response.WordResponse;
 import br.com.api.entity.*;
+import br.com.api.exception.BusinessException;
+import br.com.api.exception.NotFoundException;
 import br.com.api.mapper.UserWordMapper;
 import br.com.api.mapper.WordMapper;
 import br.com.api.repository.*;
@@ -34,7 +36,7 @@ public class WordServiceImpl implements WordService {
     @Override
     public WordResponse findById(Long wordId) {
         return WordMapper.toWordResponse(repository.findByIdWithRelations(wordId)
-                .orElseThrow(() -> new RuntimeException("Palavra não encontrada")));
+                .orElseThrow(() -> new NotFoundException("WORD_NOT_FOUND", "Palavra não encontrada")));
     }
 
     @Override
@@ -48,10 +50,10 @@ public class WordServiceImpl implements WordService {
     public UserWordListResponse save(WordRequest request, Long userId) {
 
         User existingUser = userRepository.findByIdWithRelations(userId)
-                .orElseThrow(() -> new RuntimeException("Usuário que tentou realizar a ação não existe"));
+                .orElseThrow(() -> new NotFoundException("USER_NOT_FOUND", "Usuário que tentou realizar a ação não existe"));
 
         Category existingCategory = categoryRepository.findById(request.categoryId())
-                .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
+                .orElseThrow(() -> new NotFoundException("CATEGORY_NOT_FOUND", "Categoria não encontrada"));
 
         String original = request.original().toLowerCase().trim();
         String translated = request.translated().toLowerCase().trim();
@@ -114,7 +116,7 @@ public class WordServiceImpl implements WordService {
     public UserWordListResponse unsave(Long wordId, Long userId) {
     
         UserWord existingUserWord = userWordRepository.findById(new UserWordId(userId, wordId))
-                .orElseThrow(() -> new RuntimeException("Tentando remover palavra que ainda não foi salva"));
+                .orElseThrow(() -> new BusinessException("USER_WORD_NOT_SAVED", "Tentando remover palavra que ainda não foi salva"));
 
         if(!existingUserWord.isSaved()){
             return UserWordMapper.toUserWordListResponse(existingUserWord);

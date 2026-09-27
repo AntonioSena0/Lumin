@@ -1,6 +1,7 @@
 package br.com.api.service;
 
 import br.com.api.dto.response.CategoryResponse;
+import br.com.api.exception.NotFoundException;
 import br.com.api.mapper.CategoryMapper;
 import br.com.api.repository.CategoryRepository;
 import lombok.AllArgsConstructor;
@@ -25,7 +26,7 @@ public class CategoryServiceImpl implements CategoryService{
     @Override
     public CategoryResponse findById(Integer id) {
         return CategoryMapper.toCategoryResponse(repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Categoria não encontrada"))
+                .orElseThrow(() -> new NotFoundException("CATEGORY_NOT_FOUND", "Categoria não encontrada"))
         );
     }
 }

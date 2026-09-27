@@ -4,12 +4,15 @@ import br.com.api.domain.VoiceType;
 import br.com.api.dto.request.AvatarChangeRequest;
 import br.com.api.dto.request.UserPutRequest;
 import br.com.api.dto.request.UserRequest;
+import br.com.api.dto.response.UserMeResponse;
 import br.com.api.dto.response.UserResponse;
 import br.com.api.dto.request.UserPatchRequest;
 import br.com.api.entity.Avatar;
 import br.com.api.entity.Language;
 import br.com.api.entity.Setting;
 import br.com.api.entity.User;
+import br.com.api.exception.ConflictException;
+import br.com.api.exception.NotFoundException;
 import br.com.api.mapper.UserMapper;
 import br.com.api.repository.AvatarRepository;
 import br.com.api.repository.LanguageRepository;
@@ -43,31 +46,39 @@ public class UserServiceImpl implements UserService{
 
         return UserMapper.toUserResponse(
                 repository.findByIdWithRelations(id)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"))
+                .orElseThrow(() -> new NotFoundException("USER_NOT_FOUND", "Usuário não encontrado"))
         );
 
     }
 
     @Override
+    public UserMeResponse findMe(Long id) {
+        return UserMapper.toUserMeResponse(
+                repository.findByIdWithRelations(id)
+                        .orElseThrow(() -> new NotFoundException("USER_NOT_FOUND", "Usuário não encontrado"))
+        );
+    }
+
+    @Override
     @Transactional
-    public UserResponse create(UserRequest request) {
+    public UserMeResponse create(UserRequest request) {
 
         if(repository.findByName(request.name()).isPresent()){
-            throw new RuntimeException("Nome de usuário já cadastrado");
+            throw new ConflictException();
         }
 
         if(repository.findByEmail(request.email()).isPresent()){
-            throw new RuntimeException("Verifique os dados informados");
+            throw new ConflictException();
         }
 
         Language nativeLanguage = languageRepository.findById(request.nativeLanguage())
-                .orElseThrow(() -> new RuntimeException("Língua nativa não encontrada"));
+                .orElseThrow(() -> new NotFoundException("LANGUAGE_NOT_FOUND", "Língua nativa não encontrada"));
 
         Language chosenLanguage = languageRepository.findById(request.chosenLanguage())
-                .orElseThrow(() -> new RuntimeException("Língua escolhida para tradução não encontrada"));
+                .orElseThrow(() -> new NotFoundException("LANGUAGE_NOT_FOUND", "Língua escolhida para tradução não encontrada"));
 
         Avatar avatar = avatarRepository.findById(1)
-                .orElseThrow(() -> new RuntimeException("Erro ao criar usuário"));
+                .orElseThrow(() -> new NotFoundException("AVATAR_NOT_FOUND", "Erro ao criar usuário"));
 
         String hashPassword = passwordEncoder.encode(request.password());
 
@@ -82,23 +93,23 @@ public class UserServiceImpl implements UserService{
             .voice(VoiceType.FEMALE)
             .build());
 
-        return UserMapper.toUserResponse(savedUser);
+        return UserMapper.toUserMeResponse(savedUser);
 
     }
 
     @Override
     @Transactional
-    public UserResponse update(Long id, UserPutRequest request){
+    public UserMeResponse update(Long id, UserPutRequest request){
 
         User existingUser = repository.findByIdWithRelations(id)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new NotFoundException("USER_NOT_FOUND", "Usuário não encontrado"));
 
         if(repository.existsByNameAndIdNot(request.name(), id)){
-            throw new RuntimeException("Nome de usuário já cadastrado");
+            throw new ConflictException();
         }
 
         if(repository.existsByEmailAndIdNot(request.email(), id)){
-            throw new RuntimeException("Verifique os dados informados");
+            throw new ConflictException();
         }
 
         existingUser.setName(request.name());
@@ -106,36 +117,36 @@ public class UserServiceImpl implements UserService{
         existingUser.setPassword(passwordEncoder.encode(request.password()));
 
         Language nativeLanguage = languageRepository.findById(request.nativeLanguage())
-                .orElseThrow(() -> new RuntimeException("Língua nativa não encontrada"));
+                .orElseThrow(() -> new NotFoundException("LANGUAGE_NOT_FOUND", "Língua nativa não encontrada"));
 
         existingUser.setNativeLanguage(nativeLanguage);
 
         Language chosenLanguage = languageRepository.findById(request.chosenLanguage())
-                .orElseThrow(() -> new RuntimeException("Língua escolhida para tradução não encontrada"));
+                .orElseThrow(() -> new NotFoundException("LANGUAGE_NOT_FOUND", "Língua escolhida para tradução não encontrada"));
 
         existingUser.setChosenLanguage(chosenLanguage);
 
-        return UserMapper.toUserResponse(existingUser);
+        return UserMapper.toUserMeResponse(existingUser);
 
     }
 
     @Override
     @Transactional
-    public UserResponse parcialUpdate(Long id, UserPatchRequest request){
+    public UserMeResponse parcialUpdate(Long id, UserPatchRequest request){
 
         User existingUser = repository.findByIdWithRelations(id)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new NotFoundException("USER_NOT_FOUND", "Usuário não encontrado"));
 
         if(request.name() != null){
             if(repository.existsByNameAndIdNot(request.name(), id)){
-                throw new RuntimeException("Nome de Usuário já cadastrado");
+                throw new ConflictException();
             }
             existingUser.setName(request.name());
         }
 
         if(request.email() != null){
             if(repository.existsByEmailAndIdNot(request.email(), id)){
-                throw new RuntimeException("Verifique os dados informados");
+                throw new ConflictException();
             }
             existingUser.setEmail(request.email());
         }
@@ -146,39 +157,39 @@ public class UserServiceImpl implements UserService{
 
         if(request.nativeLanguage() != null){
             Language language = languageRepository.findById(request.nativeLanguage())
-                    .orElseThrow(() -> new RuntimeException("Língua nativa não encontrada"));
+                    .orElseThrow(() -> new NotFoundException("LANGUAGE_NOT_FOUND", "Língua nativa não encontrada"));
 
             existingUser.setNativeLanguage(language);
         }
 
         if(request.chosenLanguage() != null){
             Language language = languageRepository.findById(request.chosenLanguage())
-                    .orElseThrow(() -> new RuntimeException("Língua escolhida para tradução não encontrada"));
+                    .orElseThrow(() -> new NotFoundException("LANGUAGE_NOT_FOUND", "Língua escolhida para tradução não encontrada"));
 
             existingUser.setChosenLanguage(language);
         }
 
-        return UserMapper.toUserResponse(existingUser);
+        return UserMapper.toUserMeResponse(existingUser);
 
     }
 
     @Override
     @Transactional
-    public UserResponse changeAvatar(Long id, AvatarChangeRequest request) {
+    public UserMeResponse changeAvatar(Long id, AvatarChangeRequest request) {
 
         Avatar avatar = avatarRepository.findById(request.avatarId())
-                .orElseThrow(() -> new RuntimeException("Avatar não encontrado"));
+                .orElseThrow(() -> new NotFoundException("AVATAR_NOT_FOUND", "Avatar não encontrado"));
 
         User existingUser = repository.findByIdWithRelations(id)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new NotFoundException("USER_NOT_FOUND", "Usuário não encontrado"));
 
         if(existingUser.getAvatar().getId().equals(avatar.getId())){
-            return UserMapper.toUserResponse(existingUser);
+            return UserMapper.toUserMeResponse(existingUser);
         }
 
         existingUser.setAvatar(avatar);
 
-        return UserMapper.toUserResponse(existingUser);
+        return UserMapper.toUserMeResponse(existingUser);
     }
 
     @Override
@@ -186,7 +197,7 @@ public class UserServiceImpl implements UserService{
     public void delete(Long id){
 
         if(!repository.existsById(id)){
-            throw new RuntimeException("Usuário não encontrado");
+            throw new NotFoundException("USER_NOT_FOUND", "Usuário não encontrado");
         }
 
         repository.deleteById(id);

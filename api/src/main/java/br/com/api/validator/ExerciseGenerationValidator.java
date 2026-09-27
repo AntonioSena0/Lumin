@@ -5,6 +5,7 @@ import br.com.api.dto.response.SpeakingExerciseAiResponse;
 import br.com.api.dto.response.StudySessionAiResponse;
 import br.com.api.dto.response.WrittenExerciseAiResponse;
 import br.com.api.entity.Word;
+import br.com.api.exception.BusinessException;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -23,21 +24,21 @@ public class ExerciseGenerationValidator {
 
     public void validateBaseResponse(StudySessionAiResponse response) {
         if (response == null) {
-            throw new RuntimeException("A IA não retornou exercícios");
+            throw new BusinessException("AI_INVALID", "A IA não retornou exercícios");
         }
 
         if (response.writtenExercises() == null || response.writtenExercises().size() != 10) {
-            throw new RuntimeException("A IA deve retornar exatamente 10 exercícios escritos");
+            throw new BusinessException("AI_INVALID", "A IA deve retornar exatamente 10 exercícios escritos");
         }
 
         if (response.speakingExercises() == null || response.speakingExercises().size() != 5) {
-            throw new RuntimeException("A IA deve retornar exatamente 5 exercícios de fala");
+            throw new BusinessException("AI_INVALID", "A IA deve retornar exatamente 5 exercícios de fala");
         }
     }
 
     private void validateWrittenExercises(List<WrittenExerciseAiResponse> exercises, Word word) {
         if (exercises.stream().anyMatch(exercise -> exercise == null || exercise.subType() == null)) {
-            throw new RuntimeException("Todos os exercícios escritos devem conter tipo válido");
+            throw new BusinessException("AI_INVALID", "Todos os exercícios escritos devem conter tipo válido");
         }
 
         Map<WrittenType, Long> quantities = exercises.stream()
@@ -53,7 +54,7 @@ public class ExerciseGenerationValidator {
 
     private void validateQuantity(Map<WrittenType, Long> quantities, WrittenType type, long expected) {
         if (quantities.getOrDefault(type, 0L) != expected) {
-            throw new RuntimeException("Quantidade inválida para o tipo " + type);
+            throw new BusinessException("AI_INVALID", "Quantidade inválida para o tipo " + type);
         }
     }
 
@@ -63,7 +64,7 @@ public class ExerciseGenerationValidator {
         validateText(exercise.prompt(), "Prompt do exercício escrito inválido");
 
         if (exercise.subType() == null) {
-            throw new RuntimeException("Tipo do exercício escrito inválido");
+            throw new BusinessException("AI_INVALID", "Tipo do exercício escrito inválido");
         }
 
         if (exercise.subType() == WrittenType.FILL_IN) {
@@ -85,7 +86,7 @@ public class ExerciseGenerationValidator {
 
     private void validateFillIn(WrittenExerciseAiResponse exercise) {
         if (!exercise.prompt().contains("_____")) {
-            throw new RuntimeException("Exercício FILL_IN deve conter lacuna");
+            throw new BusinessException("AI_INVALID", "Exercício FILL_IN deve conter lacuna");
         }
 
         validateText(exercise.correctAnswer(), "Resposta correta do exercício FILL_IN inválida");
@@ -93,7 +94,7 @@ public class ExerciseGenerationValidator {
 
     private void validateMultipleChoice(WrittenExerciseAiResponse exercise, Word word) {
         if (exercise.options() == null || exercise.options().size() != 4) {
-            throw new RuntimeException("Exercício MULTIPLE_CHOICE deve conter exatamente 4 opções");
+            throw new BusinessException("AI_INVALID", "Exercício MULTIPLE_CHOICE deve conter exatamente 4 opções");
         }
 
         String translatedWord = normalize(word.getTranslated());
@@ -103,7 +104,7 @@ public class ExerciseGenerationValidator {
                 .anyMatch(option -> option.equals(translatedWord));
 
         if (!containsCorrectAnswer) {
-            throw new RuntimeException("Exercício MULTIPLE_CHOICE não contém a resposta correta");
+            throw new BusinessException("AI_INVALID", "Exercício MULTIPLE_CHOICE não contém a resposta correta");
         }
     }
 
@@ -111,13 +112,13 @@ public class ExerciseGenerationValidator {
         validateText(exercise.correctAnswer(), "Resposta correta do exercício REWRITE inválida");
 
         if (normalize(exercise.prompt()).contains(normalize(word.getTranslated()))) {
-            throw new RuntimeException("Exercício REWRITE não deve entregar a palavra no prompt");
+            throw new BusinessException("AI_INVALID", "Exercício REWRITE não deve entregar a palavra no prompt");
         }
     }
 
     private void validateSpeakingExercises(List<SpeakingExerciseAiResponse> exercises, Word word) {
         if (exercises.stream().anyMatch(exercise -> exercise == null)) {
-            throw new RuntimeException("Todos os exercícios de fala devem ser válidos");
+            throw new BusinessException("AI_INVALID", "Todos os exercícios de fala devem ser válidos");
         }
 
         exercises.forEach(exercise -> validateSpeakingExercise(exercise, word));
@@ -129,7 +130,7 @@ public class ExerciseGenerationValidator {
         validateText(exercise.prompt(), "Prompt do exercício de fala inválido");
 
         if (exercise.requiredWords() == null || exercise.requiredWords().isEmpty()) {
-            throw new RuntimeException("Exercício de fala deve conter palavras obrigatórias");
+            throw new BusinessException("AI_INVALID", "Exercício de fala deve conter palavras obrigatórias");
         }
 
         String translatedWord = normalize(word.getTranslated());
@@ -139,13 +140,13 @@ public class ExerciseGenerationValidator {
                 .anyMatch(requiredWord -> requiredWord.equals(translatedWord));
 
         if (!containsRequiredWord) {
-            throw new RuntimeException("Exercício de fala deve conter a palavra estudada");
+            throw new BusinessException("AI_INVALID", "Exercício de fala deve conter a palavra estudada");
         }
     }
 
     private void validateText(String value, String message) {
         if (value == null || value.isBlank()) {
-            throw new RuntimeException(message);
+            throw new BusinessException("AI_INVALID", message);
         }
     }
 

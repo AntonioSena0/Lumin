@@ -5,6 +5,7 @@ import br.com.api.dto.response.HomeSummaryResponse;
 import br.com.api.dto.response.UserLanguageProgressResponse;
 import br.com.api.dto.response.UserWordListResponse;
 import br.com.api.entity.User;
+import br.com.api.exception.NotFoundException;
 import br.com.api.mapper.HomeSummaryMapper;
 import br.com.api.mapper.UserWordMapper;
 import br.com.api.repository.UserRepository;
@@ -28,7 +29,7 @@ public class HomeSummaryServiceImpl implements HomeSummaryService{
     public HomeSummaryResponse findByUserId(Long userId) {
 
         User user = userRepository.findByIdWithRelations(userId)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new NotFoundException("USER_NOT_FOUND", "Usuário não encontrado"));
 
         UserLanguageProgressResponse languageProgress = userLanguageProgressService.getOrCreate(
                 user.getId(),

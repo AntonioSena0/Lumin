@@ -4,6 +4,7 @@ import br.com.api.dto.request.LoginRequest;
 import br.com.api.dto.request.UserRequest;
 import br.com.api.dto.response.AuthRegisterResponse;
 import br.com.api.dto.response.TokenPair;
+import br.com.api.dto.response.UserMeResponse;
 import br.com.api.dto.response.UserResponse;
 import br.com.api.service.AuthService;
 import br.com.api.service.UserService;
@@ -35,7 +36,7 @@ public class AuthControllerImpl implements AuthController{
 
     @Override
     @PostMapping("/register")
-    public ResponseEntity<UserResponse> register(@RequestBody UserRequest request) {
+    public ResponseEntity<UserMeResponse> register(@RequestBody UserRequest request) {
 
         AuthRegisterResponse authRegisterResponse = service.register(request);
 
@@ -59,7 +60,7 @@ public class AuthControllerImpl implements AuthController{
         return ResponseEntity.status(HttpStatus.CREATED)
                 .header(SET_COOKIE, accessToken.toString())
                 .header(SET_COOKIE, refreshToken.toString())
-                .body(authRegisterResponse.userResponse());
+                .body(authRegisterResponse.userMeResponse());
     }
 
     @Override

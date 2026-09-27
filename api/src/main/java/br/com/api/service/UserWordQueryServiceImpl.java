@@ -2,6 +2,7 @@ package br.com.api.service;
 
 import br.com.api.dto.request.UserWordFilterRequest;
 import br.com.api.dto.response.UserWordListResponse;
+import br.com.api.exception.NotFoundException;
 import br.com.api.mapper.UserWordMapper;
 import br.com.api.repository.UserWordRepository;
 import br.com.api.specification.UserWordSpecification;
@@ -20,7 +21,7 @@ public class UserWordQueryServiceImpl implements UserWordQueryService {
     @Override
     public UserWordListResponse findUserWordById(Long userId, Long wordId) {
         return UserWordMapper.toUserWordListResponse(repository.findByUserIdAndWordIdWithRelations(userId, wordId)
-                .orElseThrow(() -> new RuntimeException("Detalhes não encontrados")));
+                .orElseThrow(() -> new NotFoundException("USER_WORD_NOT_FOUND", "Detalhes não encontrados")));
     }
 
     @Override
