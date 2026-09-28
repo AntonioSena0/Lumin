@@ -6,7 +6,7 @@ CREATE TABLE placement_questions(
     correct_answer VARCHAR(100) NOT NULL,
     options JSONB NOT NULL,
     language_id INTEGER NOT NULL,
-    created_at timestamp,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
 
     CONSTRAINT fk_placement_questions_language FOREIGN KEY (language_id) REFERENCES languages(id)
 );

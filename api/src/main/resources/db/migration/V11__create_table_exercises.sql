@@ -11,7 +11,7 @@ CREATE TABLE exercises(
     language_id INTEGER NOT NULL,
     word_id BIGINT NOT NULL,
     session_id BIGINT,
-    created_at timestamp,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     CONSTRAINT fk_languages_exercises FOREIGN KEY (language_id) REFERENCES languages(id),
     CONSTRAINT fk_words_exercises FOREIGN KEY (word_id) REFERENCES words(id),
     CONSTRAINT fk_study_sessions_exercises FOREIGN KEY (session_id) REFERENCES study_sessions(id) ON DELETE CASCADE

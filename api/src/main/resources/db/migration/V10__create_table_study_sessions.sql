@@ -6,9 +6,9 @@ CREATE TABLE study_sessions(
     total_exercises INTEGER NOT NULL,
     score INTEGER,
     status study_status NOT NULL,
-    finished_at timestamp,
+    finished_at TIMESTAMP,
     user_id BIGINT NOT NULL,
-    created_at timestamp,
-    updated_at timestamp,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     CONSTRAINT fk_users_study_sessions FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
