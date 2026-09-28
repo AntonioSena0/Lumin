@@ -1,9 +1,7 @@
 package br.com.api.controller;
 
-import br.com.api.dto.request.LoginRequest;
-import br.com.api.dto.request.ResendRequest;
-import br.com.api.dto.request.UserRequest;
-import br.com.api.dto.request.VerifyRequest;
+import br.com.api.dto.request.*;
+import br.com.api.dto.response.OAuthPendingResponse;
 import br.com.api.dto.response.UserMeResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -12,7 +10,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @Tag(name = "Auth", description = "Recurso responsável pela autenticação com cookies HttpOnly.")
@@ -38,6 +35,8 @@ public interface AuthController {
     @Operation(summary = "Sair", description = "Método responsável por revogar o refresh e limpar os cookies")
     @ApiResponse(responseCode = "204", description = "Sessão encerrada", content = @Content())
     ResponseEntity<Void> logout(String refresh);
+
+    ResponseEntity<OAuthPendingResponse> oauth(OAuthRequest request);
 
     ResponseEntity<Void> verify(VerifyRequest request);
 

@@ -1,19 +1,17 @@
 package br.com.api.service;
 
-import br.com.api.dto.request.LoginRequest;
-import br.com.api.dto.request.ResendRequest;
-import br.com.api.dto.request.UserRequest;
-import br.com.api.dto.request.VerifyRequest;
-import br.com.api.dto.response.AuthRegisterResponse;
-import br.com.api.dto.response.TokenPair;
-import br.com.api.dto.response.UserMeResponse;
+import br.com.api.dto.request.*;
+import br.com.api.dto.response.*;
+import br.com.api.entity.OAuthAccountId;
 import br.com.api.entity.RefreshToken;
 import br.com.api.entity.User;
+import br.com.api.entity.VerificationCode;
 import br.com.api.exception.BusinessException;
 import br.com.api.exception.EmailNotVerifiedException;
 import br.com.api.exception.NotFoundException;
 import br.com.api.exception.TooManyRequestException;
 import br.com.api.exception.UnauthorizedException;
+import br.com.api.repository.OAuthAccountRepository;
 import br.com.api.repository.RefreshTokenRepository;
 import br.com.api.repository.UserRepository;
 import br.com.api.repository.VerificationCodeRepository;
@@ -41,8 +39,9 @@ public class AuthServiceImpl implements AuthService{
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final VerificationCodeRepository verificationCodeRepository;
-    private final ApplicationEventPublisher publisher;
     private final VerificationCodeServiceImpl verificationCodeService;
+    private final OAuthService oAuthService;
+    private final OAuthAccountRepository oAuthAccountRepository;
 
     @Override
     @Transactional
@@ -208,8 +207,39 @@ public class AuthServiceImpl implements AuthService{
 
     }
 
+    private TokenPair loginSocial(User user) {
+
+        String access = jwtService.issue(user.getId(), user.isEmailVerified());
+
+        RefreshToken refreshToken = refreshTokenRepository.save(RefreshToken
+                .builder()
+                .user(user)
+                .expiresAt(LocalDateTime.now().plusDays(7))
+                .revoked(false)
+                .build());
+
+        return TokenPair
+                .builder()
+                .access(access)
+                .refreshJti(refreshToken.getJti().toString())
+                .build();
+
+    }
+
     private void issueCode(String email, String name){
         verificationCodeService.issue(email, name);
+    }
+
+    @Override
+    @Transactional
+    public OAuthResult oauth(OAuthRequest request) {
+
+        OAuthPendingResponse pendingResponse = oAuthService.resolveGoogle(request.code(), request.redirectUri());
+
+        return oAuthAccountRepository.findById(new OAuthAccountId(pendingResponse.providerId(), pendingResponse.provider()))
+                .map(acc -> new OAuthResult(loginSocial(acc.getUser()), null))
+                .orElseGet(() -> new OAuthResult(null, pendingResponse));
+
     }
 
 }

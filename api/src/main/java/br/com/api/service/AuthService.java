@@ -1,10 +1,9 @@
 package br.com.api.service;
 
-import br.com.api.dto.request.LoginRequest;
-import br.com.api.dto.request.ResendRequest;
-import br.com.api.dto.request.UserRequest;
-import br.com.api.dto.request.VerifyRequest;
+import br.com.api.dto.request.*;
+
 import br.com.api.dto.response.AuthRegisterResponse;
+import br.com.api.dto.response.OAuthResult;
 import br.com.api.dto.response.TokenPair;
 
 public interface AuthService {
@@ -15,5 +14,6 @@ public interface AuthService {
     void logout(String refreshJti);
     void verify(VerifyRequest request);
     void resend(ResendRequest request);
+    OAuthResult oauth(OAuthRequest request);
 
 }

@@ -1,23 +1,14 @@
 package br.com.api.controller;
 
-import br.com.api.dto.request.LoginRequest;
-import br.com.api.dto.request.ResendRequest;
-import br.com.api.dto.request.UserRequest;
-import br.com.api.dto.request.VerifyRequest;
-import br.com.api.dto.response.AuthRegisterResponse;
-import br.com.api.dto.response.TokenPair;
-import br.com.api.dto.response.UserMeResponse;
-import br.com.api.dto.response.UserResponse;
+import br.com.api.dto.request.*;
+import br.com.api.dto.response.*;
 import br.com.api.service.AuthService;
-import br.com.api.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.net.URI;
 
 import static org.springframework.http.HttpHeaders.SET_COOKIE;
 
@@ -155,6 +146,39 @@ public class AuthControllerImpl implements AuthController{
                 .header(SET_COOKIE, accessToken.toString())
                 .header(SET_COOKIE, refreshToken.toString())
                 .build();
+    }
+
+    @Override
+    @PostMapping("/oauth")
+    public ResponseEntity<OAuthPendingResponse> oauth(@RequestBody @Valid OAuthRequest request) {
+
+        OAuthResult result = service.oauth(request);
+
+        if(result.tokens() != null){
+
+            ResponseCookie access = ResponseCookie.from("access", result.tokens().access())
+                    .httpOnly(true)
+                    .secure(cookieSecure)
+                    .sameSite("Lax")
+                    .path("/")
+                    .maxAge(900)
+                    .build();
+
+            ResponseCookie refresh = ResponseCookie.from("refresh", result.tokens().refreshJti())
+                    .httpOnly(true)
+                    .secure(cookieSecure)
+                    .sameSite("Lax")
+                    .path("/lumin/auth/refresh")
+                    .maxAge(604800)
+                    .build();
+
+            return ResponseEntity.noContent()
+                    .header(SET_COOKIE, access.toString())
+                    .header(SET_COOKIE, refresh.toString())
+                    .build();
+        }
+
+        return ResponseEntity.status(202).body(result.pendingResponse());
     }
 
     @Override
