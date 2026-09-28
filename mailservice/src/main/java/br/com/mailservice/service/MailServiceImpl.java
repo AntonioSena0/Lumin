@@ -1,41 +1,51 @@
 package br.com.mailservice.service;
 
 import br.com.mailservice.dto.event.MailEvent;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
-import java.io.UnsupportedEncodingException;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class MailServiceImpl implements MailService {
 
-    private final JavaMailSender mailSender;
+    private final RestTemplate restTemplate;
+    private final String resendApiKey;
     private final String from;
 
     public MailServiceImpl(
-            JavaMailSender mailSender,
+            RestTemplate restTemplate,
+            @Value("${RESEND_API_KEY:}") String resendApiKey,
             @Value("${MAIL_FROM:noreply@lumin.com}") String from
     ) {
-        this.mailSender = mailSender;
+        this.restTemplate = restTemplate;
+        this.resendApiKey = resendApiKey;
         this.from = from;
     }
 
     @Override
     public void sendEmail(MailEvent event) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(resendApiKey);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        Map<String, Object> body = Map.of(
+                "from", "Lumin <" + from + ">",
+                "to", List.of(event.to()),
+                "subject", event.subject(),
+                "html", buildCodeHtml(event.vars().get("code")));
+
         try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-            helper.setTo(event.to());
-            helper.setFrom(from, "Lumin");
-            helper.setSubject(event.subject());
-            helper.setText(buildCodeHtml(event.vars().get("code")), true);
-            mailSender.send(message);
-        } catch (MessagingException | UnsupportedEncodingException e) {
-            throw new IllegalStateException("Falha ao montar e-mail", e);
+            restTemplate.postForObject("https://api.resend.com/emails",
+                    new HttpEntity<>(body, headers), Map.class);
+        } catch (HttpClientErrorException e) {
+            throw new IllegalArgumentException("E-mail rejeitado: " + e.getStatusCode(), e);
         }
     }
 

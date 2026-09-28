@@ -4,20 +4,9 @@ spring:
 
   rabbitmq:
     host: ${RABBIT_HOST:localhost}
+    port: ${RABBIT_PORT:5672}
     username: ${RABBIT_USER:guest}
     password: ${RABBIT_PASSWORD:guest}
-
-  mail:
-    host: ${SMTP_HOST:smtp.gmail.com}
-    port: ${SMTP_PORT:587}
-    username: ${SMTP_USER:}
-    password: ${SMTP_PASS:}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
 
 management:
   endpoints:
