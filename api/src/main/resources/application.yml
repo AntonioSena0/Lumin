@@ -41,6 +41,12 @@ spring:
           temperature: 0.7
           maxTokens: ${MAX_TOKENS:2500}
 
+  rabbitmq:
+    host: ${RABBIT_HOST:localhost}
+    port: ${RABBIT_PORT:5672}
+    username: ${RABBIT_USER:guest}
+    password: ${RABBIT_PASSWORD:guest}
+
 jwt:
   secret: ${JWT_SECRET}
   exp-min: ${JWT_EXP_MIN:15}

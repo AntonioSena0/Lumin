@@ -62,6 +62,7 @@ class MeSecurityTest {
     @Test
     void userACannotReadUserBSession() throws Exception {
         when(jwtService.getUserId("token-a")).thenReturn(1L);
+        when(jwtService.isVerified("token-a")).thenReturn(true);
         when(studySessionService.findById(99L)).thenThrow(new BusinessException("SESSION_NOT_OWNED", "Essa sessao nao pertence a voce"));
 
         mvc.perform(get("/lumin/me/sessions/99").cookie(new Cookie("access", "token-a")))
@@ -72,6 +73,7 @@ class MeSecurityTest {
     @Test
     void userACannotFinishUserBSession() throws Exception {
         when(jwtService.getUserId("token-a")).thenReturn(1L);
+        when(jwtService.isVerified("token-a")).thenReturn(true);
         when(studySessionService.finishSession(eq(99L), eq(1L))).thenThrow(new BusinessException("SESSION_NOT_OWNED", "Essa sessao nao pertence a voce"));
 
         mvc.perform(patch("/lumin/me/sessions/finish/99").cookie(new Cookie("access", "token-a")))

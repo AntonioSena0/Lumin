@@ -1,7 +1,9 @@
 package br.com.api.controller;
 
 import br.com.api.dto.request.LoginRequest;
+import br.com.api.dto.request.ResendRequest;
 import br.com.api.dto.request.UserRequest;
+import br.com.api.dto.request.VerifyRequest;
 import br.com.api.dto.response.AuthRegisterResponse;
 import br.com.api.dto.response.TokenPair;
 import br.com.api.dto.response.UserMeResponse;
@@ -155,4 +157,17 @@ public class AuthControllerImpl implements AuthController{
                 .build();
     }
 
+    @Override
+    @PostMapping("/verify")
+    public ResponseEntity<Void> verify(@RequestBody @Valid VerifyRequest request) {
+        service.verify(request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    @PostMapping("/resend")
+    public ResponseEntity<Void> resend(@RequestBody @Valid ResendRequest request) {
+        service.resend(request);
+        return ResponseEntity.noContent().build();
+    }
 }

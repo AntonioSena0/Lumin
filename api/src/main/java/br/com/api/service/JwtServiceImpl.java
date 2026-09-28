@@ -28,11 +28,12 @@ public class JwtServiceImpl implements JwtService{
     }
 
     @Override
-    public String issue(Long userId) {
+    public String issue(Long userId, boolean verified) {
         Instant now = Instant.now();
         return Jwts
                 .builder()
                 .subject(userId.toString())
+                .claim("verified", verified)
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(now.plus(expMin, ChronoUnit.MINUTES)))
                 .signWith(key)
@@ -52,4 +53,11 @@ public class JwtServiceImpl implements JwtService{
     public Long getUserId(String token) {
         return Long.valueOf(parse(token).getPayload().getSubject());
     }
+
+    @Override
+    public boolean isVerified(String token){
+        Boolean v = parse(token).getPayload().get("verified", Boolean.class);
+        return Boolean.TRUE.equals(v);
+    }
+
 }

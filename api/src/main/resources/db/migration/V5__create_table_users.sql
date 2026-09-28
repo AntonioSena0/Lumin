@@ -6,8 +6,9 @@ CREATE TABLE users (
     native_language_id INTEGER NOT NULL,
     to_language_id INTEGER NOT NULL,
     avatar_id INTEGER DEFAULT 1 NOT NULL,
-    created_at timestamp,
-    updated_at timestamp,
+    email_verified BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL,
     CONSTRAINT fk_users_languages_native FOREIGN KEY (native_language_id) REFERENCES languages(id),
     CONSTRAINT fk_users_languages_to FOREIGN KEY (to_language_id) REFERENCES languages(id),
     CONSTRAINT fk_users_avatars FOREIGN KEY (avatar_id) REFERENCES avatars(id)

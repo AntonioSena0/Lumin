@@ -1,7 +1,9 @@
 package br.com.api.controller;
 
 import br.com.api.dto.request.LoginRequest;
+import br.com.api.dto.request.ResendRequest;
 import br.com.api.dto.request.UserRequest;
+import br.com.api.dto.request.VerifyRequest;
 import br.com.api.dto.response.UserMeResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -21,19 +23,24 @@ public interface AuthController {
             content = @Content(schema = @Schema(implementation = UserMeResponse.class)))
     @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content())
     @ApiResponse(responseCode = "409", description = "Dados já em uso", content = @Content())
-    ResponseEntity<UserMeResponse> register(@Valid @RequestBody UserRequest request);
+    ResponseEntity<UserMeResponse> register(UserRequest request);
 
     @Operation(summary = "Entrar", description = "Método responsável por autenticar o usuário e emitir os cookies de sessão")
     @ApiResponse(responseCode = "204", description = "Autenticado", content = @Content())
     @ApiResponse(responseCode = "401", description = "Credenciais inválidas", content = @Content())
-    ResponseEntity<Void> login(@Valid @RequestBody LoginRequest request);
+    ResponseEntity<Void> login(LoginRequest request);
 
     @Operation(summary = "Renovar sessão", description = "Método responsável por rotacionar o par access/refresh")
     @ApiResponse(responseCode = "204", description = "Sessão renovada", content = @Content())
     @ApiResponse(responseCode = "401", description = "Sessão inválida", content = @Content())
-    ResponseEntity<Void> refresh(@CookieValue(name = "refresh", required = false) String refresh);
+    ResponseEntity<Void> refresh(String refresh);
 
     @Operation(summary = "Sair", description = "Método responsável por revogar o refresh e limpar os cookies")
     @ApiResponse(responseCode = "204", description = "Sessão encerrada", content = @Content())
-    ResponseEntity<Void> logout(@CookieValue(name = "refresh", required = false) String refresh);
+    ResponseEntity<Void> logout(String refresh);
+
+    ResponseEntity<Void> verify(VerifyRequest request);
+
+    ResponseEntity<Void> resend(ResendRequest request);
+
 }

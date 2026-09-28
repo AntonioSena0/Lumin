@@ -1,9 +1,6 @@
 package br.com.api.config;
 
-import br.com.api.exception.BusinessException;
-import br.com.api.exception.ConflictException;
-import br.com.api.exception.NotFoundException;
-import br.com.api.exception.UnauthorizedException;
+import br.com.api.exception.*;
 import io.jsonwebtoken.JwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -52,6 +49,18 @@ public class ApplicationControllerAdvice {
     @ResponseStatus(HttpStatus.CONFLICT)
     public Error conflict(ConflictException e) {
         return new Error("REGISTER_INVALID", "Verifique os dados informados", List.of());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.TOO_MANY_REQUESTS)
+    public Error manyRequests(TooManyRequestException e) {
+        return new Error(e.getCode(), e.getMessage(), List.of());
+    }
+
+    @ExceptionHandler(EmailNotVerifiedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public Error emailNotVerified() {
+        return new Error("EMAIL_NOT_VERIFIED", "E-mail não verificado", List.of());
     }
 
     @ExceptionHandler

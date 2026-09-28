@@ -1,6 +1,8 @@
 package br.com.api.config;
 
+import br.com.api.config.ApplicationControllerAdvice.Error;
 import br.com.api.service.JwtService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -21,6 +23,7 @@ import java.util.List;
 public class SecurityFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
+    private final ObjectMapper mapper;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -37,6 +40,16 @@ public class SecurityFilter extends OncePerRequestFilter {
         if(access != null && !access.isBlank()){
             try {
                 Long userId = jwtService.getUserId(access);
+                boolean verified = jwtService.isVerified(access);
+                String path = request.getRequestURI();
+                boolean free = path.startsWith("/lumin/auth/verify") || path.startsWith("/lumin/auth/resend")
+                        || path.startsWith("/lumin/auth/refresh") || path.startsWith("/lumin/auth/logout") || path.startsWith("/lumin/languages");
+                if(!verified && !free) {
+                    response.setStatus(403);
+                    response.setContentType("application/json;charset=UTF-8");
+                    mapper.writeValue(response.getWriter(), new Error("EMAIL_NOT_VERIFIED", "Email não verificado", List.of()));
+                    return;
+                }
                 var auth = new UsernamePasswordAuthenticationToken(userId, null, List.of());
                 SecurityContextHolder.getContext().setAuthentication(auth);
             } catch (JwtException e){

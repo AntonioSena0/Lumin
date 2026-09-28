@@ -34,6 +34,7 @@ public class UserServiceImpl implements UserService{
     private final AvatarRepository avatarRepository;
     private final SettingRepository settingRepository;
     private final PasswordEncoder passwordEncoder;
+    private final VerificationCodeServiceImpl verificationCodeService;
 
     @Override
     public Page<UserResponse> findAll(Pageable pageable) {
@@ -113,7 +114,12 @@ public class UserServiceImpl implements UserService{
         }
 
         existingUser.setName(request.name());
-        existingUser.setEmail(request.email());
+        if (!request.email().equals(existingUser.getEmail())) {
+            verificationCodeService.revoke(existingUser.getEmail());
+            existingUser.setEmail(request.email());
+            existingUser.setEmailVerified(false);
+            verificationCodeService.issue(request.email(), request.name());
+        }
         existingUser.setPassword(passwordEncoder.encode(request.password()));
 
         Language nativeLanguage = languageRepository.findById(request.nativeLanguage())
@@ -144,11 +150,14 @@ public class UserServiceImpl implements UserService{
             existingUser.setName(request.name());
         }
 
-        if(request.email() != null){
+        if(request.email() != null && !request.email().equals(existingUser.getEmail())){
             if(repository.existsByEmailAndIdNot(request.email(), id)){
                 throw new ConflictException();
             }
+            verificationCodeService.revoke(existingUser.getEmail());
             existingUser.setEmail(request.email());
+            existingUser.setEmailVerified(false);
+            verificationCodeService.issue(request.email(), existingUser.getName());
         }
 
         if(request.password() != null){

@@ -41,6 +41,18 @@ class AuthRefreshRotationTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
+
+    @Mock
+    private br.com.api.repository.VerificationCodeRepository verificationCodeRepository;
+
+    @Mock
+    private org.springframework.context.ApplicationEventPublisher publisher;
+
+    @Mock
+    private VerificationCodeServiceImpl verificationCodeService;
+
     private JwtService jwtService;
 
     private AuthServiceImpl service;
@@ -48,12 +60,12 @@ class AuthRefreshRotationTest {
     @BeforeEach
     void setUp() {
         jwtService = new JwtServiceImpl("0123456789ABCDEF0123456789ABCDEF", 15);
-        service = new AuthServiceImpl(authenticationManager, jwtService, refreshTokenRepository, userService, userRepository);
+        service = new AuthServiceImpl(authenticationManager, jwtService, refreshTokenRepository, userService, userRepository, passwordEncoder, verificationCodeRepository, publisher, verificationCodeService);
     }
 
     @Test
     void loginIssuesPairRefreshRotatesAndRevokedReuseFails() {
-        User user = User.builder().id(7L).email("a@test.com").password("secret123").build();
+        User user = User.builder().id(7L).email("a@test.com").password("secret123").emailVerified(true).build();
         Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, List.of());
         when(authenticationManager.authenticate(any())).thenReturn(authentication);
         when(refreshTokenRepository.save(any(RefreshToken.class))).thenAnswer(invocation -> {

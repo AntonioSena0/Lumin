@@ -36,9 +36,9 @@ public class SecurityConfig {
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         .requestMatchers(
                                 HttpMethod.POST,
-                                "/lumin/auth/register", "/lumin/auth/login", "/lumin/auth/refresh", "/lumin/auth/logout")
+                                "/lumin/auth/register", "/lumin/auth/login", "/lumin/auth/refresh", "/lumin/auth/logout", "/lumin/auth/verify", "/lumin/auth/resend")
                         .permitAll()
-                        .requestMatchers("/lumin/languages/").permitAll()
+                        .requestMatchers("/lumin/languages/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/v3/api-docs/**", "/swagger-ui/**").permitAll()
                         .anyRequest().authenticated()
                 )
