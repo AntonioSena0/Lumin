@@ -63,5 +63,11 @@ jwt:
 cookie:
   secure: ${COOKIE_SECURE:false}
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
 server:
   port: 8080

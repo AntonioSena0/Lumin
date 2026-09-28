@@ -19,5 +19,11 @@ spring:
           starttls:
             enable: true
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
 server:
   port: ${SERVER_PORT:8081}
