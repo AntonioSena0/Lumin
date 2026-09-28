@@ -2,21 +2,19 @@ package br.com.api.service;
 
 import br.com.api.dto.request.*;
 import br.com.api.dto.response.*;
-import br.com.api.entity.OAuthAccountId;
-import br.com.api.entity.RefreshToken;
-import br.com.api.entity.User;
-import br.com.api.entity.VerificationCode;
+import br.com.api.dto.response.OAuthResult;
+import br.com.api.entity.*;
 import br.com.api.exception.BusinessException;
 import br.com.api.exception.EmailNotVerifiedException;
 import br.com.api.exception.NotFoundException;
 import br.com.api.exception.TooManyRequestException;
 import br.com.api.exception.UnauthorizedException;
+import br.com.api.mapper.UserMapper;
 import br.com.api.repository.OAuthAccountRepository;
 import br.com.api.repository.RefreshTokenRepository;
 import br.com.api.repository.UserRepository;
 import br.com.api.repository.VerificationCodeRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -51,26 +49,7 @@ public class AuthServiceImpl implements AuthService{
 
         issueCode(request.email(), created.name());
 
-        String access = jwtService.issue(created.id(), false);
-        RefreshToken refreshToken = refreshTokenRepository.save(RefreshToken
-                        .builder()
-                        .user(userRepository.getReferenceById(created.id()))
-                        .expiresAt(LocalDateTime.now().plusDays(7))
-                        .revoked(false)
-                        .build()
-        );
-
-        return AuthRegisterResponse
-                .builder()
-                .tokenPair(
-                    TokenPair
-                            .builder()
-                            .access(access)
-                            .refreshJti(refreshToken.getJti().toString())
-                            .build()
-                )
-                .userMeResponse(created)
-                .build();
+        return buildSession(created);
 
     }
 
@@ -209,20 +188,9 @@ public class AuthServiceImpl implements AuthService{
 
     private TokenPair loginSocial(User user) {
 
-        String access = jwtService.issue(user.getId(), user.isEmailVerified());
+        AuthRegisterResponse session = buildSession(UserMapper.toUserMeResponse(user));
 
-        RefreshToken refreshToken = refreshTokenRepository.save(RefreshToken
-                .builder()
-                .user(user)
-                .expiresAt(LocalDateTime.now().plusDays(7))
-                .revoked(false)
-                .build());
-
-        return TokenPair
-                .builder()
-                .access(access)
-                .refreshJti(refreshToken.getJti().toString())
-                .build();
+        return session.tokenPair();
 
     }
 
@@ -239,6 +207,56 @@ public class AuthServiceImpl implements AuthService{
         return oAuthAccountRepository.findById(new OAuthAccountId(pendingResponse.providerId(), pendingResponse.provider()))
                 .map(acc -> new OAuthResult(loginSocial(acc.getUser()), null))
                 .orElseGet(() -> new OAuthResult(null, pendingResponse));
+
+    }
+
+    @Override
+    @Transactional
+    public AuthRegisterResponse registerOAuth(UserOAuthRequest request) {
+
+        String randomPassword = UUID.randomUUID().toString();
+
+        UserMeResponse created = userService.create(new UserRequest(
+                request.name(),
+                request.email(),
+                randomPassword,
+                request.nativeLanguage(),
+                request.chosenLanguage()
+        ));
+
+        oAuthAccountRepository.save(OAuthAccount
+                        .builder()
+                        .id(new OAuthAccountId(request.providerId(), request.provider()))
+                        .user(userRepository.getReferenceById(created.id()))
+                        .build()
+        );
+
+        if(request.providerEmailVerified()){
+            userRepository.getReferenceById(created.id()).setEmailVerified(true);
+        } else {
+            verificationCodeService.issue(request.email(), request.name());
+        }
+
+        return buildSession(created);
+
+    }
+
+    private AuthRegisterResponse buildSession(UserMeResponse created) {
+
+        boolean verified = userRepository.findById(created.id())
+                .orElseThrow(() -> new NotFoundException("USER_NOT_FOUND", "Usuário não encontrado"))
+                .isEmailVerified();
+
+        String access = jwtService.issue(created.id(), verified);
+
+        RefreshToken rt = refreshTokenRepository.save(RefreshToken.builder()
+                .user(userRepository.getReferenceById(created.id()))
+                .expiresAt(LocalDateTime.now().plusDays(7)).revoked(false).build());
+
+        UserMeResponse user = UserMapper.toUserMeResponse(userRepository.findByIdWithRelations(created.id())
+                .orElseThrow(() -> new NotFoundException("USER_NOT_FOUND", "Usuário não encontrado")));
+
+        return new AuthRegisterResponse(user, TokenPair.builder().access(access).refreshJti(rt.getJti().toString()).build());
 
     }
 

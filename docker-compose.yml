@@ -84,7 +84,7 @@ services:
       SPRING_PROFILES_ACTIVE: test
     command: ["mvn",
               "-B",
-              "-Dtest=AuthRefreshRotationTest,PlacementSubmitTest,SettingPatchTest,MeSecurityTest,UserLanguageProgressConcurrencyTest",
+              "-Dtest=AuthRefreshRotationTest,PlacementSubmitTest,SettingPatchTest,MeSecurityTest,UserLanguageProgressConcurrencyTest,OAuthBranchTest",
               "-DfailIfNoTests=false",
               "test"]
     depends_on:

@@ -36,10 +36,24 @@ public interface AuthController {
     @ApiResponse(responseCode = "204", description = "Sessão encerrada", content = @Content())
     ResponseEntity<Void> logout(String refresh);
 
+    @Operation(summary = "Entrar com provedor social", description = "Método responsável por autenticar via Google ou retornar os dados para concluir o cadastro")
+    @ApiResponse(responseCode = "204", description = "Autenticado", content = @Content())
+    @ApiResponse(responseCode = "202", description = "Conta nova, concluir cadastro",
+            content = @Content(schema = @Schema(implementation = OAuthPendingResponse.class)))
+    @ApiResponse(responseCode = "422", description = "Login social inválido", content = @Content())
     ResponseEntity<OAuthPendingResponse> oauth(OAuthRequest request);
 
+    ResponseEntity<UserMeResponse> registerOAuth(UserOAuthRequest request);
+
+    @Operation(summary = "Verificar código", description = "Método responsável por confirmar o e-mail com o código enviado")
+    @ApiResponse(responseCode = "204", description = "E-mail verificado", content = @Content())
+    @ApiResponse(responseCode = "422", description = "Código inválido", content = @Content())
     ResponseEntity<Void> verify(VerifyRequest request);
 
+    @Operation(summary = "Reenviar código", description = "Método responsável por reenviar o código de verificação")
+    @ApiResponse(responseCode = "204", description = "Código reenviado", content = @Content())
+    @ApiResponse(responseCode = "404", description = "Usuário não encontrado", content = @Content())
+    @ApiResponse(responseCode = "429", description = "Aguarde antes de reenviar", content = @Content())
     ResponseEntity<Void> resend(ResendRequest request);
 
 }

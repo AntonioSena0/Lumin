@@ -182,6 +182,36 @@ public class AuthControllerImpl implements AuthController{
     }
 
     @Override
+    @PostMapping("/register/oauth")
+    public ResponseEntity<UserMeResponse> registerOAuth(@RequestBody @Valid UserOAuthRequest request) {
+
+        AuthRegisterResponse authRegisterResponse = service.registerOAuth(request);
+
+        ResponseCookie accessToken = ResponseCookie
+                .from("access", authRegisterResponse.tokenPair().access())
+                .httpOnly(true).secure(cookieSecure)
+                .sameSite("Lax")
+                .path("/")
+                .maxAge(900)
+                .build();
+
+        ResponseCookie refreshToken = ResponseCookie
+                .from("refresh", authRegisterResponse.tokenPair().refreshJti())
+                .httpOnly(true)
+                .secure(cookieSecure)
+                .sameSite("Lax")
+                .path("/lumin/auth/refresh")
+                .maxAge(604800)
+                .build();
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .header(SET_COOKIE, accessToken.toString())
+                .header(SET_COOKIE, refreshToken.toString())
+                .body(authRegisterResponse.userMeResponse());
+
+    }
+
+    @Override
     @PostMapping("/verify")
     public ResponseEntity<Void> verify(@RequestBody @Valid VerifyRequest request) {
         service.verify(request);

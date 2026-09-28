@@ -15,5 +15,6 @@ public interface AuthService {
     void verify(VerifyRequest request);
     void resend(ResendRequest request);
     OAuthResult oauth(OAuthRequest request);
+    AuthRegisterResponse registerOAuth(UserOAuthRequest request);
 
 }
