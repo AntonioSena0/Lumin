@@ -3,11 +3,9 @@ package br.com.api.service;
 import br.com.api.domain.OAuthProvider;
 import br.com.api.dto.request.OAuthRequest;
 import br.com.api.dto.response.OAuthPendingResponse;
+import br.com.api.dto.response.OAuthResult;
 import br.com.api.dto.response.TokenPair;
-import br.com.api.entity.OAuthAccount;
-import br.com.api.entity.OAuthAccountId;
-import br.com.api.entity.RefreshToken;
-import br.com.api.entity.User;
+import br.com.api.entity.*;
 import br.com.api.repository.OAuthAccountRepository;
 import br.com.api.repository.RefreshTokenRepository;
 import br.com.api.repository.UserRepository;
@@ -72,7 +70,11 @@ class OAuthBranchTest {
 
     @Test
     void linkedAccountIssuesTokens() {
-        User user = User.builder().id(3L).email("o@test.com").password("secret123").emailVerified(true).build();
+        Language nativeLanguage = Language.builder().id(1).code("pt").name("Portugues").build();
+        Language targetLanguage = Language.builder().id(2).code("en").name("English").build();
+        Avatar avatar = Avatar.builder().id(1).name("Av").imgUrl("http://img/av.png").build();
+        User user = User.builder().id(3L).email("o@test.com").password("secret123").emailVerified(true)
+                .nativeLanguage(nativeLanguage).chosenLanguage(targetLanguage).avatar(avatar).build();
         OAuthPendingResponse pending = OAuthPendingResponse.builder()
                 .email("o@test.com").name("O").provider(OAuthProvider.GOOGLE).providerId("sub-1")
                 .emailVerified(true).build();
@@ -80,6 +82,9 @@ class OAuthBranchTest {
         OAuthAccount account = OAuthAccount.builder().id(id).user(user).build();
         when(oAuthService.resolveGoogle("code", "http://localhost")).thenReturn(pending);
         when(oAuthAccountRepository.findById(id)).thenReturn(Optional.of(account));
+        when(userRepository.findById(3L)).thenReturn(Optional.of(user));
+        when(userRepository.findByIdWithRelations(3L)).thenReturn(Optional.of(user));
+        when(userRepository.getReferenceById(3L)).thenReturn(user);
         when(refreshTokenRepository.save(any(RefreshToken.class))).thenAnswer(invocation -> {
             RefreshToken token = invocation.getArgument(0);
             if (token.getJti() == null) {
