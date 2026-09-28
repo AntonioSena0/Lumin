@@ -7,6 +7,7 @@ CREATE TABLE users (
     to_language_id INTEGER NOT NULL,
     avatar_id INTEGER DEFAULT 1 NOT NULL,
     email_verified BOOLEAN NOT NULL DEFAULT FALSE,
+    pending_email VARCHAR(100),
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     CONSTRAINT fk_users_languages_native FOREIGN KEY (native_language_id) REFERENCES languages(id),

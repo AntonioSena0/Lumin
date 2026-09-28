@@ -16,5 +16,7 @@ public interface AuthService {
     void resend(ResendRequest request);
     OAuthResult oauth(OAuthRequest request);
     AuthRegisterResponse registerOAuth(UserOAuthRequest request);
+    void forgotPassword(ResendRequest request);
+    void resetPassword(PasswordResetConfirmRequest request);
 
 }

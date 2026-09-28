@@ -56,6 +56,12 @@ class OAuthBranchTest {
     @Mock
     private OAuthAccountRepository oAuthAccountRepository;
 
+    @Mock
+    private br.com.api.repository.PasswordResetCodeRepository passwordResetCodeRepository;
+
+    @Mock
+    private org.springframework.context.ApplicationEventPublisher publisher;
+
     private JwtService jwtService;
 
     private AuthServiceImpl service;
@@ -65,7 +71,7 @@ class OAuthBranchTest {
         jwtService = new JwtServiceImpl("0123456789ABCDEF0123456789ABCDEF", 15);
         service = new AuthServiceImpl(authenticationManager, jwtService, refreshTokenRepository, userService,
                 userRepository, passwordEncoder, verificationCodeRepository, verificationCodeService,
-                oAuthService, oAuthAccountRepository);
+                oAuthService, oAuthAccountRepository, passwordResetCodeRepository, publisher);
     }
 
     @Test

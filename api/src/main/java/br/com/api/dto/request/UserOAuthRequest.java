@@ -9,11 +9,6 @@ public record UserOAuthRequest(
         @Size(max = 100)
         String name,
 
-        @NotEmpty(message = "Email não pode ser vazio")
-        @Size(max = 100)
-        @Email(message = "Formato de email inválido")
-        String email,
-
         @NotNull(message = "Língua nativa não pode ser nula")
         Integer nativeLanguage,
 
@@ -23,9 +18,10 @@ public record UserOAuthRequest(
         @NotNull(message = "Provider não pode ser nulo")
         OAuthProvider provider,
 
-        @NotBlank(message = "Id do provider não pode ser vazio")
-        String providerId,
+        @NotBlank(message = "Código não pode ser vazio")
+        String code,
 
-        boolean providerEmailVerified
+        @NotBlank(message = "Redirect não pode ser vazio")
+        String redirectUri
 
 ) {}

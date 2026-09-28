@@ -25,6 +25,21 @@ public class MailProducerImpl implements MailProducer{
     }
 
     @Override
+    public void sendPasswordChanged(String to, String name) {
+        rabbitTemplate.convertAndSend(
+                exchange,
+                routing,
+                MailEvent
+                        .builder()
+                        .to(to)
+                        .subject("Sua senha foi alterada")
+                        .template("password-changed")
+                        .vars(Map.of("name", name))
+                        .build()
+        );
+    }
+
+    @Override
     public void sendCode(String to, String code) {
         rabbitTemplate.convertAndSend(
                 exchange,

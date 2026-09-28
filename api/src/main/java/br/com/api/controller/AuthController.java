@@ -56,4 +56,13 @@ public interface AuthController {
     @ApiResponse(responseCode = "429", description = "Aguarde antes de reenviar", content = @Content())
     ResponseEntity<Void> resend(ResendRequest request);
 
+    @Operation(summary = "Solicitar troca pública de senha", description = "Método responsável por enviar o código de troca para o e-mail")
+    @ApiResponse(responseCode = "204", description = "Se o e-mail existir, código enviado", content = @Content())
+    ResponseEntity<Void> forgotPassword(ResendRequest request);
+
+    @Operation(summary = "Redefinir senha pública", description = "Método responsável por trocar a senha com o código enviado")
+    @ApiResponse(responseCode = "204", description = "Senha redefinida", content = @Content())
+    @ApiResponse(responseCode = "422", description = "Código inválido", content = @Content())
+    ResponseEntity<Void> resetPassword(PasswordResetConfirmRequest request);
+
 }

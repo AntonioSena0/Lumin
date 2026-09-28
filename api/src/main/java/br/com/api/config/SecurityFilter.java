@@ -42,8 +42,7 @@ public class SecurityFilter extends OncePerRequestFilter {
                 Long userId = jwtService.getUserId(access);
                 boolean verified = jwtService.isVerified(access);
                 String path = request.getRequestURI();
-                boolean free = path.startsWith("/lumin/auth/verify") || path.startsWith("/lumin/auth/resend")
-                        || path.startsWith("/lumin/auth/refresh") || path.startsWith("/lumin/auth/logout") || path.startsWith("/lumin/languages");
+                boolean free = path.startsWith("/lumin/auth/") || path.startsWith("/lumin/languages");
                 if(!verified && !free) {
                     response.setStatus(403);
                     response.setContentType("application/json;charset=UTF-8");

@@ -44,6 +44,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     )
     Optional<User> findByEmail(String email);
 
+    Optional<User> findByPendingEmail(String pendingEmail);
+
     @QueryHints(
             @QueryHint(name = "javax.persistence.query.timeout", value = "2000")
     )

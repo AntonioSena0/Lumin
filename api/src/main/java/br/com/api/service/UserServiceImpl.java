@@ -1,6 +1,13 @@
 package br.com.api.service;
 
 import br.com.api.domain.VoiceType;
+import br.com.api.dto.event.PasswordChangedEvent;
+import br.com.api.dto.event.UserRegisteredEvent;
+import br.com.api.entity.PasswordResetCode;
+import br.com.api.exception.BusinessException;
+import br.com.api.exception.TooManyRequestException;
+import br.com.api.repository.PasswordResetCodeRepository;
+import br.com.api.util.CodeGenerator;
 import br.com.api.dto.request.AvatarChangeRequest;
 import br.com.api.dto.request.UserPutRequest;
 import br.com.api.dto.request.UserRequest;
@@ -16,9 +23,11 @@ import br.com.api.exception.NotFoundException;
 import br.com.api.mapper.UserMapper;
 import br.com.api.repository.AvatarRepository;
 import br.com.api.repository.LanguageRepository;
+import br.com.api.repository.RefreshTokenRepository;
 import br.com.api.repository.SettingRepository;
 import br.com.api.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,6 +44,9 @@ public class UserServiceImpl implements UserService{
     private final SettingRepository settingRepository;
     private final PasswordEncoder passwordEncoder;
     private final VerificationCodeServiceImpl verificationCodeService;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final PasswordResetCodeRepository passwordResetCodeRepository;
+    private final ApplicationEventPublisher publisher;
 
     @Override
     public Page<UserResponse> findAll(Pageable pageable) {
@@ -115,12 +127,9 @@ public class UserServiceImpl implements UserService{
 
         existingUser.setName(request.name());
         if (!request.email().equals(existingUser.getEmail())) {
-            verificationCodeService.revoke(existingUser.getEmail());
-            existingUser.setEmail(request.email());
-            existingUser.setEmailVerified(false);
+            existingUser.setPendingEmail(request.email());
             verificationCodeService.issue(request.email(), request.name());
         }
-        existingUser.setPassword(passwordEncoder.encode(request.password()));
 
         Language nativeLanguage = languageRepository.findById(request.nativeLanguage())
                 .orElseThrow(() -> new NotFoundException("LANGUAGE_NOT_FOUND", "Língua nativa não encontrada"));
@@ -154,14 +163,8 @@ public class UserServiceImpl implements UserService{
             if(repository.existsByEmailAndIdNot(request.email(), id)){
                 throw new ConflictException();
             }
-            verificationCodeService.revoke(existingUser.getEmail());
-            existingUser.setEmail(request.email());
-            existingUser.setEmailVerified(false);
+            existingUser.setPendingEmail(request.email());
             verificationCodeService.issue(request.email(), existingUser.getName());
-        }
-
-        if(request.password() != null){
-            existingUser.setPassword(passwordEncoder.encode(request.password()));
         }
 
         if(request.nativeLanguage() != null){
@@ -210,6 +213,71 @@ public class UserServiceImpl implements UserService{
         }
 
         repository.deleteById(id);
+
+    }
+
+    @Override
+    @Transactional
+    public void requestPasswordReset(Long id){
+
+        User existingUser = repository.findById(id)
+                .orElseThrow(() -> new NotFoundException("USER_NOT_FOUND", "Usuário não encontrado"));
+
+        passwordResetCodeRepository.findById(existingUser.getEmail()).ifPresent(resetCode -> {
+            long seconds = java.time.Duration.between(resetCode.getLastSentAt(), java.time.LocalDateTime.now()).getSeconds();
+            if(seconds < 60){
+                throw new TooManyRequestException("CODE_RESEND_COOLDOWN", "Aguarde " + (60 - seconds) + "s");
+            }
+        });
+
+        String code = CodeGenerator.sixDigits();
+        passwordResetCodeRepository.save(PasswordResetCode
+                .builder()
+                .email(existingUser.getEmail())
+                .code(passwordEncoder.encode(code))
+                .expiresAt(java.time.LocalDateTime.now().plusMinutes(10))
+                .lastSentAt(java.time.LocalDateTime.now())
+                .attempts(0)
+                .build());
+        publisher.publishEvent(UserRegisteredEvent.builder().email(existingUser.getEmail()).name(existingUser.getName()).code(code).build());
+
+    }
+
+    @Override
+    @Transactional
+    public void confirmPasswordReset(Long id, String code, String newPassword){
+
+        User existingUser = repository.findById(id)
+                .orElseThrow(() -> new NotFoundException("USER_NOT_FOUND", "Usuário não encontrado"));
+
+        PasswordResetCode resetCode = passwordResetCodeRepository.findById(existingUser.getEmail())
+                .orElseThrow(() -> new BusinessException("CODE_INVALID", "Código inválido"));
+
+        if(resetCode.getWindowStartedAt().isBefore(java.time.LocalDateTime.now().minusHours(1))){
+            resetCode.setWindowAttempts(0);
+            resetCode.setWindowStartedAt(java.time.LocalDateTime.now());
+        }
+        if(resetCode.getWindowAttempts() >= 20){
+            throw new TooManyRequestException("CODE_RATE_LIMITED", "Muitas tentativas. Tente novamente em uma hora");
+        }
+
+        if(resetCode.getExpiresAt().isBefore(java.time.LocalDateTime.now()) || resetCode.getAttempts() >= 5){
+            passwordResetCodeRepository.deleteById(existingUser.getEmail());
+            throw new BusinessException("CODE_INVALID", "Código inválido");
+        }
+
+        if(!passwordEncoder.matches(code, resetCode.getCode())){
+            resetCode.setAttempts(resetCode.getAttempts() + 1);
+            resetCode.setWindowAttempts(resetCode.getWindowAttempts() + 1);
+            passwordResetCodeRepository.saveAndFlush(resetCode);
+            throw new BusinessException("CODE_INVALID", "Código inválido");
+        }
+
+        passwordResetCodeRepository.deleteById(existingUser.getEmail());
+        existingUser.setPassword(passwordEncoder.encode(newPassword));
+        repository.saveAndFlush(existingUser);
+        refreshTokenRepository.revokeAllByUser(id);
+        publisher.publishEvent(PasswordChangedEvent.builder().email(existingUser.getEmail()).name(existingUser.getName()).build());
 
     }
 

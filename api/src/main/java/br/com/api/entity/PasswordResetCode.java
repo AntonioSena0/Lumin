@@ -10,13 +10,13 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "verification_codes")
+@Table(name = "password_reset_codes")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class VerificationCode {
+public class PasswordResetCode {
 
     @Id
     private String email;

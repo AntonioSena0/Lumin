@@ -56,6 +56,12 @@ class AuthRefreshRotationTest {
     @Mock
     private br.com.api.repository.OAuthAccountRepository oAuthAccountRepository;
 
+    @Mock
+    private br.com.api.repository.PasswordResetCodeRepository passwordResetCodeRepository;
+
+    @Mock
+    private org.springframework.context.ApplicationEventPublisher publisher;
+
     private JwtService jwtService;
 
     private AuthServiceImpl service;
@@ -63,7 +69,7 @@ class AuthRefreshRotationTest {
     @BeforeEach
     void setUp() {
         jwtService = new JwtServiceImpl("0123456789ABCDEF0123456789ABCDEF", 15);
-        service = new AuthServiceImpl(authenticationManager, jwtService, refreshTokenRepository, userService, userRepository, passwordEncoder, verificationCodeRepository, verificationCodeService, oAuthService, oAuthAccountRepository);
+        service = new AuthServiceImpl(authenticationManager, jwtService, refreshTokenRepository, userService, userRepository, passwordEncoder, verificationCodeRepository, verificationCodeService, oAuthService, oAuthAccountRepository, passwordResetCodeRepository, publisher);
     }
 
     @Test

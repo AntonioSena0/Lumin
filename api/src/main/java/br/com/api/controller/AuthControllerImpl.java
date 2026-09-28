@@ -46,7 +46,7 @@ public class AuthControllerImpl implements AuthController{
                 .httpOnly(true)
                 .secure(cookieSecure)
                 .sameSite("Lax")
-                .path("/lumin/auth/refresh")
+                .path("/")
                 .maxAge(604800)
                 .build();
 
@@ -75,7 +75,7 @@ public class AuthControllerImpl implements AuthController{
                 .httpOnly(true)
                 .secure(cookieSecure)
                 .sameSite("Lax")
-                .path("/lumin/auth/refresh")
+                .path("/")
                 .maxAge(604800)
                 .build();
 
@@ -107,7 +107,7 @@ public class AuthControllerImpl implements AuthController{
                 .httpOnly(true)
                 .secure(cookieSecure)
                 .sameSite("Lax")
-                .path("/lumin/auth/refresh")
+                .path("/")
                 .maxAge(604800)
                 .build();
 
@@ -138,7 +138,7 @@ public class AuthControllerImpl implements AuthController{
                 .httpOnly(true)
                 .secure(cookieSecure)
                 .sameSite("Lax")
-                .path("/lumin/auth/refresh")
+                .path("/")
                 .maxAge(0)
                 .build();
 
@@ -168,7 +168,7 @@ public class AuthControllerImpl implements AuthController{
                     .httpOnly(true)
                     .secure(cookieSecure)
                     .sameSite("Lax")
-                    .path("/lumin/auth/refresh")
+                    .path("/")
                     .maxAge(604800)
                     .build();
 
@@ -200,7 +200,7 @@ public class AuthControllerImpl implements AuthController{
                 .httpOnly(true)
                 .secure(cookieSecure)
                 .sameSite("Lax")
-                .path("/lumin/auth/refresh")
+                .path("/")
                 .maxAge(604800)
                 .build();
 
@@ -222,6 +222,20 @@ public class AuthControllerImpl implements AuthController{
     @PostMapping("/resend")
     public ResponseEntity<Void> resend(@RequestBody @Valid ResendRequest request) {
         service.resend(request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    @PostMapping("/password/forgot")
+    public ResponseEntity<Void> forgotPassword(@RequestBody @Valid ResendRequest request) {
+        service.forgotPassword(request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    @PostMapping("/password/reset")
+    public ResponseEntity<Void> resetPassword(@RequestBody @Valid PasswordResetConfirmRequest request) {
+        service.resetPassword(request);
         return ResponseEntity.noContent().build();
     }
 }

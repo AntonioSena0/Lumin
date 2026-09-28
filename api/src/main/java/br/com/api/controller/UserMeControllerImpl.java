@@ -1,6 +1,7 @@
 package br.com.api.controller;
 
 import br.com.api.dto.request.AvatarChangeRequest;
+import br.com.api.dto.request.PasswordResetConfirmRequest;
 import br.com.api.dto.request.UserPatchRequest;
 import br.com.api.dto.request.UserPutRequest;
 import br.com.api.dto.response.UserMeResponse;
@@ -57,6 +58,26 @@ public class UserMeControllerImpl implements UserMeController{
         service.delete(SecurityUtils.currentUserId());
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+
+    }
+
+    @Override
+    @PostMapping("/password/request")
+    public ResponseEntity<Void> requestPasswordReset(){
+
+        service.requestPasswordReset(SecurityUtils.currentUserId());
+
+        return ResponseEntity.noContent().build();
+
+    }
+
+    @Override
+    @PostMapping("/password/confirm")
+    public ResponseEntity<Void> confirmPasswordReset(@RequestBody @Valid PasswordResetConfirmRequest request){
+
+        service.confirmPasswordReset(SecurityUtils.currentUserId(), request.code(), request.newPassword());
+
+        return ResponseEntity.noContent().build();
 
     }
 

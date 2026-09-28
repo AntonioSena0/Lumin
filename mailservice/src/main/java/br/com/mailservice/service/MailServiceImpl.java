@@ -35,11 +35,15 @@ public class MailServiceImpl implements MailService {
         headers.setBearerAuth(resendApiKey);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
+        String html = "password-changed".equals(event.template())
+                ? buildPasswordChangedHtml(event.vars().get("name"))
+                : buildCodeHtml(event.vars().get("code"));
+
         Map<String, Object> body = Map.of(
                 "from", "Lumin <" + from + ">",
                 "to", List.of(event.to()),
                 "subject", event.subject(),
-                "html", buildCodeHtml(event.vars().get("code")));
+                "html", html);
 
         try {
             restTemplate.postForObject("https://api.resend.com/emails",
@@ -47,6 +51,46 @@ public class MailServiceImpl implements MailService {
         } catch (HttpClientErrorException e) {
             throw new IllegalArgumentException("E-mail rejeitado: " + e.getStatusCode(), e);
         }
+    }
+
+    private String escape(String value) {
+        if (value == null) {
+            return "";
+        }
+        return value.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+                .replace("\"", "&quot;").replace("'", "&#39;");
+    }
+
+    private String buildPasswordChangedHtml(String name) {
+        String safeName = escape(name);
+        return """
+                <!DOCTYPE html>
+                <html lang="pt-BR">
+                <body style="margin:0;padding:0;background-color:#070111;font-family:Arial,Helvetica,sans-serif;">
+                  <table width="100%" cellpadding="0" cellspacing="0" style="padding:32px 16px;">
+                    <tr><td align="center">
+                      <table width="480" cellpadding="0" cellspacing="0" style="background-color:#171020;border-radius:12px;overflow:hidden;">
+                        <tr><td align="center" style="padding:28px 24px;background:linear-gradient(135deg,#6A00F4,#D000D9);">
+                          <div style="font-size:26px;font-weight:bold;color:#F6F0FF;letter-spacing:4px;">LUMIN</div>
+                          <div style="font-size:13px;color:#F6F0FF;opacity:0.85;margin-top:4px;">Explore &middot; Aprenda &middot; Conecte-se</div>
+                        </td></tr>
+                        <tr><td align="center" style="padding:32px 24px 8px;color:#F6F0FF;font-size:16px;">
+                          Ol&aacute;,"""
+                + safeName + """
+                , sua senha foi alterada.
+                        </td></tr>
+                        <tr><td align="center" style="padding:16px 24px;color:#8F829D;font-size:13px;">
+                          Se n&atilde;o foi voc&ecirc;, redefina sua senha e revise suas sess&otilde;es agora.
+                        </td></tr>
+                        <tr><td align="center" style="padding:20px 24px 28px;color:#8F829D;font-size:11px;">
+                          &copy; 2026 Lumin. Todos os direitos reservados.
+                        </td></tr>
+                      </table>
+                    </td></tr>
+                  </table>
+                </body>
+                </html>
+                """;
     }
 
     private String buildCodeHtml(String code) {

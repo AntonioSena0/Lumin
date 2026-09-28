@@ -1,11 +1,18 @@
 package br.com.mailservice.config;
 
+import org.springframework.amqp.support.converter.Jackson2JavaTypeMapper;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
+
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.AmqpRejectAndDontRequeueException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.retry.interceptor.RetryInterceptorBuilder;
+import org.springframework.retry.interceptor.RetryOperationsInterceptor;
 import org.springframework.web.client.RestTemplate;
 
 @Configuration
@@ -50,12 +57,37 @@ public class RabbitMQConfig {
 
     @Bean
     Jackson2JsonMessageConverter messageConverter() {
-        return new Jackson2JsonMessageConverter();
+        Jackson2JsonMessageConverter converter = new Jackson2JsonMessageConverter();
+        converter.setTypePrecedence(Jackson2JavaTypeMapper.TypePrecedence.INFERRED);
+        return converter;
     }
 
     @Bean
     RestTemplate restTemplate(RestTemplateBuilder builder) {
         return builder.build();
+    }
+
+    @Bean
+    RetryOperationsInterceptor mailRetryInterceptor() {
+        return RetryInterceptorBuilder.stateless()
+                .maxAttempts(4)
+                .backOffOptions(2000, 2.0, 10000)
+                .recoverer((args, cause) -> {
+                    throw new AmqpRejectAndDontRequeueException(cause);
+                })
+                .build();
+    }
+
+    @Bean
+    SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(
+            ConnectionFactory connectionFactory,
+            RetryOperationsInterceptor mailRetryInterceptor,
+            Jackson2JsonMessageConverter messageConverter) {
+        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+        factory.setConnectionFactory(connectionFactory);
+        factory.setAdviceChain(mailRetryInterceptor);
+        factory.setMessageConverter(messageConverter);
+        return factory;
     }
 
 }

@@ -19,5 +19,7 @@ public interface UserService {
     UserMeResponse parcialUpdate(Long id, UserPatchRequest request);
     UserMeResponse changeAvatar(Long id, AvatarChangeRequest request);
     void delete(Long id);
+    void requestPasswordReset(Long id);
+    void confirmPasswordReset(Long id, String code, String newPassword);
 
 }

@@ -40,6 +40,9 @@ public class User implements UserDetails {
     @Column(name = "email_verified", nullable = false)
     private boolean emailVerified = false;
 
+    @Column(name = "pending_email")
+    private String pendingEmail;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "native_language_id", nullable = false)
     private Language nativeLanguage;

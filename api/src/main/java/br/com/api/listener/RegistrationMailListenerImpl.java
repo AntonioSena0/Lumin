@@ -1,5 +1,6 @@
 package br.com.api.listener;
 
+import br.com.api.dto.event.PasswordChangedEvent;
 import br.com.api.dto.event.UserRegisteredEvent;
 import br.com.api.producer.MailProducer;
 import lombok.AllArgsConstructor;
@@ -16,6 +17,12 @@ public class RegistrationMailListenerImpl implements RegistrationMailListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void onRegistered(UserRegisteredEvent event){
         mailProducer.sendCode(event.email(), event.code());
+    }
+
+    @Override
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void onPasswordChanged(PasswordChangedEvent event){
+        mailProducer.sendPasswordChanged(event.email(), event.name());
     }
 
 }

@@ -1,6 +1,7 @@
 package br.com.api.controller;
 
 import br.com.api.dto.request.AvatarChangeRequest;
+import br.com.api.dto.request.PasswordResetConfirmRequest;
 import br.com.api.dto.request.UserPatchRequest;
 import br.com.api.dto.request.UserPutRequest;
 import br.com.api.dto.response.UserMeResponse;
@@ -50,4 +51,18 @@ public interface UserMeController {
     @ApiResponse(responseCode = "204", description = "Conta excluída", content = @Content())
     @ApiResponse(responseCode = "401", description = "Não autenticado", content = @Content())
     ResponseEntity<Void> delete();
+
+    @Operation(summary = "Solicitar troca de senha", description = "Método responsável por enviar o código de troca de senha",
+            security = @SecurityRequirement(name = "cookieAuth"))
+    @ApiResponse(responseCode = "204", description = "Código enviado", content = @Content())
+    @ApiResponse(responseCode = "401", description = "Não autenticado", content = @Content())
+    @ApiResponse(responseCode = "429", description = "Aguarde antes de reenviar", content = @Content())
+    ResponseEntity<Void> requestPasswordReset();
+
+    @Operation(summary = "Confirmar troca de senha", description = "Método responsável por trocar a senha com o código enviado",
+            security = @SecurityRequirement(name = "cookieAuth"))
+    @ApiResponse(responseCode = "204", description = "Senha trocada", content = @Content())
+    @ApiResponse(responseCode = "401", description = "Não autenticado", content = @Content())
+    @ApiResponse(responseCode = "422", description = "Código inválido", content = @Content())
+    ResponseEntity<Void> confirmPasswordReset(PasswordResetConfirmRequest request);
 }

@@ -6,6 +6,7 @@ public record UserRequest(
 
         @NotEmpty(message = "O nome de usuário não pode estar vazio")
         @Size(max = 100, message = "O nome de usuário só pode ter até 100 caracteres")
+        @Pattern(regexp = "^[^<>&]*$", message = "O nome contém caracteres inválidos")
         String name,
 
         @NotEmpty(message = "O email não pode estar vazio")
