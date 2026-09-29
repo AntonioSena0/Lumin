@@ -86,7 +86,7 @@ class OAuthBranchTest {
                 .emailVerified(true).build();
         OAuthAccountId id = new OAuthAccountId("sub-1", OAuthProvider.GOOGLE);
         OAuthAccount account = OAuthAccount.builder().id(id).user(user).build();
-        when(oAuthService.resolveGoogle("code", "http://localhost")).thenReturn(pending);
+        when(oAuthService.resolveGoogle("code", "http://localhost", null)).thenReturn(pending);
         when(oAuthAccountRepository.findById(id)).thenReturn(Optional.of(account));
         when(userRepository.findById(3L)).thenReturn(Optional.of(user));
         when(userRepository.findByIdWithRelations(3L)).thenReturn(Optional.of(user));
@@ -99,7 +99,7 @@ class OAuthBranchTest {
             return token;
         });
 
-        OAuthResult result = service.oauth(new OAuthRequest(OAuthProvider.GOOGLE, "code", "http://localhost"));
+        OAuthResult result = service.oauth(new OAuthRequest(OAuthProvider.GOOGLE, "code", "http://localhost", null));
 
         assertThat(result.tokens()).isNotNull();
         assertThat(result.tokens().access()).isNotBlank();
@@ -112,11 +112,11 @@ class OAuthBranchTest {
         OAuthPendingResponse pending = OAuthPendingResponse.builder()
                 .email("n@test.com").name("N").provider(OAuthProvider.GOOGLE).providerId("sub-9")
                 .emailVerified(true).build();
-        when(oAuthService.resolveGoogle("code", "http://localhost")).thenReturn(pending);
+        when(oAuthService.resolveGoogle("code", "http://localhost", null)).thenReturn(pending);
         when(oAuthAccountRepository.findById(new OAuthAccountId("sub-9", OAuthProvider.GOOGLE)))
                 .thenReturn(Optional.empty());
 
-        OAuthResult result = service.oauth(new OAuthRequest(OAuthProvider.GOOGLE, "code", "http://localhost"));
+        OAuthResult result = service.oauth(new OAuthRequest(OAuthProvider.GOOGLE, "code", "http://localhost", null));
 
         assertThat(result.tokens()).isNull();
         assertThat(result.pendingResponse()).isNotNull();

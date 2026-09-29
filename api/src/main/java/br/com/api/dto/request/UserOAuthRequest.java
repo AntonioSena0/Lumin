@@ -1,7 +1,9 @@
 package br.com.api.dto.request;
 
 import br.com.api.domain.OAuthProvider;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 public record UserOAuthRequest(
 
@@ -18,10 +20,10 @@ public record UserOAuthRequest(
         @NotNull(message = "Provider não pode ser nulo")
         OAuthProvider provider,
 
-        @NotBlank(message = "Código não pode ser vazio")
         String code,
 
-        @NotBlank(message = "Redirect não pode ser vazio")
-        String redirectUri
+        String redirectUri,
+
+        String idToken
 
 ) {}

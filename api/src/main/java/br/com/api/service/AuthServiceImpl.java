@@ -311,7 +311,8 @@ public class AuthServiceImpl implements AuthService{
     @Transactional
     public OAuthResult oauth(OAuthRequest request) {
 
-        OAuthPendingResponse pendingResponse = oAuthService.resolveGoogle(request.code(), request.redirectUri());
+        OAuthPendingResponse pendingResponse = 
+                oAuthService.resolveGoogle(request.code(), request.redirectUri(), request.idToken());
 
         return oAuthAccountRepository.findById(new OAuthAccountId(pendingResponse.providerId(), pendingResponse.provider()))
                 .map(acc -> new OAuthResult(loginSocial(acc.getUser()), null))
@@ -327,7 +328,8 @@ public class AuthServiceImpl implements AuthService{
             throw new BusinessException("OAUTH_INVALID", "Provedor não suportado");
         }
 
-        OAuthPendingResponse pending = oAuthService.resolveGoogle(request.code(), request.redirectUri());
+        OAuthPendingResponse pending = 
+                oAuthService.resolveGoogle(request.code(), request.redirectUri(), request.idToken());
 
         if (oAuthAccountRepository.existsById(new OAuthAccountId(pending.providerId(), pending.provider()))) {
             throw new ConflictException();

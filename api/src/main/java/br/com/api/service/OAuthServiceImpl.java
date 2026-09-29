@@ -46,7 +46,35 @@ public class OAuthServiceImpl implements OAuthService{
 
     @Override
     @Transactional
-    public OAuthPendingResponse resolveGoogle(String code, String redirectUri) {
+    public OAuthPendingResponse resolveGoogle(String code, String redirectUri, String idToken) {
+
+        if (idToken != null && !idToken.isBlank()) {
+            return fromIdToken(idToken);
+        }
+
+        if (code == null || code.isBlank() || redirectUri == null || redirectUri.isBlank()) {
+            throw new BusinessException("OAUTH_INVALID", "Informe o idToken do aplicativo ou o código de autorização");
+        }
+
+        return fromAuthorizationCode(code, redirectUri);
+    }
+
+    private OAuthPendingResponse fromIdToken(String idToken) {
+
+        try {
+            GoogleIdToken verified = verifier.verify(idToken);
+
+            if (verified == null) {
+                throw new BusinessException("OAUTH_INVALID", "Login social inválido");
+            }
+
+            return toPending(verified);
+        } catch (GeneralSecurityException | IOException e){
+            throw new BusinessException("OAUTH_INVALID", "Login social inválido");
+        }
+    }
+
+    private OAuthPendingResponse fromAuthorizationCode(String code, String redirectUri) {
 
         MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
         form.add("code", code);
@@ -72,29 +100,22 @@ public class OAuthServiceImpl implements OAuthService{
             throw new BusinessException("OAUTH_INVALID", "Login social inválido");
         }
 
-        try {
-            GoogleIdToken idToken = verifier.verify(tokens.idToken());
-
-            if (idToken == null){
-                throw new BusinessException("OAUTH_INVALID", "Login social inválido");
-            }
-
-            GoogleIdToken.Payload payload = idToken.getPayload();
-            return OAuthPendingResponse
-                    .builder()
-                    .email(payload.getEmail())
-                    .name((String) payload.get("name"))
-                    .avatarUrl((String) payload.get("picture"))
-                    .provider(OAuthProvider.GOOGLE)
-                    .providerId(payload.getSubject())
-                    .emailVerified(Boolean.TRUE.equals(payload.getEmailVerified()))
-                    .build();
-        } catch (GeneralSecurityException | IOException e){
-            throw new BusinessException("OAUTH_INVALID", "Login social inválido");
-        }
-
+        return fromIdToken(tokens.idToken);
     }
 
+    private OAuthPendingResponse toPending(GoogleIdToken idToken) {
 
+        GoogleIdToken.Payload payload = idToken.getPayload();
+
+        return OAuthPendingResponse
+                .builder()
+                .email(payload.getEmail())
+                .name((String) payload.get("name"))
+                .avatarUrl((String) payload.get("picture"))
+                .provider(OAuthProvider.GOOGLE)
+                .providerId(payload.getSubject())
+                .emailVerified(Boolean.TRUE.equals(payload.getEmailVerified()))
+                .build();
+    }
 
 }

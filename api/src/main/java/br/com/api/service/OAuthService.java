@@ -4,6 +4,6 @@ import br.com.api.dto.response.OAuthPendingResponse;
 
 public interface OAuthService {
 
-    OAuthPendingResponse resolveGoogle(String code, String redirectUri);
+    OAuthPendingResponse resolveGoogle(String code, String redirectUri, String idToken);
 
 }
