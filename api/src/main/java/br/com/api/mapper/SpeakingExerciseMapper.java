@@ -14,6 +14,7 @@ public class SpeakingExerciseMapper {
                 .builder()
                 .id(speakingExercise.getId())
                 .title(speakingExercise.getTitle())
+                .instruction(speakingExercise.getInstruction())
                 .prompt(speakingExercise.getPrompt())
                 .completed(speakingExercise.isCompleted())
                 .correct(speakingExercise.getCorrect())

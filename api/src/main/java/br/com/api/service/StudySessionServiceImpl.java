@@ -7,6 +7,7 @@ import br.com.api.dto.response.ExerciseCheckResponse;
 import br.com.api.dto.response.ExerciseResponse;
 import br.com.api.dto.response.StudySessionAiResponse;
 import br.com.api.dto.response.StudySessionResponse;
+import br.com.api.dto.response.StudySessionSummaryResponse;
 import br.com.api.entity.*;
 import br.com.api.exception.BusinessException;
 import br.com.api.exception.NotFoundException;
@@ -16,19 +17,24 @@ import br.com.api.mapper.ExerciseMapper;
 import br.com.api.mapper.StudySessionMapper;
 import br.com.api.normalizer.ExerciseGenerationNormalizer;
 import br.com.api.repository.StudySessionRepository;
+import br.com.api.repository.projection.SessionWordProjection;
 import br.com.api.repository.UserRepository;
 import br.com.api.repository.UserWordRepository;
 import br.com.api.repository.WordRepository;
 import br.com.api.util.SecurityUtils;
 import br.com.api.validator.ExerciseGenerationValidator;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -88,7 +94,6 @@ public class StudySessionServiceImpl implements StudySessionService{
 
     @Override
     public StudySessionResponse findById(Long id) {
-
         StudySession studySession = repository.findByIdWithRelations(id)
                 .orElseThrow(() -> new NotFoundException("SESSION_NOT_FOUND", "Sessão não encontrada"));
 
@@ -97,6 +102,31 @@ public class StudySessionServiceImpl implements StudySessionService{
         }
 
         return StudySessionMapper.toStudySessionResponse(studySession);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<StudySessionSummaryResponse> findAllByUserId(Long userId, Pageable pageable) {
+
+        Page<StudySession> page = repository.findByUserId(userId, pageable);
+
+        if (page.isEmpty()) {
+            return Page.empty(pageable);
+        }
+
+        List<Long> sessionIds = page.getContent().stream()
+                .map(StudySession::getId)
+                .toList();
+
+        Map<Long, SessionWordProjection> wordBySession = new LinkedHashMap<>();
+
+        for (SessionWordProjection projection : repository.findWordsBySessionIds(sessionIds)) {
+            wordBySession.putIfAbsent(projection.getSessionId(), projection);
+        }
+
+        return page.map(session ->
+                StudySessionMapper.toStudySessionSummaryResponse(session, wordBySession.get(session.getId()))
+        );
     }
 
     @Override

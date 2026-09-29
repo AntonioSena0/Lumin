@@ -11,6 +11,7 @@ public record SpeakingExerciseResponse (
 
         Long id,
         String title,
+        String instruction,
         String prompt,
         boolean completed,
         ExerciseCorrect correct,

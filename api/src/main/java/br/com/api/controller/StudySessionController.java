@@ -3,13 +3,16 @@ package br.com.api.controller;
 import br.com.api.dto.request.ExerciseCheckRequest;
 import br.com.api.dto.response.ExerciseCheckResponse;
 import br.com.api.dto.response.ExerciseResponse;
+import br.com.api.dto.response.PageResponse;
 import br.com.api.dto.response.StudySessionResponse;
+import br.com.api.dto.response.StudySessionSummaryResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 
 @Tag(name = "StudySession", description = "Recurso responsável pelas sessões de estudo.")
@@ -23,6 +26,13 @@ public interface StudySessionController {
     @ApiResponse(responseCode = "404", description = "Sessão não encontrada", content = @Content())
     @ApiResponse(responseCode = "422", description = "Sessão não pertence ao usuário", content = @Content())
     ResponseEntity<StudySessionResponse> findById(Long id);
+
+    @Operation(summary = "Listar sessões", description = "Método responsável por listar as sessões de estudo do usuário autenticado",
+            security = @SecurityRequirement(name = "cookieAuth"))
+    @ApiResponse(responseCode = "200", description = "Sessões encontradas",
+            content = @Content(schema = @Schema(implementation = PageResponse.class)))
+    @ApiResponse(responseCode = "401", description = "Não autenticado", content = @Content())
+    ResponseEntity<PageResponse<StudySessionSummaryResponse>> findAllByUserId(Pageable pageable);
 
     @Operation(summary = "Iniciar sessão", description = "Método responsável por gerar os exercícios de uma palavra",
             security = @SecurityRequirement(name = "cookieAuth"))
