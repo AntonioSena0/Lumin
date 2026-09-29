@@ -28,6 +28,10 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>O Lumin usa a câmera para identificar objetos e sugerir traduções.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>O Lumin usa o microfone para corrigir exercícios de fala.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>O Lumin converte sua fala em texto para corrigir exercícios de idioma.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

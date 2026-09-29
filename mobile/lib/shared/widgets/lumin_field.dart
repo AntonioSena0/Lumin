@@ -8,19 +8,31 @@ class LuminField extends StatelessWidget {
     this.initialValue,
     this.obscureText = false,
     this.icon,
+    this.controller,
+    this.keyboardType,
+    this.onChanged,
+    this.onSubmitted,
   });
 
   final String label;
   final String? initialValue;
   final bool obscureText;
   final IconData? icon;
+  final TextEditingController? controller;
+  final TextInputType? keyboardType;
+  final ValueChanged<String>? onChanged;
+  final ValueChanged<String>? onSubmitted;
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      initialValue: initialValue,
+      controller: controller,
+      initialValue: controller == null ? initialValue : null,
       obscureText: obscureText,
       style: const TextStyle(color: LuminColors.text, fontSize: 14),
+      keyboardType: keyboardType,
+      onChanged: onChanged,
+      onFieldSubmitted: onSubmitted,
       decoration: InputDecoration(
         labelText: label,
         labelStyle: const TextStyle(color: LuminColors.muted, fontSize: 12),

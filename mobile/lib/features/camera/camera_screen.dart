@@ -5,10 +5,14 @@ import 'package:mobile/core/theme/lumin_colors.dart';
 import 'package:mobile/core/theme/lumin_spacing.dart';
 import 'package:mobile/features/camera/detected_object.dart';
 import 'package:mobile/features/camera/detection_confidence_policy.dart';
+import 'package:mobile/features/camera/detection_frame.dart';
 import 'package:mobile/features/camera/lumin_detector_model.dart';
 import 'package:mobile/features/camera/object_translation_dictionary.dart';
 import 'package:mobile/features/camera/yolo_object_selection_service.dart';
 import 'package:mobile/features/translation/save_translation_screen.dart';
+import 'package:mobile/main.dart';
+import 'package:mobile/shared/widgets/language_flag.dart';
+import 'package:mobile/shared/widgets/marker_circle.dart';
 import 'package:ultralytics_yolo/ultralytics_yolo.dart';
 
 class CameraScreen extends StatefulWidget {
@@ -36,17 +40,41 @@ class _CameraScreenState extends State<CameraScreen> {
   bool fallbackModelActive = !LuminDetectorModel.usesCustomModel;
   bool translationDictionaryReady = false;
   DateTime lastAcceptedObject = DateTime.fromMillisecondsSinceEpoch(0);
+  String fromLanguage = 'Origem';
+  String fromLanguageCode = '';
+  String toLanguage = 'Destino';
+  String toLanguageCode = '';
 
   @override
   void initState() {
     super.initState();
     unawaited(loadTranslationDictionary());
+    unawaited(loadLanguages());
     unawaited(yoloController.setShowOverlays(false));
     unawaited(
       yoloController.setThresholds(
         confidenceThreshold: LuminDetectorModel.confidenceThreshold,
       ),
     );
+  }
+
+  Future<void> loadLanguages() async {
+    final response = await luminApi.me();
+    if (!mounted || !response.ok) return;
+    final native = response.map['nativeLanguage'];
+    final chosen = response.map['chosenLanguage'];
+    setState(() {
+      if (native is Map) {
+        if (native['name'] is String) fromLanguage = native['name'] as String;
+        if (native['code'] is String) {
+          fromLanguageCode = native['code'] as String;
+        }
+      }
+      if (chosen is Map) {
+        if (chosen['name'] is String) toLanguage = chosen['name'] as String;
+        if (chosen['code'] is String) toLanguageCode = chosen['code'] as String;
+      }
+    });
   }
 
   Future<void> loadTranslationDictionary() async {
@@ -169,8 +197,8 @@ class _CameraScreenState extends State<CameraScreen> {
 
     setState(() {
       detectedTranslation = DetectedTranslation(
-        originalText: detectedLabel,
-        translatedText: translatedText,
+        originalText: translatedText,
+        translatedText: detectedLabel,
         confidence: result.confidence,
       );
       statusText = 'Tradução pronta';
@@ -284,28 +312,20 @@ class _CameraScreenState extends State<CameraScreen> {
               },
             ),
           ),
+          const Positioned.fill(child: IgnorePointer(child: CameraBackdrop())),
           Positioned.fill(
-            child: IgnorePointer(
-              child: NeonObjectDetectionOverlay(selectedObject: objectOnCenter),
-            ),
-          ),
-          Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.08),
-              ),
-            ),
+            child: IgnorePointer(child: DetectionFrame(result: objectOnCenter)),
           ),
           SafeArea(
             child: Padding(
               padding: LuminSpacing.page,
               child: Column(
                 children: [
-                  const Row(
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      CameraPill(label: 'Inglês'),
-                      CameraPill(label: 'Português'),
+                      CameraPill(label: fromLanguage, code: fromLanguageCode),
+                      CameraPill(label: toLanguage, code: toLanguageCode),
                     ],
                   ),
                   const SizedBox(height: 12),
@@ -315,6 +335,15 @@ class _CameraScreenState extends State<CameraScreen> {
                     modelFailed: modelFailed,
                   ),
                   const Spacer(),
+                  Center(
+                    child: MarkerCircle(
+                      selected: objectOnCenter != null,
+                      enabled: objectOnCenter != null,
+                      size: 128,
+                      label: 'Foco do objeto detectado',
+                    ),
+                  ),
+                  const SizedBox(height: 18),
                   GestureDetector(
                     onTap: saveDetectedTranslation,
                     child: CameraCaptureButton(enabled: translation != null),
@@ -330,92 +359,45 @@ class _CameraScreenState extends State<CameraScreen> {
   }
 }
 
-class NeonObjectDetectionOverlay extends StatelessWidget {
-  const NeonObjectDetectionOverlay({super.key, required this.selectedObject});
-
-  final YOLOResult? selectedObject;
+class CameraBackdrop extends StatelessWidget {
+  const CameraBackdrop({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: selectedObject == null
-          ? null
-          : NeonObjectDetectionPainter(selectedObject!),
+    return DecoratedBox(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0x66000000), Color(0x12000000), Color(0x80000000)],
+          stops: [0.0, 0.45, 1.0],
+        ),
+      ),
+      child: CustomPaint(painter: _CameraVignettePainter()),
     );
   }
 }
 
-class NeonObjectDetectionPainter extends CustomPainter {
-  const NeonObjectDetectionPainter(this.selectedObject);
-
-  final YOLOResult selectedObject;
-
+class _CameraVignettePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final detectedBox = Rect.fromLTRB(
-      selectedObject.normalizedBox.left * size.width,
-      selectedObject.normalizedBox.top * size.height,
-      selectedObject.normalizedBox.right * size.width,
-      selectedObject.normalizedBox.bottom * size.height,
+    final center = Offset(size.width / 2, size.height * 0.48);
+    final radius = size.longestSide * 0.72;
+    canvas.drawCircle(
+      center,
+      radius,
+      Paint()
+        ..shader = RadialGradient(
+          colors: [
+            LuminColors.violet.withValues(alpha: 0.06),
+            Colors.transparent,
+          ],
+        ).createShader(Rect.fromCircle(center: center, radius: radius)),
     );
-    final box = expandBox(detectedBox, size);
-    final shapeIsCircular = isCircularShape(box);
-    final glowPaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 18
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 18)
-      ..color = LuminColors.magenta.withValues(alpha: 0.55);
-    final outerPaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 7
-      ..strokeCap = StrokeCap.round
-      ..color = LuminColors.magenta.withValues(alpha: 0.92);
-    final innerPaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 3
-      ..strokeCap = StrokeCap.round
-      ..color = LuminColors.cyan.withValues(alpha: 0.95);
-    final softFillPaint = Paint()
-      ..style = PaintingStyle.fill
-      ..color = LuminColors.magenta.withValues(alpha: 0.08);
-
-    if (shapeIsCircular) {
-      canvas.drawOval(box, softFillPaint);
-      canvas.drawOval(box, glowPaint);
-      canvas.drawOval(box, outerPaint);
-      canvas.drawOval(box.deflate(7), innerPaint);
-      return;
-    }
-
-    final radius = Radius.circular((box.shortestSide * 0.18).clamp(18, 42));
-    final roundedBox = RRect.fromRectAndRadius(box, radius);
-    canvas.drawRRect(roundedBox, softFillPaint);
-    canvas.drawRRect(roundedBox, glowPaint);
-    canvas.drawRRect(roundedBox, outerPaint);
-    canvas.drawRRect(roundedBox.deflate(7), innerPaint);
-  }
-
-  Rect expandBox(Rect box, Size size) {
-    final horizontalPadding = (box.width * 0.16).clamp(18, 54).toDouble();
-    final verticalPadding = (box.height * 0.16).clamp(18, 54).toDouble();
-
-    return Rect.fromLTRB(
-      (box.left - horizontalPadding).clamp(0, size.width).toDouble(),
-      (box.top - verticalPadding).clamp(0, size.height).toDouble(),
-      (box.right + horizontalPadding).clamp(0, size.width).toDouble(),
-      (box.bottom + verticalPadding).clamp(0, size.height).toDouble(),
-    );
-  }
-
-  bool isCircularShape(Rect box) {
-    final ratio = box.width / box.height;
-    return ratio >= 0.72 && ratio <= 1.28;
   }
 
   @override
-  bool shouldRepaint(covariant NeonObjectDetectionPainter oldDelegate) {
-    return oldDelegate.selectedObject != selectedObject;
-  }
+  bool shouldRepaint(covariant _CameraVignettePainter oldDelegate) => false;
 }
 
 class CameraTranslationPanel extends StatelessWidget {
@@ -432,81 +414,120 @@ class CameraTranslationPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final activeTranslation = translation;
-    final confidenceText = activeTranslation == null
-        ? null
-        : '${(activeTranslation.confidence * 100).round()}%';
+    final active = translation;
+    final ready = active != null;
 
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 180),
+      duration: const Duration(milliseconds: 260),
+      curve: Curves.easeOutCubic,
       width: double.infinity,
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
       decoration: BoxDecoration(
-        color: LuminColors.panel.withValues(alpha: 0.92),
-        borderRadius: BorderRadius.circular(10),
+        color: Colors.black.withValues(alpha: 0.84),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: activeTranslation == null
-              ? Colors.transparent
-              : LuminColors.magenta.withValues(alpha: 0.7),
+          color: ready
+              ? LuminColors.violet
+              : Colors.white.withValues(alpha: 0.18),
+          width: ready ? 1.4 : 1,
         ),
+        boxShadow: ready
+            ? [
+                BoxShadow(
+                  color: LuminColors.violet.withValues(alpha: 0.28),
+                  blurRadius: 22,
+                  spreadRadius: 0,
+                ),
+              ]
+            : null,
       ),
-      child: activeTranslation == null
-          ? Text(
-              statusText,
-              textAlign: TextAlign.center,
+      child: ready ? _readyBody(active) : _statusBody(),
+    );
+  }
+
+  Widget _statusBody() {
+    return Row(
+      children: [
+        if (!modelFailed) ...[
+          const SizedBox(
+            width: 14,
+            height: 14,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
+          const SizedBox(width: 12),
+        ] else ...[
+          const Icon(Icons.error_outline, color: LuminColors.violet, size: 18),
+          const SizedBox(width: 12),
+        ],
+        Expanded(
+          child: Text(
+            statusText,
+            style: TextStyle(
+              color: modelFailed ? Colors.white : LuminColors.text,
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _readyBody(DetectedTranslation active) {
+    final confidence = '${(active.confidence * 100).round()}%';
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          children: [
+            const Text(
+              'OBJETO IDENTIFICADO',
               style: TextStyle(
-                color: modelFailed ? Colors.redAccent : LuminColors.text,
-                fontSize: 13,
-                fontWeight: FontWeight.w800,
+                color: LuminColors.violet,
+                fontSize: 10,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 1.1,
               ),
-            )
-          : Row(
+            ),
+            const Spacer(),
+            Row(
               children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        activeTranslation.originalText.toUpperCase(),
-                        style: const TextStyle(
-                          color: LuminColors.muted,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        activeTranslation.translatedText,
-                        style: const TextStyle(
-                          color: LuminColors.text,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                    ],
+                const Icon(Icons.verified, color: Colors.white, size: 14),
+                const SizedBox(width: 4),
+                Text(
+                  confidence,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w900,
                   ),
                 ),
-                if (confidenceText != null)
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 7,
-                    ),
-                    decoration: BoxDecoration(
-                      color: LuminColors.panelLight,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      confidenceText,
-                      style: const TextStyle(
-                        color: LuminColors.magenta,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                  ),
               ],
             ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Text(
+          active.originalText.toUpperCase(),
+          style: const TextStyle(
+            color: Colors.white60,
+            fontSize: 12,
+            letterSpacing: 1.2,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 3),
+        Text(
+          active.translatedText,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 28,
+            height: 1.1,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -519,22 +540,48 @@ class CameraCaptureButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedOpacity(
-      duration: const Duration(milliseconds: 180),
-      opacity: enabled ? 1 : 0.48,
+      duration: const Duration(milliseconds: 220),
+      opacity: enabled ? 1 : 0.45,
       child: Container(
-        width: 88,
-        height: 88,
+        width: 84,
+        height: 84,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          border: Border.all(color: LuminColors.magenta, width: 5),
           color: LuminColors.text,
-          boxShadow: [
-            BoxShadow(
-              color: LuminColors.magenta.withValues(alpha: enabled ? 0.45 : 0),
-              blurRadius: 22,
-              spreadRadius: 2,
+          border: Border.all(
+            color: enabled ? LuminColors.violet : Colors.white24,
+            width: 2,
+          ),
+          boxShadow: enabled
+              ? [
+                  BoxShadow(
+                    color: LuminColors.violet.withValues(alpha: 0.42),
+                    blurRadius: 24,
+                    spreadRadius: 1,
+                  ),
+                ]
+              : null,
+        ),
+        child: Center(
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 220),
+            width: enabled ? 60 : 52,
+            height: enabled ? 60 : 52,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: enabled
+                  ? const LinearGradient(
+                      colors: [LuminColors.violet, LuminColors.magenta],
+                    )
+                  : null,
+              color: enabled ? null : LuminColors.muted,
             ),
-          ],
+            child: Icon(
+              Icons.bookmark_add_outlined,
+              color: LuminColors.text,
+              size: enabled ? 30 : 24,
+            ),
+          ),
         ),
       ),
     );
@@ -542,20 +589,24 @@ class CameraCaptureButton extends StatelessWidget {
 }
 
 class CameraPill extends StatelessWidget {
-  const CameraPill({super.key, required this.label});
+  const CameraPill({super.key, required this.label, required this.code});
 
   final String label;
+  final String code;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
-        color: LuminColors.panel.withValues(alpha: 0.9),
-        borderRadius: BorderRadius.circular(18),
+        color: Colors.black.withValues(alpha: 0.72),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: LuminColors.violet.withValues(alpha: 0.7)),
       ),
       child: Row(
         children: [
+          LanguageFlag(code: code, size: 17),
+          const SizedBox(width: 6),
           Text(
             label,
             style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),

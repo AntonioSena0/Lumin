@@ -1,13 +1,69 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/core/theme/lumin_colors.dart';
+import 'package:mobile/core/models/api_models.dart';
+import 'package:mobile/core/network/api_client.dart';
+import 'package:mobile/core/repositories/lumin_repository.dart';
+import 'package:mobile/main.dart';
+import 'package:mobile/features/level_test/level_test_screen.dart';
+import 'package:mobile/features/profile/edit_profile_screen.dart';
 import 'package:mobile/features/profile/progress_screen.dart';
 import 'package:mobile/features/profile/saved_words_screen.dart';
 import 'package:mobile/features/profile/settings_screen.dart';
+import 'package:mobile/features/study/study_sessions_screen.dart';
 import 'package:mobile/features/translation/translation_history_screen.dart';
+import 'package:mobile/shared/widgets/lumin_avatar.dart';
 import 'package:mobile/shared/widgets/lumin_page.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  String name = '';
+  String level = '';
+  String practiced = '0';
+  String saved = '0';
+  String? avatarUrl;
+  int sessionCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    load();
+  }
+
+  Future<void> load() async {
+    final results = await Future.wait<Object?>([
+      luminApi.me(),
+      luminRepository.profileSummary(),
+      luminRepository.homeSummary(),
+    ]);
+    if (!mounted) return;
+    setState(() {
+      final user = (results[0] as ApiResult).map;
+      if (user['name'] is String) name = user['name'] as String;
+      final avatar = user['avatar'];
+      if (avatar is Map && avatar['imgUrl'] is String) {
+        avatarUrl = avatar['imgUrl'] as String;
+      }
+      final profileResult = results[1] as RepositoryResult<ProfileSummaryModel>;
+      final data = profileResult.data;
+      if (data != null) {
+        practiced = '${data.practicedWords}';
+        saved = '${data.savedWords}';
+      }
+      final homeResult = results[2] as RepositoryResult<HomeSummaryModel>;
+      final home = homeResult.data;
+      if (home != null) level = home.level;
+    });
+    final sessions = await luminApi.sessions(page: 0, size: 1);
+    if (!mounted) return;
+    final total = sessions.map['totalElements'];
+    if (sessions.ok && total is num) setState(() => sessionCount = total.toInt());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,46 +76,44 @@ class ProfileScreen extends StatelessWidget {
             style: TextStyle(fontSize: 27, fontWeight: FontWeight.w900),
           ),
           const SizedBox(height: 28),
-          const Center(
-            child: CircleAvatar(
-              radius: 52,
-              backgroundColor: LuminColors.text,
-              child: Icon(
-                Icons.person,
-                color: LuminColors.background,
-                size: 70,
-              ),
-            ),
+          Center(
+            child: LuminAvatar(imgUrl: avatarUrl, name: name, radius: 52),
           ),
           const SizedBox(height: 12),
-          const Center(
+          Center(
             child: Text(
-              'Beatriz Galdino',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+              name.isEmpty ? '...' : name,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
             ),
           ),
-          const Center(
+          Center(
             child: Text(
-              'Nível N2',
-              style: TextStyle(
+              level.isEmpty ? '' : 'Nível $level',
+              style: const TextStyle(
                 color: LuminColors.magenta,
                 fontWeight: FontWeight.w800,
               ),
             ),
           ),
           const SizedBox(height: 18),
-          const Row(
+          Row(
             children: [
               Expanded(
-                child: ProfileStat(value: '128', label: 'Palavras aprendidas'),
+                child: ProfileStat(value: practiced, label: 'Palavras praticadas'),
               ),
-              SizedBox(width: 10),
+              const SizedBox(width: 10),
               Expanded(
-                child: ProfileStat(value: '12', label: 'Dias de rotina'),
+                child: ProfileStat(value: saved, label: 'Palavras salvas'),
               ),
             ],
           ),
           const SizedBox(height: 18),
+          SettingsRow(
+            label: 'Editar dados',
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const EditProfileScreen()),
+            ).then((_) => load()),
+          ),
           SettingsRow(
             label: 'Meu progresso',
             onTap: () => Navigator.of(
@@ -67,7 +121,20 @@ class ProfileScreen extends StatelessWidget {
             ).push(MaterialPageRoute(builder: (_) => const ProgressScreen())),
           ),
           SettingsRow(
-            label: 'Histórico',
+            label: 'Minhas sessões',
+            trailing: sessionCount > 0 ? '$sessionCount' : null,
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const StudySessionsScreen()),
+            ),
+          ),
+          SettingsRow(
+            label: 'Teste de nivelamento',
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(              builder: (_) => const LevelTestScreen(canSkip: false)),
+            ),
+          ),
+          SettingsRow(
+            label: 'Histórico de traduções',
             onTap: () => Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (_) => const TranslationHistoryScreen(),

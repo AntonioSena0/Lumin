@@ -14,6 +14,7 @@ class AuthScaffold extends StatelessWidget {
     required this.children,
     required this.onAction,
     required this.onFooter,
+    this.onGoogle,
   });
 
   final String title;
@@ -23,6 +24,7 @@ class AuthScaffold extends StatelessWidget {
   final List<Widget> children;
   final VoidCallback onAction;
   final VoidCallback onFooter;
+  final VoidCallback? onGoogle;
 
   @override
   Widget build(BuildContext context) {
@@ -77,13 +79,9 @@ class AuthScaffold extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 14),
-              const Row(
+              Row(
                 children: [
-                  Expanded(child: SocialButton(label: 'G')),
-                  SizedBox(width: 10),
-                  Expanded(child: SocialButton(label: 'X')),
-                  SizedBox(width: 10),
-                  Expanded(child: SocialButton(label: 'f')),
+                  Expanded(child: SocialButton(label: 'G', onTap: onGoogle)),
                 ],
               ),
               const Spacer(),
@@ -102,25 +100,29 @@ class AuthScaffold extends StatelessWidget {
 }
 
 class SocialButton extends StatelessWidget {
-  const SocialButton({super.key, required this.label});
+  const SocialButton({super.key, required this.label, this.onTap});
 
   final String label;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 42,
-      decoration: BoxDecoration(
-        color: LuminColors.text,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Center(
-        child: Text(
-          label,
-          style: const TextStyle(
-            color: LuminColors.background,
-            fontSize: 20,
-            fontWeight: FontWeight.w900,
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 42,
+        decoration: BoxDecoration(
+          color: LuminColors.text,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Center(
+          child: Text(
+            label,
+            style: const TextStyle(
+              color: LuminColors.background,
+              fontSize: 20,
+              fontWeight: FontWeight.w900,
+            ),
           ),
         ),
       ),

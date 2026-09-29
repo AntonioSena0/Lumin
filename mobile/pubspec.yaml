@@ -12,6 +12,13 @@ dependencies:
 
   cupertino_icons: ^1.0.8
   ultralytics_yolo: ^0.6.10
+  dio: ^5.7.0
+  cookie_jar: ^4.0.8
+  dio_cookie_manager: ^3.2.0
+  path_provider: ^2.1.4
+  google_sign_in: ^7.1.1
+  flutter_tts: ^4.2.2
+  speech_to_text: ^7.3.0
 
 dev_dependencies:
   flutter_test:

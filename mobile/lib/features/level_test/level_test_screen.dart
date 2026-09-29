@@ -2,11 +2,75 @@ import 'package:flutter/material.dart';
 import 'package:mobile/core/theme/lumin_assets.dart';
 import 'package:mobile/core/theme/lumin_colors.dart';
 import 'package:mobile/core/theme/lumin_spacing.dart';
+import 'package:mobile/features/level_test/placement_screen.dart';
 import 'package:mobile/features/shell/app_shell.dart';
+import 'package:mobile/main.dart';
 import 'package:mobile/shared/widgets/lumin_button.dart';
 
-class LevelTestScreen extends StatelessWidget {
-  const LevelTestScreen({super.key});
+class LevelTestScreen extends StatefulWidget {
+  const LevelTestScreen({super.key, this.canSkip = true});
+
+  final bool canSkip;
+
+  @override
+  State<LevelTestScreen> createState() => _LevelTestScreenState();
+}
+
+class _LevelTestScreenState extends State<LevelTestScreen> {
+  bool loading = false;
+  List<Map<String, dynamic>> languages = [];
+  int? selectedLanguageId;
+
+  @override
+  void initState() {
+    super.initState();
+    load();
+  }
+
+  void goHome() {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (_) => const AppShell()),
+    );
+  }
+
+  Future<void> load() async {
+    setState(() => loading = true);
+    final results = await Future.wait([luminApi.languages(), luminApi.me()]);
+    if (!mounted) return;
+    setState(() => loading = false);
+    final langs = results[0].list.map((e) => Map<String, dynamic>.from(e as Map)).toList();
+    final me = results[1].map;
+    final chosen = me['chosenLanguage'];
+    final chosenId = chosen is Map ? chosen['id'] : null;
+    setState(() {
+      languages = langs;
+      if (chosenId is int) {
+        selectedLanguageId = chosenId;
+      } else if (langs.isNotEmpty && langs.first['id'] is int) {
+        selectedLanguageId = langs.first['id'] as int;
+      }
+    });
+  }
+
+  void start() {
+    if (selectedLanguageId == null) {
+      goHome();
+      return;
+    }
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => PlacementScreen(languageId: selectedLanguageId!)),
+    ).then((_) {
+      if (mounted) load();
+    });
+  }
+
+  void goBack() {
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+      return;
+    }
+    goHome();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,12 +121,44 @@ class LevelTestScreen extends StatelessWidget {
                   LevelChip(label: 'N3', text: 'Avançado'),
                 ],
               ),
-              const Spacer(),
-              LuminButton(
-                label: 'Começar',
-                onPressed: () => Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (_) => const AppShell()),
+              const SizedBox(height: 18),
+              const Text('Idioma do teste', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+              const SizedBox(height: 10),
+              if (loading)
+                const Center(child: CircularProgressIndicator())
+              else
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (final lang in languages)
+                      ChoiceChip(
+                        label: Text('${lang['name'] ?? ''}'),
+                        selected: lang['id'] == selectedLanguageId,
+                        onSelected: (_) {
+                          final id = lang['id'];
+                          if (id is int) setState(() => selectedLanguageId = id);
+                        },
+                      ),
+                  ],
                 ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  if (widget.canSkip) ...[
+                    TextButton(onPressed: goHome, child: const Text('Pular')),
+                    const SizedBox(width: 12),
+                  ] else ...[
+                    TextButton(onPressed: goBack, child: const Text('Voltar')),
+                    const SizedBox(width: 12),
+                  ],
+                  Expanded(
+                    child: LuminButton(
+                      label: loading ? 'Carregando...' : 'Começar',
+                      onPressed: loading ? () {} : start,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
