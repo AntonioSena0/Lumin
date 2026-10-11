@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/core/theme/lumin_colors.dart';
 import 'package:mobile/features/auth/auth_scaffold.dart';
 import 'package:mobile/features/auth/google_auth.dart';
 import 'package:mobile/features/auth/register_screen.dart';
@@ -21,6 +22,7 @@ class _LoginScreenState extends State<LoginScreen> {
   String? error;
   bool loading = false;
   bool loadingGoogle = false;
+  bool obscurePassword = true;
 
   @override
   void dispose() {
@@ -52,7 +54,10 @@ class _LoginScreenState extends State<LoginScreen> {
     } else if (result.status == 403) {
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (_) => VerifyScreen(email: emailController.text.trim(), onVerified: goHome),
+          builder: (_) => VerifyScreen(
+            email: emailController.text.trim(),
+            onVerified: goHome,
+          ),
         ),
       );
     } else {
@@ -82,7 +87,9 @@ class _LoginScreenState extends State<LoginScreen> {
         return;
       }
       final created = await Navigator.of(context).push<bool>(
-        MaterialPageRoute(builder: (_) => GoogleRegisterScreen(pending: pending)),
+        MaterialPageRoute(
+          builder: (_) => GoogleRegisterScreen(pending: pending),
+        ),
       );
       if (!mounted) return;
       if (created == true) {
@@ -104,20 +111,28 @@ class _LoginScreenState extends State<LoginScreen> {
       title: 'Login',
       subtitle: 'Entre para continuar aprendendo sem limites',
       action: loading ? 'Entrando...' : 'Entrar',
-      footer: 'Não possui uma conta? Cadastre-se',
+      footer: 'Não possui uma conta?',
+      footerAction: 'Cadastre-se',
       onAction: loading ? () {} : submit,
       onGoogle: loadingGoogle ? () {} : signInWithGoogle,
       onFooter: () => Navigator.of(context).push(
         MaterialPageRoute(builder: (_) => const RegisterScreen()),
       ),
       children: [
-        LuminField(label: 'E-mail', controller: emailController, keyboardType: TextInputType.emailAddress),
-        const SizedBox(height: 14),
+        LuminField(
+          label: 'E-mail',
+          labelAbove: true,
+          controller: emailController,
+          keyboardType: TextInputType.emailAddress,
+        ),
+        const SizedBox(height: 18),
         LuminField(
           label: 'Senha',
+          labelAbove: true,
           controller: passwordController,
-          obscureText: true,
-          icon: Icons.visibility_off,
+          obscureText: obscurePassword,
+          icon: obscurePassword ? Icons.visibility_off : Icons.visibility,
+          onIconTap: () => setState(() => obscurePassword = !obscurePassword),
         ),
         Align(
           alignment: Alignment.centerRight,
@@ -125,12 +140,22 @@ class _LoginScreenState extends State<LoginScreen> {
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const ForgotPasswordScreen()),
             ),
-            child: const Text('Esqueci a senha?', style: TextStyle(fontSize: 12)),
+            child: const Text(
+              'Esqueceu sua senha?',
+              style: TextStyle(
+                fontSize: 12,
+                color: LuminColors.blue,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
           ),
         ),
         if (error != null) ...[
           const SizedBox(height: 10),
-          Text(error!, style: const TextStyle(color: Colors.redAccent, fontSize: 12)),
+          Text(
+            error!,
+            style: const TextStyle(color: Colors.redAccent, fontSize: 12),
+          ),
         ],
       ],
     );

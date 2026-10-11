@@ -24,6 +24,17 @@ class WelcomeScreen extends StatelessWidget {
               ),
             ),
           ),
+
+          const SafeArea(
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: Padding(
+                padding: EdgeInsets.only(left: 21, top: 12),
+                child: WelcomeBrand(),
+              ),
+            ),
+          ),
+
           SafeArea(
             child: Padding(
               padding: LuminSpacing.page,
@@ -33,21 +44,37 @@ class WelcomeScreen extends StatelessWidget {
                   const Spacer(),
                   const WelcomeHeadline(),
                   const SizedBox(height: 30),
+
                   LuminButton(
                     label: 'Começar',
                     onPressed: () => Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const LoginScreen()),
+                      MaterialPageRoute(builder: (_) => const RegisterScreen()),
                     ),
                   ),
                   const SizedBox(height: 12),
+
                   Center(
                     child: TextButton(
                       onPressed: () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const RegisterScreen(),
+                        MaterialPageRoute(builder: (_) => const LoginScreen()),
+                      ),
+                      child: const Text.rich(
+                        TextSpan(
+                          children: [
+                            TextSpan(
+                              text: 'Já possui conta? ',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            TextSpan(
+                              text: 'Faça o Login',
+                              style: TextStyle(
+                                color: LuminColors.blue,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      child: const Text('Já possui conta? Faça o login'),
                     ),
                   ),
                 ],
@@ -55,6 +82,45 @@ class WelcomeScreen extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class WelcomeBrand extends StatelessWidget {
+  const WelcomeBrand({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      header: true,
+      label: 'Lumin',
+      child: ExcludeSemantics(
+        child: Text.rich(
+          TextSpan(
+            children: [
+              const TextSpan(
+                text: 'Lu',
+                style: TextStyle(color: Colors.white),
+              ),
+              TextSpan(
+                text: 'min',
+                style: TextStyle(
+                  foreground: Paint()
+                    ..shader = const LinearGradient(
+                      colors: [Color(0xFF9B3DF0), Color(0xFFD62BE0)],
+                    ).createShader(const Rect.fromLTWH(0, 0, 40, 24)),
+                ),
+              ),
+            ],
+          ),
+          style: const TextStyle(
+            fontFamily: 'Poppins',
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            height: 1.5,
+          ),
+        ),
       ),
     );
   }
