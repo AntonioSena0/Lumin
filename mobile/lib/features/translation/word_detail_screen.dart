@@ -73,14 +73,14 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
       setState(() => pronunciation = given);
       return;
     }
-    final original = '${word['original'] ?? ''}'.trim();
-    if (original.isEmpty) return;
+    final term = pronunciationTerm(word);
+    if (term.isEmpty) return;
     setState(() => loadingPronunciation = true);
-    final fetched = await _fetchPhonetic(original);
+    final parts = await Future.wait(term.split(' ').map(_fetchPhonetic));
     if (!mounted) return;
     setState(() {
       loadingPronunciation = false;
-      pronunciation = _cleanPhonetic(fetched);
+      pronunciation = parts.any((p) => p.isEmpty) ? '' : parts.map(_cleanPhonetic).join(' ');
     });
   }
 
@@ -126,8 +126,9 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
     return '';
   }
 
+  /// Fala a tradução em inglês, que é a palavra que o usuário está aprendendo.
   Future<void> speak() async {
-    final text = '${word['original'] ?? ''}'.trim();
+    final text = pronunciationTerm(word);
     if (text.isEmpty) return;
     try {
       await _tts.setLanguage('en-US');
@@ -614,4 +615,9 @@ class _GradientButton extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Termo que deve ser pronunciado e transcrito: a tradução, já que o usuário conhece o original.
+String pronunciationTerm(Map<String, dynamic> word) {
+  return '${word['translated'] ?? ''}'.trim().replaceAll(RegExp(r'\s+'), ' ');
 }

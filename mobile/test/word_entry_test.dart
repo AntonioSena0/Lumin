@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mobile/core/models/word_entry.dart';
+import 'package:mobile/features/translation/word_detail_screen.dart';
 
 void main() {
   test('catalog word becomes an unsaved user word for the detail screen', () {
@@ -31,5 +32,10 @@ void main() {
 
     expect(entries.single.id, 7);
     expect(entries.single.categoryName, 'Tecnologia');
+  });
+
+  test('pronunciation uses the translation, not the original word', () {
+    expect(pronunciationTerm({'original': 'urso de pelúcia', 'translated': ' Teddy   bear '}), 'Teddy bear');
+    expect(pronunciationTerm({'original': 'caneca'}), '');
   });
 }
