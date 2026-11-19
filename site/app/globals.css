@@ -1,0 +1,174 @@
+@import "tailwindcss";
+
+@theme {
+  --color-night: #070111;
+  --color-dusk: #140726;
+  --color-violet: #6a00f4;
+  --color-magenta: #d000d9;
+  --color-scan: #52e7ff;
+  --color-sky: #2b6cff;
+  --color-mist: #f6f0ff;
+  --color-haze: #b3a6c8;
+  --font-display: var(--font-bricolage);
+  --font-sans: var(--font-poppins);
+}
+
+html {
+  background: var(--color-night);
+  color: var(--color-mist);
+  color-scheme: dark;
+}
+
+body {
+  font-family: var(--font-sans);
+  overflow-x: clip;
+}
+
+::selection {
+  background: var(--color-magenta);
+  color: var(--color-mist);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-scan);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+.cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 90;
+  width: 10px;
+  height: 10px;
+  border-radius: 9999px;
+  border: 1px solid rgb(246 240 255 / 0.55);
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform;
+  transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1), height 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.4s, background-color 0.4s, backdrop-filter 0.4s, opacity 0.3s;
+}
+
+.cursor-dot.is-visible {
+  opacity: 1;
+}
+
+.cursor-dot.is-hover {
+  width: 64px;
+  height: 64px;
+  border-color: rgb(246 240 255 / 0.85);
+  background-color: rgb(246 240 255 / 0.06);
+  backdrop-filter: blur(2px);
+}
+
+.phone-screen {
+  box-shadow: 0 0 0 200vmax rgb(7 1 17 / var(--dim, 0));
+}
+
+.orbit-ring {
+  border: 1.5px solid rgb(106 0 244 / 0.7);
+}
+
+.glass {
+  background: rgb(20 7 38 / 0.55);
+  border: 1px solid rgb(255 255 255 / 0.08);
+  backdrop-filter: blur(16px);
+}
+
+@property --reveal {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+
+.loader {
+  --reveal: 0px;
+  transition: --reveal 1.2s cubic-bezier(0.7, 0, 0.25, 1);
+}
+
+.loader-open {
+  --reveal: 150vmax;
+}
+
+.loader-veil {
+  mask: radial-gradient(circle at 50% 50%, transparent var(--reveal), #000 calc(var(--reveal) + 1px));
+}
+
+.loader-ring {
+  width: calc(var(--reveal) * 2 + 4px);
+  height: calc(var(--reveal) * 2 + 4px);
+  border: 2px solid #d000d9;
+  opacity: 0;
+}
+
+.loader-open .loader-ring {
+  opacity: 1;
+}
+
+.planet {
+  background: radial-gradient(circle, #8f4dff 1.4px, transparent 1.6px) 0 0 / 9px 9px, #2c0b66;
+  animation: planet-spin 3.2s linear infinite;
+}
+
+@keyframes planet-spin {
+  to {
+    background-position: 90px 0, 0 0;
+  }
+}
+
+.moon {
+  animation: moon-orbit 2.4s linear infinite;
+}
+
+@keyframes moon-orbit {
+  0.0% {
+    transform: translate(88.0px, 0.0px);
+  }
+  8.33% {
+    transform: translate(76.2px, 12.0px);
+  }
+  16.67% {
+    transform: translate(44.0px, 20.8px);
+  }
+  25.0% {
+    transform: translate(0.0px, 24.0px);
+  }
+  33.33% {
+    transform: translate(-44.0px, 20.8px);
+  }
+  41.67% {
+    transform: translate(-76.2px, 12.0px);
+  }
+  50.0% {
+    transform: translate(-88.0px, 0.0px);
+  }
+  58.33% {
+    transform: translate(-76.2px, -12.0px);
+  }
+  66.67% {
+    transform: translate(-44.0px, -20.8px);
+  }
+  75.0% {
+    transform: translate(-0.0px, -24.0px);
+  }
+  83.33% {
+    transform: translate(44.0px, -20.8px);
+  }
+  91.67% {
+    transform: translate(76.2px, -12.0px);
+  }
+  100.0% {
+    transform: translate(88.0px, -0.0px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
