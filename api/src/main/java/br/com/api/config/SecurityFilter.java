@@ -25,6 +25,7 @@ public class SecurityFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final ObjectMapper mapper;
 
+    /** Autentica a requisição pelo cookie de acesso e bloqueia usuários sem e-mail verificado fora das rotas públicas. */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String access = null;
@@ -42,7 +43,8 @@ public class SecurityFilter extends OncePerRequestFilter {
                 Long userId = jwtService.getUserId(access);
                 boolean verified = jwtService.isVerified(access);
                 String path = request.getRequestURI();
-                boolean free = path.startsWith("/lumin/auth/") || path.startsWith("/lumin/languages");
+                boolean free = path.startsWith("/lumin/auth/") || path.startsWith("/lumin/languages")
+                        || path.startsWith("/images/") || path.startsWith("/lumin/avatars");
                 if(!verified && !free) {
                     response.setStatus(403);
                     response.setContentType("application/json;charset=UTF-8");

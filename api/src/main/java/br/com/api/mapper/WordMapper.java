@@ -1,6 +1,5 @@
 package br.com.api.mapper;
 
-import br.com.api.dto.request.WordRequest;
 import br.com.api.dto.response.WordResponse;
 import br.com.api.entity.Category;
 import br.com.api.entity.Language;
@@ -10,12 +9,12 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class WordMapper {
 
-    public Word toWord(WordRequest request, String description, Language from_language, Language to_language, Category category){
+    public Word toWord(String original, String translated, String description, Language from_language, Language to_language, Category category){
 
         return Word
                 .builder()
-                .original(request.original().toLowerCase().trim())
-                .translated(request.translated().toLowerCase().trim())
+                .original(original)
+                .translated(translated)
                 .description(description)
                 .category(category)
                 .fromLanguage(from_language)

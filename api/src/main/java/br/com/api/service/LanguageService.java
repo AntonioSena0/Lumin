@@ -8,5 +8,6 @@ public interface LanguageService {
 
     List<LanguageResponse> findAll();
     LanguageResponse findById(Integer id);
+    LanguageResponse detect(String clientIp, String acceptLanguage);
 
 }

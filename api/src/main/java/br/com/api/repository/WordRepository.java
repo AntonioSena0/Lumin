@@ -68,4 +68,24 @@ public interface WordRepository extends JpaRepository<Word, Long> {
             nativeQuery = true)
     List<String> findTop10ByCategoryIdAndToLanguageIdAndIdNot(@Param("categoryId") Integer categoryId, @Param("toLanguageId") Integer toLanguageId, @Param("id") Long id);
 
+    /** Pesquisa palavras de um par de idiomas pelo texto original ou tradução; categoryId 0 ignora o filtro de categoria. */
+    @Query(value = "SELECT w FROM Word w " +
+            "JOIN FETCH w.fromLanguage " +
+            "JOIN FETCH w.toLanguage " +
+            "JOIN FETCH w.category " +
+            "WHERE w.fromLanguage.id = :fromLanguageId " +
+            "AND w.toLanguage.id = :toLanguageId " +
+            "AND (LOWER(w.original) LIKE CONCAT('%', :q, '%') OR LOWER(w.translated) LIKE CONCAT('%', :q, '%')) " +
+            "AND (:categoryId = 0 OR w.category.id = :categoryId)",
+            countQuery = "SELECT COUNT(w) FROM Word w " +
+                    "WHERE w.fromLanguage.id = :fromLanguageId " +
+                    "AND w.toLanguage.id = :toLanguageId " +
+                    "AND (LOWER(w.original) LIKE CONCAT('%', :q, '%') OR LOWER(w.translated) LIKE CONCAT('%', :q, '%')) " +
+                    "AND (:categoryId = 0 OR w.category.id = :categoryId)")
+    Page<Word> searchCatalog(@Param("fromLanguageId") Integer fromLanguageId,
+                             @Param("toLanguageId") Integer toLanguageId,
+                             @Param("q") String q,
+                             @Param("categoryId") Integer categoryId,
+                             Pageable pageable);
+
 }

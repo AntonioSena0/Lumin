@@ -33,17 +33,24 @@ public class ExerciseGenerationNormalizer {
                 .toList();
     }
 
+    /** Ajusta cada exercício escrito e gera as opções do formato: banco de palavras no FILL_IN e blocos de frase no TRANSLATE e REWRITE. */
     private WrittenExerciseAiResponse normalizeWrittenExercise(WrittenExerciseAiResponse exercise, Word word) {
         if (exercise.subType() == WrittenType.MULTIPLE_CHOICE) {
             return normalizeMultipleChoice(exercise, word);
         }
 
+        String correctAnswer = normalizeText(exercise.correctAnswer());
+
+        List<String> options = exercise.subType() == WrittenType.FILL_IN
+                ? exerciseOptionService.buildWordBank(correctAnswer, word, exercise.options())
+                : exerciseOptionService.buildSentenceBlocks(correctAnswer, word);
+
         return new WrittenExerciseAiResponse(
                 normalizeText(exercise.title()),
                 normalizeText(exercise.instruction()),
                 normalizeText(exercise.prompt()),
-                normalizeText(exercise.correctAnswer()),
-                List.of(),
+                correctAnswer,
+                options,
                 exercise.subType()
         );
     }

@@ -12,6 +12,7 @@ import br.com.api.entity.*;
 import br.com.api.exception.BusinessException;
 import br.com.api.exception.NotFoundException;
 import br.com.api.exception.UnauthorizedException;
+import br.com.api.factory.ExerciseOrder;
 import br.com.api.factory.StudySessionFactory;
 import br.com.api.mapper.ExerciseMapper;
 import br.com.api.mapper.StudySessionMapper;
@@ -35,6 +36,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @Service
@@ -129,6 +131,7 @@ public class StudySessionServiceImpl implements StudySessionService{
         );
     }
 
+    /** Gera a sessão de estudo da palavra com a IA, intercalando os tipos de exercício para a sessão variar. */
     @Override
     @Transactional
     public StudySessionResponse startSession(Long userId, Long wordId) {
@@ -144,10 +147,12 @@ public class StudySessionServiceImpl implements StudySessionService{
         List<WrittenExercise> writtenExercises = writtenExerciseService.createAllWrittenExercises(aiResponse.writtenExercises(), existingWord.getToLanguage(), existingWord);
         List<SpeakingExercise> speakingExercises = speakingExerciseService.createAllSpeakingExercises(aiResponse.speakingExercises(), existingWord.getToLanguage(), existingWord);
 
-        List<Exercise> exercises = new ArrayList<>();
+        List<Exercise> grouped = new ArrayList<>();
 
-        exercises.addAll(writtenExercises);
-        exercises.addAll(speakingExercises);
+        grouped.addAll(writtenExercises);
+        grouped.addAll(speakingExercises);
+
+        List<Exercise> exercises = ExerciseOrder.interleave(grouped, new Random());
 
         for (int index = 0; index < exercises.size(); index++) {
             exercises.get(index).setOrderIndex(index);

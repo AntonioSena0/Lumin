@@ -24,6 +24,8 @@ public record UserOAuthRequest(
 
         String redirectUri,
 
-        String idToken
+        String idToken,
+
+        Integer appLanguage
 
 ) {}

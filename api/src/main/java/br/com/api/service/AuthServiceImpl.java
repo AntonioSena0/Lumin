@@ -342,7 +342,8 @@ public class AuthServiceImpl implements AuthService{
                 pending.email(),
                 randomPassword,
                 request.nativeLanguage(),
-                request.chosenLanguage()
+                request.chosenLanguage(),
+                request.appLanguage()
         ));
 
         oAuthAccountRepository.save(OAuthAccount

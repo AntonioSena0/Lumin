@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -24,4 +25,9 @@ public interface LanguageController {
             content = @Content(schema = @Schema(implementation = LanguageResponse.class)))
     @ApiResponse(responseCode = "404", description = "Idioma não encontrado", content = @Content())
     ResponseEntity<LanguageResponse> findById(Integer id);
+
+    @Operation(summary = "Detectar idioma do app", description = "Retorna o idioma padrão do app a partir do IP do usuário (Brasil = português, demais = inglês), com fallback para o Accept-Language")
+    @ApiResponse(responseCode = "200", description = "Idioma detectado",
+            content = @Content(schema = @Schema(implementation = LanguageResponse.class)))
+    ResponseEntity<LanguageResponse> detect(HttpServletRequest request);
 }

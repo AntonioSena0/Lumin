@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -16,6 +17,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
@@ -27,10 +31,12 @@ public class SecurityConfig {
     public final SecurityFilter securityFilter;
     private final ObjectMapper mapper;
 
+    /** Define rotas públicas e autenticadas, CORS, sessão stateless e a resposta padrão para requisições sem autenticação. */
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable())
+                .cors(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(a -> a
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
@@ -39,6 +45,7 @@ public class SecurityConfig {
                                 "/lumin/auth/register", "/lumin/auth/register/oauth", "/lumin/auth/login", "/lumin/auth/refresh", "/lumin/auth/logout", "/lumin/auth/verify", "/lumin/auth/resend", "/lumin/auth/oauth", "/lumin/auth/password/forgot", "/lumin/auth/password/reset")
                         .permitAll()
                         .requestMatchers("/lumin/languages/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/images/**", "/lumin/avatars/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/v3/api-docs/**", "/swagger-ui/**", "/actuator/health").permitAll()
                         .anyRequest().authenticated()
                 )
@@ -51,6 +58,19 @@ public class SecurityConfig {
                         })
                 ))
                 .build();
+    }
+
+    /** Libera CORS apenas para leitura das imagens estáticas e dos avatares, usados direto pelo app via rede. */
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration publicAssets = new CorsConfiguration();
+        publicAssets.addAllowedOriginPattern("*");
+        publicAssets.setAllowedMethods(List.of("GET", "HEAD", "OPTIONS"));
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/images/**", publicAssets);
+        source.registerCorsConfiguration("/lumin/avatars/**", publicAssets);
+        return source;
     }
 
     @Bean

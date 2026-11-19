@@ -54,6 +54,16 @@ public class UserServiceImpl implements UserService{
                 .map(UserMapper::toUserResponse);
     }
 
+    /** Pesquisa usuários pelo nome ou lista todos quando o termo está vazio. */
+    @Override
+    public Page<UserResponse> search(String q, Pageable pageable) {
+        if (q == null || q.isBlank()) {
+            return findAll(pageable);
+        }
+        return repository.searchByName(q.trim(), pageable)
+                .map(UserMapper::toUserResponse);
+    }
+
     @Override
     public UserResponse findById(Long id) {
 
@@ -72,6 +82,7 @@ public class UserServiceImpl implements UserService{
         );
     }
 
+    /** Cadastra o usuário com senha criptografada e cria suas configurações com o idioma do app informado ou a língua nativa. */
     @Override
     @Transactional
     public UserMeResponse create(UserRequest request) {
@@ -97,10 +108,14 @@ public class UserServiceImpl implements UserService{
 
         User savedUser = repository.save(UserMapper.toUser(request, hashPassword, nativeLanguage, chosenLanguage, avatar));
 
+        Language appLanguage = request.appLanguage() == null
+                ? nativeLanguage
+                : languageRepository.findById(request.appLanguage()).orElse(nativeLanguage);
+
         settingRepository.save(Setting
             .builder()
             .user(savedUser)
-            .appLanguage(nativeLanguage)
+            .appLanguage(appLanguage)
             .notifyDaily(true)
             .notifyReview(true)
             .voice(VoiceType.FEMALE)

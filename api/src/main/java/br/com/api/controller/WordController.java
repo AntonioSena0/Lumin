@@ -36,4 +36,11 @@ public interface WordController {
             content = @Content(schema = @Schema(implementation = PageResponse.class)))
     @ApiResponse(responseCode = "401", description = "Não autenticado", content = @Content())
     ResponseEntity<PageResponse<WordResponse>> search(Integer languageId, String q, Pageable pageable);
+
+    @Operation(summary = "Catálogo da comunidade", description = "Pesquisa palavras salvas por qualquer usuário no mesmo par de idiomas do usuário logado, filtrando por texto (original ou tradução) e categoria",
+            security = @SecurityRequirement(name = "cookieAuth"))
+    @ApiResponse(responseCode = "200", description = "Palavras encontradas",
+            content = @Content(schema = @Schema(implementation = PageResponse.class)))
+    @ApiResponse(responseCode = "401", description = "Não autenticado", content = @Content())
+    ResponseEntity<PageResponse<WordResponse>> catalog(String q, Integer categoryId, Pageable pageable);
 }

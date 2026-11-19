@@ -22,6 +22,8 @@ public record UserRequest(
         Integer nativeLanguage,
 
         @NotNull(message = "A linguagem de preferência é obrigatória")
-        Integer chosenLanguage
+        Integer chosenLanguage,
+
+        Integer appLanguage
 
 ) {}

@@ -10,6 +10,7 @@ public interface WordService {
 
     Page<WordResponse> findAll(Pageable pageable);
     WordResponse findById(Long wordId);
+    Page<WordResponse> catalog(Long userId, String q, Integer categoryId, Pageable pageable);
     Page<WordResponse> search(String q, Integer languageId, Pageable pageable);
     UserWordListResponse save(WordRequest request, Long userId);
     UserWordListResponse unsave(Long wordId, Long userId);

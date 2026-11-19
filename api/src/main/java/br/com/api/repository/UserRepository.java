@@ -56,4 +56,31 @@ public interface UserRepository extends JpaRepository<User, Long> {
     )
     boolean existsByEmailAndIdNot(String email, Long id);
 
+    /** Pesquisa usuários pelo nome sem diferenciar maiúsculas de minúsculas. */
+    @Query(value = "SELECT u FROM User u " +
+            "JOIN FETCH u.nativeLanguage " +
+            "JOIN FETCH u.chosenLanguage " +
+            "JOIN FETCH u.avatar " +
+            "WHERE LOWER(u.name) LIKE LOWER(CONCAT('%', :q, '%'))",
+            countQuery = "SELECT COUNT(u) FROM User u WHERE LOWER(u.name) LIKE LOWER(CONCAT('%', :q, '%'))")
+    Page<User> searchByName(@Param("q") String q, Pageable pageable);
+
+    /** Lista os usuários que seguem o usuário informado. */
+    @Query(value = "SELECT u FROM User u " +
+            "JOIN FETCH u.nativeLanguage " +
+            "JOIN FETCH u.chosenLanguage " +
+            "JOIN FETCH u.avatar " +
+            "WHERE u.id IN (SELECT f.id.followerId FROM Follow f WHERE f.id.followedId = :userId)",
+            countQuery = "SELECT COUNT(f) FROM Follow f WHERE f.id.followedId = :userId")
+    Page<User> findFollowersOf(@Param("userId") Long userId, Pageable pageable);
+
+    /** Lista os usuários seguidos pelo usuário informado. */
+    @Query(value = "SELECT u FROM User u " +
+            "JOIN FETCH u.nativeLanguage " +
+            "JOIN FETCH u.chosenLanguage " +
+            "JOIN FETCH u.avatar " +
+            "WHERE u.id IN (SELECT f.id.followedId FROM Follow f WHERE f.id.followerId = :userId)",
+            countQuery = "SELECT COUNT(f) FROM Follow f WHERE f.id.followerId = :userId")
+    Page<User> findFollowedBy(@Param("userId") Long userId, Pageable pageable);
+
 }

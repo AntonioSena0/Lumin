@@ -19,6 +19,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -79,5 +80,23 @@ class MeSecurityTest {
         mvc.perform(patch("/lumin/me/sessions/finish/99").cookie(new Cookie("access", "token-a")))
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.code").value("SESSION_NOT_OWNED"));
+    }
+
+    @Test
+    void publicImagesAreServedWithoutAuthAndWithCors() throws Exception {
+        mvc.perform(get("/images/flags/br.png").header("Origin", "http://localhost:5000"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Access-Control-Allow-Origin", "http://localhost:5000"));
+        mvc.perform(get("/images/avatars/default.png"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void unverifiedUserCanStillLoadPublicImages() throws Exception {
+        when(jwtService.getUserId("token-u")).thenReturn(1L);
+        when(jwtService.isVerified("token-u")).thenReturn(false);
+
+        mvc.perform(get("/images/flags/us.png").cookie(new Cookie("access", "token-u")))
+                .andExpect(status().isOk());
     }
 }

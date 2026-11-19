@@ -32,20 +32,23 @@ public class WrittenExercise extends Exercise{
     @Column(columnDefinition = "jsonb")
     private List<String> options;
 
+    /** Compara a resposta com a correta ignorando maiúsculas, pontuação e espaços extras, mas mantendo apóstrofos. */
     @Override
     public boolean checkAnswer(String answer) {
 
         if (answer == null) return false;
 
-        return answer.trim()
-                .toLowerCase()
-                .replaceAll("\\.$", "")
-                .equalsIgnoreCase(correctAnswer
-                                    .trim()
-                                    .toLowerCase()
-                                    .replaceAll("\\.$", "")
-                );
+        return normalizeAnswer(answer).equals(normalizeAnswer(correctAnswer));
 
+    }
+
+    /** Reduz a frase a letras, números, apóstrofos e espaços simples, em minúsculas. */
+    private static String normalizeAnswer(String value) {
+        return value.toLowerCase()
+                .replace('’', '\'')
+                .replaceAll("[^\\p{L}\\p{N}' ]", " ")
+                .replaceAll("\\s+", " ")
+                .trim();
     }
 
     @Override

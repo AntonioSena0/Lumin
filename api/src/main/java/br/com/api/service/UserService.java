@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 public interface UserService {
 
     Page<UserResponse> findAll(Pageable pageable);
+    Page<UserResponse> search(String q, Pageable pageable);
     UserResponse findById(Long id);
     UserMeResponse findMe(Long id);
     UserMeResponse create(UserRequest request);
