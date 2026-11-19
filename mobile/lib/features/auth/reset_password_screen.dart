@@ -5,6 +5,7 @@ import 'package:mobile/shared/widgets/back_title.dart';
 import 'package:mobile/shared/widgets/lumin_button.dart';
 import 'package:mobile/shared/widgets/lumin_field.dart';
 import 'package:mobile/shared/widgets/lumin_page.dart';
+import 'package:mobile/core/i18n/i18n.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -47,15 +48,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const BackTitle(title: 'Esqueci a senha'),
+          BackTitle(title: tr('Esqueci a senha')),
           const SizedBox(height: 16),
-          LuminField(label: 'E-mail', controller: emailController, keyboardType: TextInputType.emailAddress),
+          LuminField(label: tr('E-mail'), controller: emailController, keyboardType: TextInputType.emailAddress),
           if (error != null) ...[
             const SizedBox(height: 10),
             Text(error!, style: const TextStyle(color: Colors.redAccent, fontSize: 12)),
           ],
           const SizedBox(height: 22),
-          LuminButton(label: loading ? 'Enviando...' : 'Enviar código', onPressed: loading ? () {} : submit),
+          LuminButton(label: loading ? tr('Enviando...') : tr('Enviar código'), onPressed: loading ? () {} : submit),
         ],
       ),
     );
@@ -112,17 +113,17 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const BackTitle(title: 'Nova senha'),
+          BackTitle(title: tr('Nova senha')),
           const SizedBox(height: 16),
-          LuminField(label: 'Código', controller: codeController, keyboardType: TextInputType.number),
+          LuminField(label: tr('Código'), controller: codeController, keyboardType: TextInputType.number),
           const SizedBox(height: 14),
-          LuminField(label: 'Nova senha', controller: passwordController, obscureText: true),
+          LuminField(label: tr('Nova senha'), controller: passwordController, obscureText: true),
           if (error != null) ...[
             const SizedBox(height: 10),
             Text(error!, style: const TextStyle(color: Colors.redAccent, fontSize: 12)),
           ],
           const SizedBox(height: 22),
-          LuminButton(label: loading ? 'Salvando...' : 'Salvar senha', onPressed: loading ? () {} : submit),
+          LuminButton(label: loading ? tr('Salvando...') : tr('Salvar senha'), onPressed: loading ? () {} : submit),
         ],
       ),
     );

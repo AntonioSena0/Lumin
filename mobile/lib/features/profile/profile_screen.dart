@@ -3,6 +3,7 @@ import 'package:mobile/core/theme/lumin_colors.dart';
 import 'package:mobile/core/models/api_models.dart';
 import 'package:mobile/core/network/api_client.dart';
 import 'package:mobile/core/repositories/lumin_repository.dart';
+import 'package:mobile/features/social/people_screen.dart';
 import 'package:mobile/main.dart';
 import 'package:mobile/features/level_test/level_test_screen.dart';
 import 'package:mobile/features/profile/edit_profile_screen.dart';
@@ -13,6 +14,7 @@ import 'package:mobile/features/study/study_sessions_screen.dart';
 import 'package:mobile/features/translation/translation_history_screen.dart';
 import 'package:mobile/shared/widgets/lumin_avatar.dart';
 import 'package:mobile/shared/widgets/lumin_page.dart';
+import 'package:mobile/core/i18n/i18n.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -71,8 +73,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Perfil',
+          Text(
+            tr('Perfil'),
             style: TextStyle(fontSize: 27, fontWeight: FontWeight.w900),
           ),
           const SizedBox(height: 28),
@@ -88,7 +90,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           Center(
             child: Text(
-              level.isEmpty ? '' : 'Nível $level',
+              level.isEmpty ? '' : t('Nível $level', 'Level $level'),
               style: const TextStyle(
                 color: LuminColors.magenta,
                 fontWeight: FontWeight.w800,
@@ -99,42 +101,48 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Row(
             children: [
               Expanded(
-                child: ProfileStat(value: practiced, label: 'Palavras praticadas'),
+                child: ProfileStat(value: practiced, label: tr('Palavras praticadas')),
               ),
               const SizedBox(width: 10),
               Expanded(
-                child: ProfileStat(value: saved, label: 'Palavras salvas'),
+                child: ProfileStat(value: saved, label: tr('Palavras salvas')),
               ),
             ],
           ),
           const SizedBox(height: 18),
           SettingsRow(
-            label: 'Editar dados',
+            label: tr('Editar dados'),
             onTap: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const EditProfileScreen()),
             ).then((_) => load()),
           ),
           SettingsRow(
-            label: 'Meu progresso',
+            label: tr('Meu progresso'),
             onTap: () => Navigator.of(
               context,
             ).push(MaterialPageRoute(builder: (_) => const ProgressScreen())),
           ),
           SettingsRow(
-            label: 'Minhas sessões',
+            label: tr('Pessoas'),
+            onTap: () => Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (_) => const PeopleScreen())),
+          ),
+          SettingsRow(
+            label: tr('Minhas sessões'),
             trailing: sessionCount > 0 ? '$sessionCount' : null,
             onTap: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const StudySessionsScreen()),
             ),
           ),
           SettingsRow(
-            label: 'Teste de nivelamento',
+            label: tr('Teste de nivelamento'),
             onTap: () => Navigator.of(context).push(
               MaterialPageRoute(              builder: (_) => const LevelTestScreen(canSkip: false)),
             ),
           ),
           SettingsRow(
-            label: 'Histórico de traduções',
+            label: tr('Histórico de traduções'),
             onTap: () => Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (_) => const TranslationHistoryScreen(),
@@ -142,13 +150,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           SettingsRow(
-            label: 'Palavras salvas',
+            label: tr('Palavras salvas'),
             onTap: () => Navigator.of(
               context,
             ).push(MaterialPageRoute(builder: (_) => const SavedWordsScreen())),
           ),
           SettingsRow(
-            label: 'Configurações',
+            label: tr('Configurações'),
             onTap: () => Navigator.of(
               context,
             ).push(MaterialPageRoute(builder: (_) => const SettingsScreen())),

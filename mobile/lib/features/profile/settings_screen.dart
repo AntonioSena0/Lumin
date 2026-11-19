@@ -11,6 +11,7 @@ import 'package:mobile/features/study/study_sessions_screen.dart';
 import 'package:mobile/shared/widgets/back_title.dart';
 import 'package:mobile/shared/widgets/lumin_avatar.dart';
 import 'package:mobile/shared/widgets/lumin_page.dart';
+import 'package:mobile/core/i18n/i18n.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -66,7 +67,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         appLanguage = '${settings['appLanguageId']}';
       }
       if (settings['notifyDaily'] != null) {
-        notifications = settings['notifyDaily'] == true ? 'Ativadas' : 'Desativadas';
+        notifications = settings['notifyDaily'] == true ? tr('Ativadas') : tr('Desativadas');
       }
       if (settings['voice'] != null) {
         voice = '${settings['voice']}';
@@ -89,7 +90,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const BackTitle(title: 'Configurações'),
+          BackTitle(title: tr('Configurações')),
           const SizedBox(height: 16),
           if (loading)
             const Center(child: CircularProgressIndicator())
@@ -98,37 +99,37 @@ class _SettingsScreenState extends State<SettingsScreen> {
           else ...[
             SettingsProfileHeader(name: name, email: email, avatarUrl: avatarUrl),
             const SizedBox(height: 18),
-            const Text('Preferências', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
+            Text(tr('Preferências'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
             const SizedBox(height: 10),
             SettingsRow(
-              label: 'Idioma do app',
+              label: tr('Idioma do app'),
               trailing: appLanguage,
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const SettingsLanguageScreen()),
               ).then((_) => load()),
             ),
             SettingsRow(
-              label: 'Notificações',
+              label: tr('Notificações'),
               trailing: notifications,
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const NotificationSettingsScreen()),
               ).then((_) => load()),
             ),
             SettingsRow(
-              label: 'Voz',
+              label: tr('Voz'),
               trailing: voice,
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const VoiceSettingsScreen()),
               ).then((_) => load()),
             ),
             SettingsRow(
-              label: 'Alterar senha',
+              label: tr('Alterar senha'),
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const ChangePasswordScreen()),
               ),
             ),
             SettingsRow(
-              label: 'Minhas sessões',
+              label: tr('Minhas sessões'),
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const StudySessionsScreen()),
               ),
@@ -137,7 +138,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             Center(
               child: TextButton(
                 onPressed: logout,
-                child: const Text('Sair da conta', style: TextStyle(color: LuminColors.danger)),
+                child: Text(tr('Sair da conta'), style: TextStyle(color: LuminColors.danger)),
               ),
             ),
           ],
@@ -199,7 +200,7 @@ class SettingsErrorState extends StatelessWidget {
         const SizedBox(height: 12),
         Text(message, textAlign: TextAlign.center, style: const TextStyle(color: LuminColors.danger, fontSize: 12)),
         const SizedBox(height: 12),
-        OutlinedButton(onPressed: onRetry, child: const Text('Tentar novamente')),
+        OutlinedButton(onPressed: onRetry, child: Text(tr('Tentar novamente'))),
       ],
     );
   }

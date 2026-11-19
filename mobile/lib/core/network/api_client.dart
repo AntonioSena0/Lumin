@@ -1,9 +1,10 @@
-import 'dart:typed_data';
+import 'dart:io';
 
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:mobile/core/i18n/i18n.dart';
 
 const apiUnavailableBaseUrl = 'http://localhost:0';
 
@@ -14,6 +15,7 @@ class ApiClient {
 
   Future<bool>? _refreshInFlight;
 
+  /// Cria o cliente HTTP com cookies persistentes, timeouts e o idioma do aparelho no Accept-Language.
   static Future<ApiClient> create(String baseUrl) async {
     final dir = await getApplicationDocumentsDirectory();
     final jar = PersistCookieJar(storage: FileStorage('${dir.path}/cookies'));
@@ -21,6 +23,7 @@ class ApiClient {
       BaseOptions(
         baseUrl: baseUrl,
         contentType: Headers.jsonContentType,
+        headers: {'Accept-Language': Platform.localeName.replaceAll('_', '-')},
         validateStatus: (_) => true,
         connectTimeout: const Duration(seconds: 10),
         sendTimeout: const Duration(seconds: 20),
@@ -78,30 +81,9 @@ class ApiClient {
       return ApiResult(response.statusCode ?? 0, response.data);
     } on DioException {
       return ApiResult(0, {
-        'message': 'Não foi possível conectar ao servidor.',
+        'message': tr('Não foi possível conectar ao servidor.'),
       });
     }
-  }
-
-  Future<Uint8List?> bytes(String url) async {
-    try {
-      final response = await _request(
-        () => _dio.get<List<int>>(
-          url,
-          options: Options(responseType: ResponseType.bytes),
-        ),
-      );
-      final data = response.data;
-      if (response.statusCode != null &&
-          response.statusCode! >= 200 &&
-          response.statusCode! < 300 &&
-          data != null) {
-        return Uint8List.fromList(data);
-      }
-    } catch (_) {
-      return null;
-    }
-    return null;
   }
 
   Future<Response<dynamic>> _request(
@@ -171,6 +153,6 @@ class ApiResult {
     final message = map['message'];
     if (message is String && message.isNotEmpty) return message;
     if (data is String && data.isNotEmpty) return data as String;
-    return 'Não foi possível concluir a operação.';
+    return tr('Não foi possível concluir a operação.');
   }
 }

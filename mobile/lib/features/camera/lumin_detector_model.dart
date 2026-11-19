@@ -15,8 +15,12 @@ class LuminDetectorModel {
 
   static const fallbackModelPath = 'yolo26n';
   static const fallbackTask = YOLOTask.detect;
-  static const confidenceThreshold = 0.48;
-  static const stableFrameTarget = 8;
+  static const confidenceThreshold = 0.40;
+  static const cautiousConfidenceThreshold = 0.60;
+  static const stableFrameTarget = 6;
+  static const cautiousStableFrameTarget = 8;
+  static const stableFrameWindow = 10;
+  static const centerTolerance = 0.22;
   static const modelCooldown = Duration(seconds: 3);
 
   static YOLOTask get configuredTask {

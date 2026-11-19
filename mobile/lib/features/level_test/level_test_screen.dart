@@ -4,6 +4,7 @@ import 'package:mobile/core/theme/lumin_colors.dart';
 import 'package:mobile/features/level_test/placement_screen.dart';
 import 'package:mobile/features/shell/app_shell.dart';
 import 'package:mobile/main.dart';
+import 'package:mobile/core/i18n/i18n.dart';
 
 class LevelTestScreen extends StatefulWidget {
   const LevelTestScreen({super.key, this.canSkip = true});
@@ -100,28 +101,28 @@ class _LevelTestScreenState extends State<LevelTestScreen> {
                         const SizedBox(height: 14),
                         _infoCard(),
                         const SizedBox(height: 18),
-                        const _LevelRow(
+                        _LevelRow(
                           code: 'N1',
-                          text: 'Iniciante',
+                          text: tr('Iniciante'),
                           color: Color(0xFF4F9A45),
                         ),
                         const SizedBox(height: 7),
-                        const _LevelRow(
+                        _LevelRow(
                           code: 'N2',
-                          text: 'Intermediário',
+                          text: tr('Intermediário'),
                           color: Color(0xFF7A3F9E),
                         ),
                         const SizedBox(height: 7),
-                        const _LevelRow(
+                        _LevelRow(
                           code: 'N3',
-                          text: 'Avançado',
+                          text: tr('Avançado'),
                           color: Color(0xFFC23B3B),
                         ),
                         const Spacer(),
                         const SizedBox(height: 24),
                         Center(
                           child: _GradientButton(
-                            label: loading ? 'Carregando...' : 'Começar',
+                            label: loading ? tr('Carregando...') : tr('Começar'),
                             onTap: loading ? null : start,
                           ),
                         ),
@@ -150,8 +151,8 @@ class _LevelTestScreenState extends State<LevelTestScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 minimumSize: const Size(48, 40),
               ),
-              child: const Text(
-                'Pular',
+              child: Text(
+                tr('Pular'),
                 style: TextStyle(
                   fontFamily: _font,
                   color: LuminColors.muted,
@@ -160,14 +161,14 @@ class _LevelTestScreenState extends State<LevelTestScreen> {
               ),
             ),
           ),
-        const Padding(
+        Padding(
           padding: EdgeInsets.only(top: 18),
           child: SizedBox(
             width: double.infinity,
             child: Column(
               children: [
                 Text(
-                  'Teste de Nivelamento',
+                  tr('Teste de Nivelamento'),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontFamily: _font,
@@ -178,7 +179,7 @@ class _LevelTestScreenState extends State<LevelTestScreen> {
                 ),
                 SizedBox(height: 2),
                 Text(
-                  'Vamos identificar seu nível no\nidioma escolhido',
+                  tr('Vamos identificar seu nível no\nidioma escolhido'),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontFamily: _font,
@@ -219,10 +220,10 @@ class _LevelTestScreenState extends State<LevelTestScreen> {
               ),
             ),
           ),
-          const Padding(
+          Padding(
             padding: EdgeInsets.fromLTRB(20, 12, 20, 0),
             child: Text(
-              'O que será avaliado?',
+              tr('O que será avaliado?'),
               style: TextStyle(
                 fontFamily: _font,
                 fontSize: 14,
@@ -231,10 +232,10 @@ class _LevelTestScreenState extends State<LevelTestScreen> {
               ),
             ),
           ),
-          const _TopicLine('Gramática'),
-          const _TopicLine('Leitura'),
-          const _TopicLine('Escuta'),
-          const Padding(
+          _TopicLine(tr('Gramática')),
+          _TopicLine(tr('Leitura')),
+          _TopicLine(tr('Escuta')),
+          Padding(
             padding: EdgeInsets.fromLTRB(16, 4, 20, 14),
             child: Row(
               children: [
@@ -243,7 +244,7 @@ class _LevelTestScreenState extends State<LevelTestScreen> {
                 ),
                 SizedBox(width: 6),
                 Text(
-                  'Tempo estimado 5 minutos',
+                  tr('Tempo estimado 5 minutos'),
                   style: TextStyle(
                     fontFamily: _font,
                     fontSize: 11,

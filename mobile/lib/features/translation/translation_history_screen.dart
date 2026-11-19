@@ -5,6 +5,7 @@ import 'package:mobile/features/translation/word_detail_screen.dart';
 import 'package:mobile/main.dart';
 import 'package:mobile/shared/widgets/back_title.dart';
 import 'package:mobile/shared/widgets/lumin_page.dart';
+import 'package:mobile/core/i18n/i18n.dart';
 
 class TranslationHistoryScreen extends StatefulWidget {
   const TranslationHistoryScreen({super.key});
@@ -50,13 +51,13 @@ class _TranslationHistoryScreenState extends State<TranslationHistoryScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const BackTitle(title: 'Histórico de traduções'),
+          BackTitle(title: tr('Histórico de traduções')),
           const SizedBox(height: 10),
           Row(
             children: [
               Expanded(
                 child: HistoryTab(
-                  label: 'Todas',
+                  label: tr('Todas'),
                   selected: !onlySaved,
                   onTap: () {
                     setState(() => onlySaved = false);
@@ -67,7 +68,7 @@ class _TranslationHistoryScreenState extends State<TranslationHistoryScreen> {
               const SizedBox(width: 8),
               Expanded(
                 child: HistoryTab(
-                  label: 'Salvas',
+                  label: tr('Salvas'),
                   selected: onlySaved,
                   onTap: () {
                     setState(() => onlySaved = true);
@@ -81,9 +82,9 @@ class _TranslationHistoryScreenState extends State<TranslationHistoryScreen> {
           if (loading)
             const Center(child: CircularProgressIndicator())
           else if (items.isEmpty)
-            const Center(
+            Center(
               child: Text(
-                'Suas traduções salvas aparecerão aqui para você revisar e aprender.',
+                tr('Suas traduções salvas aparecerão aqui para você revisar e aprender.'),
                 textAlign: TextAlign.center,
                 style: TextStyle(color: LuminColors.muted, fontSize: 12),
               ),

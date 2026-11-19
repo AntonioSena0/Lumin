@@ -6,6 +6,7 @@ import 'package:mobile/shared/widgets/back_title.dart';
 import 'package:mobile/shared/widgets/lumin_button.dart';
 import 'package:mobile/shared/widgets/lumin_field.dart';
 import 'package:mobile/shared/widgets/lumin_page.dart';
+import 'package:mobile/core/i18n/i18n.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({super.key});
@@ -55,7 +56,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       if (response.ok) {
         email = address;
         codeSent = true;
-        notice = 'Enviamos um código de 6 dígitos para $address.';
+        notice = t('Enviamos um código de 6 dígitos para $address.', 'We sent a 6-digit code to $address.');
       } else {
         error = response.error;
       }
@@ -64,15 +65,15 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
   Future<void> confirm() async {
     if (passwordController.text != confirmController.text) {
-      setState(() => error = 'As senhas não conferem.');
+      setState(() => error = tr('As senhas não conferem.'));
       return;
     }
     if (passwordController.text.length < 8) {
-      setState(() => error = 'A senha precisa ter ao menos 8 caracteres.');
+      setState(() => error = tr('A senha precisa ter ao menos 8 caracteres.'));
       return;
     }
     if (codeController.text.trim().length != 6) {
-      setState(() => error = 'Informe o código de 6 dígitos.');
+      setState(() => error = tr('Informe o código de 6 dígitos.'));
       return;
     }
 
@@ -94,7 +95,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     if (response.ok) {
       setState(() {
         codeSent = false;
-        notice = 'Senha alterada. Entre novamente com a nova senha.';
+        notice = tr('Senha alterada. Entre novamente com a nova senha.');
       });
       await luminApi.logout();
       if (!mounted) return;
@@ -121,12 +122,12 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const BackTitle(title: 'Alterar senha'),
+          BackTitle(title: tr('Alterar senha')),
           const SizedBox(height: 16),
           Text(
             codeSent
-                ? 'Confirme com o código enviado para $email.'
-                : 'Não foi possível enviar o código agora.',
+                ? t('Confirme com o código enviado para $email.', 'Confirm with the code sent to $email.')
+                : tr('Não foi possível enviar o código agora.'),
             style: const TextStyle(color: LuminColors.muted, fontSize: 12, height: 1.4),
           ),
           const SizedBox(height: 18),
@@ -150,20 +151,20 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             const SizedBox(height: 14),
           ],
           LuminField(
-            label: 'Código de verificação',
+            label: tr('Código de verificação'),
             controller: codeController,
             keyboardType: TextInputType.number,
           ),
           const SizedBox(height: 14),
           LuminField(
-            label: 'Nova senha',
+            label: tr('Nova senha'),
             controller: passwordController,
             obscureText: true,
             icon: Icons.visibility_off,
           ),
           const SizedBox(height: 14),
           LuminField(
-            label: 'Confirmar nova senha',
+            label: tr('Confirmar nova senha'),
             controller: confirmController,
             obscureText: true,
             icon: Icons.visibility_off,
@@ -173,12 +174,12 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             width: double.infinity,
             child: OutlinedButton(
               onPressed: sending ? () {} : requestCode,
-              child: const Text('Reenviar código'),
+              child: Text(tr('Reenviar código')),
             ),
           ),
           const SizedBox(height: 10),
           LuminButton(
-            label: sending ? 'Alterando...' : 'Alterar senha',
+            label: sending ? tr('Alterando...') : tr('Alterar senha'),
             onPressed: sending || !codeSent ? () {} : confirm,
           ),
         ],

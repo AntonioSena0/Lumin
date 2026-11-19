@@ -3,6 +3,7 @@ import 'package:mobile/core/theme/lumin_assets.dart';
 import 'package:mobile/core/theme/lumin_colors.dart';
 import 'package:mobile/core/theme/lumin_spacing.dart';
 import 'package:mobile/shared/widgets/lumin_button.dart';
+import 'package:mobile/core/i18n/i18n.dart';
 
 class AuthScaffold extends StatelessWidget {
   const AuthScaffold({
@@ -97,10 +98,10 @@ class AuthScaffold extends StatelessWidget {
                                 color: LuminColors.panelLight,
                               ),
                             ),
-                            const Padding(
+                            Padding(
                               padding: EdgeInsets.symmetric(horizontal: 10),
                               child: Text(
-                                'ou continue com',
+                                tr('ou continue com'),
                                 style: TextStyle(
                                   color: LuminColors.muted,
                                   fontSize: 12,
@@ -179,7 +180,7 @@ class SocialButton extends StatelessWidget {
     final isGoogle = label == 'G';
     return Semantics(
       button: true,
-      label: isGoogle ? 'Entrar com o Google' : label,
+      label: isGoogle ? tr('Entrar com o Google') : label,
       child: GestureDetector(
         onTap: onTap,
         child: Container(

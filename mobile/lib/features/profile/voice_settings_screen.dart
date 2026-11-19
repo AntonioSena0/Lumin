@@ -3,6 +3,7 @@ import 'package:mobile/features/profile/settings_language_screen.dart';
 import 'package:mobile/main.dart';
 import 'package:mobile/shared/widgets/back_title.dart';
 import 'package:mobile/shared/widgets/lumin_page.dart';
+import 'package:mobile/core/i18n/i18n.dart';
 
 class VoiceSettingsScreen extends StatefulWidget {
   const VoiceSettingsScreen({super.key});
@@ -44,17 +45,17 @@ class _VoiceSettingsScreenState extends State<VoiceSettingsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const BackTitle(title: 'Voz'),
+          BackTitle(title: tr('Voz')),
           const SizedBox(height: 16),
           PreferenceOption(
-            title: 'Feminina',
-            description: 'Voz padrão para pronúncia e exemplos',
+            title: tr('Feminina'),
+            description: tr('Voz padrão para pronúncia e exemplos'),
             selected: selected == 'FEMALE',
             onTap: () => select('FEMALE'),
           ),
           PreferenceOption(
-            title: 'Masculina',
-            description: 'Alternativa para treinar escuta com outro timbre',
+            title: tr('Masculina'),
+            description: tr('Alternativa para treinar escuta com outro timbre'),
             selected: selected == 'MALE',
             onTap: () => select('MALE'),
           ),

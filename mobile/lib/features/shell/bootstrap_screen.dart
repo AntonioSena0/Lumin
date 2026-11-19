@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/core/i18n/i18n.dart';
 import 'package:mobile/core/theme/lumin_colors.dart';
 import 'package:mobile/features/auth/welcome_screen.dart';
 import 'package:mobile/features/shell/app_shell.dart';
@@ -18,8 +19,13 @@ class _BootstrapScreenState extends State<BootstrapScreen> {
     checkSession();
   }
 
+  /// Aplica o idioma (configurações se logado, IP se visitante) e abre o app ou a tela de boas-vindas.
   Future<void> checkSession() async {
     final response = await luminApi.me();
+    final language = response.ok
+        ? (await luminApi.settings()).map['appLanguage']
+        : (await luminApi.detectLanguage()).data;
+    applyLanguage(language);
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(

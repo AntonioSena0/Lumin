@@ -6,6 +6,7 @@ import 'package:mobile/features/translation/word_detail_screen.dart';
 import 'package:mobile/main.dart';
 import 'package:mobile/shared/widgets/back_title.dart';
 import 'package:mobile/shared/widgets/lumin_page.dart';
+import 'package:mobile/core/i18n/i18n.dart';
 
 const String _font = 'Poppins';
 const Color _accent = Color(0xFFC21BD6);
@@ -77,7 +78,7 @@ String categorySubtitle(Map<String, dynamic> category) {
       final text = v >= 1000
           ? '${(v / 1000).toStringAsFixed(1).replaceAll('.0', '')}k'
           : '$v';
-      return '$text traduções';
+      return t('$text traduções', '$text translations');
     }
   }
   return '${category['description'] ?? ''}';
@@ -132,6 +133,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
     });
   }
 
+  /// Pesquisa o termo no catálogo da comunidade para que o usuário possa salvar palavras de outros usuários.
   Future<void> search(String value) async {
     final term = value.trim();
     if (term.isEmpty) {
@@ -146,37 +148,14 @@ class _ExploreScreenState extends State<ExploreScreen> {
       error = null;
     });
 
-    final mine = await luminApi.words(search: term, page: 0, size: 20);
+    final catalog = await luminApi.catalogSearch(q: term);
     if (!mounted) return;
-
-    final found = WordEntry.fromContent(mine.map);
-    if (mine.ok && found.isNotEmpty) {
-      setState(() {
-        searchingNow = false;
-        results = found;
-        searching = true;
-      });
-      return;
-    }
-
-    final catalog = await luminApi.catalogWords(page: 0, size: 60);
-    if (!mounted) return;
-
-    final matches = catalog.ok
-        ? WordEntry.fromContent(catalog.map)
-              .where(
-                (e) =>
-                    e.original.toLowerCase().contains(term.toLowerCase()) ||
-                    e.translated.toLowerCase().contains(term.toLowerCase()),
-              )
-              .toList()
-        : <WordEntry>[];
 
     setState(() {
       searchingNow = false;
       searching = true;
-      results = matches;
-      if (!mine.ok) error = mine.error;
+      results = catalog.ok ? WordEntry.fromContent(catalog.map) : [];
+      if (!catalog.ok) error = catalog.error;
     });
   }
 
@@ -194,8 +173,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Explorar',
+          Text(
+            tr('Explorar'),
             style: TextStyle(
               fontFamily: _font,
               fontSize: 26,
@@ -218,11 +197,11 @@ class _ExploreScreenState extends State<ExploreScreen> {
             const SizedBox(height: 12),
           ],
           if (searching) ...[
-            const Text('Resultados', style: _sectionTitle),
+            Text(tr('Resultados'), style: _sectionTitle),
             const SizedBox(height: 12),
             if (results.isEmpty)
-              const Text(
-                'Nenhuma palavra encontrada.',
+              Text(
+                tr('Nenhuma palavra encontrada.'),
                 style: TextStyle(
                   fontFamily: _font,
                   color: LuminColors.muted,
@@ -237,7 +216,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Text('Minhas Palavras', style: _sectionTitle),
+                Text(tr('Minhas Palavras'), style: _sectionTitle),
                 InkWell(
                   borderRadius: BorderRadius.circular(6),
                   onTap: () => Navigator.of(context).push(
@@ -245,10 +224,10 @@ class _ExploreScreenState extends State<ExploreScreen> {
                       builder: (_) => const TranslationHistoryScreen(),
                     ),
                   ),
-                  child: const Padding(
+                  child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: 6, vertical: 10),
                     child: Text(
-                      'Ver Tudo',
+                      tr('Ver Tudo'),
                       style: TextStyle(
                         fontFamily: _font,
                         color: _accent,
@@ -262,8 +241,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
             ),
             const SizedBox(height: 6),
             if (myWords.isEmpty)
-              const Text(
-                'Salve uma tradução com a câmera para vê-la aqui.',
+              Text(
+                tr('Salve uma tradução com a câmera para vê-la aqui.'),
                 style: TextStyle(
                   fontFamily: _font,
                   color: LuminColors.muted,
@@ -289,14 +268,14 @@ class _ExploreScreenState extends State<ExploreScreen> {
                 ],
               ),
             const SizedBox(height: 22),
-            const Text(
-              'Traduzido por outros\nusuários',
+            Text(
+              tr('Traduzido por outros\nusuários'),
               style: _sectionTitle,
             ),
             const SizedBox(height: 10),
             if (categories.isEmpty)
-              const Text(
-                'Nenhuma categoria disponível.',
+              Text(
+                tr('Nenhuma categoria disponível.'),
                 style: TextStyle(
                   fontFamily: _font,
                   color: LuminColors.muted,
@@ -307,7 +286,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
               for (final category in categories)
                 CategoryRow(
                   icon: exploreCategoryIcon('${category['name'] ?? ''}'),
-                  title: '${category['name'] ?? ''}',
+                  title: tr('${category['name'] ?? ''}'),
                   subtitle: categorySubtitle(category),
                   onTap: () => openCategory(category),
                 ),
@@ -325,7 +304,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
           MaterialPageRoute(
             builder: (_) => CategoryWordsScreen(
               categoryId: id,
-              title: '${category['name'] ?? ''}',
+              title: tr('${category['name'] ?? ''}'),
             ),
           ),
         )
@@ -363,7 +342,7 @@ class ExploreSearchField extends StatelessWidget {
         fontSize: 14,
       ),
       decoration: InputDecoration(
-        hintText: 'Pesquisar palavras ou frases..',
+        hintText: tr('Pesquisar palavras ou frases..'),
         hintStyle: const TextStyle(
           fontFamily: _font,
           color: Color(0xFF9A96A8),
@@ -371,7 +350,7 @@ class ExploreSearchField extends StatelessWidget {
           fontWeight: FontWeight.w300,
         ),
         prefixIcon: IconButton(
-          tooltip: 'Buscar',
+          tooltip: tr('Buscar'),
           onPressed: () => onSearch(controller.text),
           icon: const Icon(Icons.search, size: 28, color: Color(0xFFB9B5C6)),
         ),
@@ -426,7 +405,7 @@ class _CategoryWordsScreenState extends State<CategoryWordsScreen> {
 
   Future<void> load() async {
     final response = widget.languageId == null
-        ? await luminApi.categoryWords(categoryId: widget.categoryId)
+        ? await luminApi.catalogSearch(categoryId: widget.categoryId)
         : await luminApi.words(
             categoryId: widget.categoryId == 0 ? null : widget.categoryId,
             languageId: widget.languageId,
@@ -460,8 +439,8 @@ class _CategoryWordsScreenState extends State<CategoryWordsScreen> {
               style: const TextStyle(color: Colors.redAccent, fontSize: 12),
             )
           else if (items.isEmpty)
-            const Text(
-              'Nenhuma palavra encontrada.',
+            Text(
+              tr('Nenhuma palavra encontrada.'),
               style: TextStyle(color: LuminColors.muted, fontSize: 12),
             )
           else
@@ -528,7 +507,7 @@ class WordSearchTile extends StatelessWidget {
                   if (entry.categoryName.isNotEmpty) ...[
                     const SizedBox(height: 3),
                     Text(
-                      entry.categoryName,
+                      tr(entry.categoryName),
                       style: const TextStyle(
                         fontFamily: _font,
                         color: LuminColors.muted,
@@ -573,7 +552,7 @@ class WordMiniCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              entry.categoryName.toUpperCase(),
+              tr(entry.categoryName).toUpperCase(),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(

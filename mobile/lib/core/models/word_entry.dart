@@ -50,3 +50,21 @@ class WordEntry {
         .toList();
   }
 }
+
+/// Converte uma palavra do catálogo da comunidade para o formato de palavra do usuário, marcada como ainda não salva.
+Map<String, dynamic> userWordFromCatalog(Map<String, dynamic> word) {
+  final category = word['category'];
+  final from = word['fromLanguage'];
+  final to = word['toLanguage'];
+  return {
+    ...word,
+    'wordId': word['id'],
+    'categoryId': category is Map ? category['id'] : null,
+    'categoryName': category is Map ? category['name'] : null,
+    'fromLanguageCode': from is Map ? from['code'] : null,
+    'toLanguageCode': to is Map ? to['code'] : null,
+    'isSaved': false,
+    'correctAnswers': 0,
+    'incorrectAnswers': 0,
+  };
+}

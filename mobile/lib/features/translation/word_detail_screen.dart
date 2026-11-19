@@ -2,10 +2,12 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:mobile/core/models/word_entry.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:mobile/core/theme/lumin_spacing.dart';
 import 'package:mobile/features/study/exercise_screen.dart';
 import 'package:mobile/main.dart';
+import 'package:mobile/core/i18n/i18n.dart';
 
 const String _font = 'Poppins';
 const Color _card = Color(0xFF3B393D);
@@ -43,17 +45,23 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
     super.dispose();
   }
 
+  /// Carrega a palavra do usuário ou, se ele ainda não a salvou, a palavra do catálogo da comunidade.
   Future<void> load() async {
     if (widget.wordId == null) {
       setState(() => loading = false);
       return;
     }
-    final response = await luminApi.findUserWord(widget.wordId!);
+    var response = await luminApi.findUserWord(widget.wordId!);
+    var fromCatalog = false;
+    if (response.status == 404) {
+      response = await luminApi.catalogWord(widget.wordId!);
+      fromCatalog = true;
+    }
     if (!mounted) return;
     setState(() {
       loading = false;
       if (response.ok) {
-        word = response.map;
+        word = fromCatalog ? userWordFromCatalog(response.map) : response.map;
         saved = word['isSaved'] == true;
       } else {
         error = response.error;
@@ -170,7 +178,7 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Não foi possível criar a sessão.')),
+        SnackBar(content: Text(tr('Não foi possível criar a sessão.'))),
       );
     }
   }
@@ -185,9 +193,9 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
         } else if (e is Map) {
           final text =
               e['text'] ?? e['sentence'] ?? e['original'] ?? e['example'] ?? '';
-          final tr = e['translation'] ?? e['translated'] ?? '';
+          final translation = e['translation'] ?? e['translated'] ?? '';
           if ('$text'.trim().isNotEmpty) {
-            out.add(_Example('$text'.trim(), '$tr'.trim()));
+            out.add(_Example('$text'.trim(), '$translation'.trim()));
           }
         }
       }
@@ -206,14 +214,14 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
           Align(
             alignment: Alignment.centerLeft,
             child: IconButton(
-              tooltip: 'Voltar',
+              tooltip: tr('Voltar'),
               padding: EdgeInsets.zero,
               onPressed: () => Navigator.of(context).pop(),
               icon: const Icon(Icons.arrow_back, size: 28, color: Colors.white),
             ),
           ),
-          const Text(
-            'Detalhes da Tradução',
+          Text(
+            tr('Detalhes da Tradução'),
             style: TextStyle(
               fontFamily: _font,
               fontSize: 18,
@@ -225,7 +233,7 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
             Align(
               alignment: Alignment.centerRight,
               child: IconButton(
-                tooltip: saved ? 'Remover das salvas' : 'Salvar palavra',
+                tooltip: saved ? tr('Remover das salvas') : tr('Salvar palavra'),
                 padding: EdgeInsets.zero,
                 onPressed: saving ? null : toggleSaved,
                 icon: Icon(
@@ -289,9 +297,9 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
                                 ),
                                 const SizedBox(height: 12),
                                 _InfoCard(
-                                  title: 'Pronúncia',
+                                  title: tr('Pronúncia'),
                                   trailing: IconButton(
-                                    tooltip: 'Ouvir pronúncia',
+                                    tooltip: tr('Ouvir pronúncia'),
                                     onPressed: speak,
                                     icon: const Icon(
                                       Icons.volume_up,
@@ -316,7 +324,7 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
                                 ),
                                 const SizedBox(height: 12),
                                 _InfoCard(
-                                  title: 'Significado',
+                                  title: tr('Significado'),
                                   child: Text(
                                     '${word['description'] ?? ''}',
                                     style: const TextStyle(
@@ -331,7 +339,7 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
                                 if (exs.isNotEmpty) ...[
                                   const SizedBox(height: 12),
                                   _InfoCard(
-                                    title: 'Exemplos',
+                                    title: tr('Exemplos'),
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
@@ -349,13 +357,14 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
                                 ],
                                 const SizedBox(height: 12),
                                 DetailBox(
-                                  title: 'Categoria',
-                                  body: '${word['categoryName'] ?? ''}',
+                                  title: tr('Categoria'),
+                                  body: tr('${word['categoryName'] ?? ''}'),
                                 ),
                                 DetailBox(
-                                  title: 'Desempenho',
+                                  title: tr('Desempenho'),
                                   body:
-                                      '${word['correctAnswers'] ?? 0} acertos · ${word['incorrectAnswers'] ?? 0} erros',
+                                      t('${word['correctAnswers'] ?? 0} acertos · ${word['incorrectAnswers'] ?? 0} erros',
+                                        '${word['correctAnswers'] ?? 0} correct · ${word['incorrectAnswers'] ?? 0} wrong'),
                                 ),
                               ],
                             ),
@@ -366,8 +375,8 @@ class _WordDetailScreenState extends State<WordDetailScreen> {
                                 child: Center(
                                   child: _GradientButton(
                                     label: practicing
-                                        ? 'Criando...'
-                                        : 'Praticar palavra',
+                                        ? tr('Criando...')
+                                        : tr('Praticar palavra'),
                                     onTap: practicing ? null : practice,
                                   ),
                                 ),

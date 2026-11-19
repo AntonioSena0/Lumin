@@ -10,6 +10,7 @@ class YoloObjectSelectionService {
 
   static const confidencePolicy = DetectionConfidencePolicy();
 
+  /// Escolhe a detecção com maior pontuação entre as candidatas próximas ao centro.
   YOLOResult? selectCenteredObject(List<YOLOResult> results) {
     YOLOResult? selectedResult;
     var selectedScore = double.negativeInfinity;
@@ -27,39 +28,21 @@ class YoloObjectSelectionService {
       }
     }
 
-    if (selectedResult == null) {
-      return null;
-    }
-
-    if (hasAmbiguousCandidate(selectedResult, results)) {
-      return null;
-    }
-
     return selectedResult;
   }
 
+  /// Indica se a detecção tem confiança, rótulo e posição suficientes para ser escolhida.
   bool isCandidate(YOLOResult result) {
     return result.confidence >= LuminDetectorModel.confidenceThreshold &&
         result.className.trim().isNotEmpty &&
         confidencePolicy.accepts(result) &&
-        result.normalizedBox.contains(const Offset(0.5, 0.5));
+        isNearCenter(result.normalizedBox);
   }
 
-  bool hasAmbiguousCandidate(
-    YOLOResult selectedResult,
-    List<YOLOResult> results,
-  ) {
-    for (final result in results) {
-      if (identical(result, selectedResult) || !isCandidate(result)) {
-        continue;
-      }
-
-      if (confidencePolicy.isAmbiguous(selectedResult, result)) {
-        return true;
-      }
-    }
-
-    return false;
+  /// Aceita objetos que cobrem o centro da tela ou cujo centro está dentro da tolerância.
+  bool isNearCenter(Rect box) {
+    return box.contains(const Offset(0.5, 0.5)) ||
+        centerDistance(box) <= LuminDetectorModel.centerTolerance;
   }
 
   double priorityScore(YOLOResult result) {

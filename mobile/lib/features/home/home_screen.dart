@@ -13,6 +13,7 @@ import 'package:mobile/shared/widgets/back_title.dart';
 import 'package:mobile/shared/widgets/lumin_avatar.dart';
 import 'package:mobile/shared/widgets/lumin_page.dart';
 import 'package:mobile/shared/widgets/language_flag.dart';
+import 'package:mobile/core/i18n/i18n.dart';
 
 const String _font = 'Poppins';
 
@@ -44,8 +45,8 @@ class _HomeScreenState extends State<HomeScreen> {
   String xpText = '';
   String languageName = '';
   String languageCode = '';
-  String continueTitle = 'Vocabulário';
-  String continueSubtitle = 'Comece agora';
+  String continueTitle = tr('Vocabulário');
+  String continueSubtitle = tr('Comece agora');
   String continueCategory = '';
   int? continueWordId;
   List<Map<String, dynamic>> modules = [];
@@ -85,10 +86,10 @@ class _HomeScreenState extends State<HomeScreen> {
       if (recent != null && recent.isNotEmpty) {
         final entry = recent.first;
         if (entry.translated.isNotEmpty) {
-          continueTitle = 'Vocabulário: ${entry.translated}';
+          continueTitle = t('Vocabulário: ${entry.translated}', 'Vocabulary: ${entry.translated}');
         }
         if (entry.original.isNotEmpty) {
-          continueSubtitle = 'Praticar ${entry.original}';
+          continueSubtitle = t('Praticar ${entry.original}', 'Practice ${entry.original}');
         }
         continueCategory = entry.categoryName;
         continueWordId = entry.wordId;
@@ -163,7 +164,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      name.isEmpty ? 'Olá!' : 'Olá, $name!',
+                      name.isEmpty ? tr('Olá!') : t('Olá, $name!', 'Hello, $name!'),
                       style: const TextStyle(
                         fontFamily: _font,
                         fontSize: 24,
@@ -171,8 +172,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         color: Colors.white,
                       ),
                     ),
-                    const Text(
-                      'Pronta para traduzir o mundo hoje?',
+                    Text(
+                      tr('Pronta para traduzir o mundo hoje?'),
                       style: TextStyle(
                         fontFamily: _font,
                         fontSize: 13,
@@ -198,7 +199,7 @@ class _HomeScreenState extends State<HomeScreen> {
             languageCode: languageCode,
           ),
           const SizedBox(height: 22),
-          const Text('Continue aprendendo', style: _heading),
+          Text(tr('Continue aprendendo'), style: _heading),
           const SizedBox(height: 10),
           PracticeTile(
             title: continueTitle,
@@ -218,13 +219,13 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
           ),
-          const SizedBox(height: 20),
-          const Text('Módulos', style: _heading),
-          const SizedBox(height: 10),
+          SizedBox(height: 20),
+          Text(tr('Módulos'), style: _heading),
+          SizedBox(height: 10),
           GridView.count(
             crossAxisCount: 2,
             shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
+            physics: NeverScrollableScrollPhysics(),
             childAspectRatio: 3.1,
             mainAxisSpacing: 10,
             crossAxisSpacing: 10,
@@ -239,9 +240,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
             ],
           ),
-          const SizedBox(height: 18),
+          SizedBox(height: 18),
           CameraBanner(onTap: widget.onOpenCamera),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
         ],
       ),
     );
@@ -263,11 +264,11 @@ class ProfileAvatar extends StatelessWidget {
     return Container(
       width: 44,
       height: 44,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: Colors.white,
         shape: BoxShape.circle,
       ),
-      child: const Icon(Icons.person, size: 30, color: Color(0xFF0B0620)),
+      child: Icon(Icons.person, size: 30, color: Color(0xFF0B0620)),
     );
   }
 }
@@ -280,7 +281,7 @@ class EvolutionPanel extends StatelessWidget {
     this.xpText = '',
     this.languageName = '',
     this.languageCode = '',
-    this.goal = 'Conversação em até 3 meses',
+    this.goal,
   });
 
   final double progress;
@@ -288,13 +289,13 @@ class EvolutionPanel extends StatelessWidget {
   final String xpText;
   final String languageName;
   final String languageCode;
-  final String goal;
+  final String? goal;
 
   @override
   Widget build(BuildContext context) {
     final summary = [
       if (languageName.isNotEmpty) languageName,
-      level.isEmpty ? 'Comece seu nivelamento' : 'Nível $level',
+      level.isEmpty ? tr('Comece seu nivelamento') : t('Nível $level', 'Level $level'),
       if (xpText.isNotEmpty) xpText,
     ].join(' · ');
 
@@ -310,8 +311,8 @@ class EvolutionPanel extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Seu Objetivo',
+                Text(
+                  tr('Seu Objetivo'),
                   style: TextStyle(
                     fontFamily: _font,
                     fontSize: 13,
@@ -321,7 +322,7 @@ class EvolutionPanel extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  goal,
+                  goal ?? tr('Conversação em até 3 meses'),
                   style: const TextStyle(
                     fontFamily: _font,
                     fontSize: 17,
@@ -373,7 +374,7 @@ class GradientRing extends StatelessWidget {
   Widget build(BuildContext context) {
     final value = progress.clamp(0, 1).toDouble();
     return Semantics(
-      label: 'Progresso ${(value * 100).round()} por cento',
+      label: t('Progresso ${(value * 100).round()} por cento', 'Progress ${(value * 100).round()} percent'),
       child: SizedBox(
         width: size,
         height: size,
@@ -614,7 +615,7 @@ class CameraBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     return Semantics(
       button: true,
-      label: 'Traduza o mundo com sua câmera. Aponte, traduza, aprenda na hora.',
+      label: tr('Traduza o mundo com sua câmera. Aponte, traduza, aprenda na hora.'),
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
@@ -633,13 +634,13 @@ class CameraBanner extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(14, 12, 12, 12),
               child: Row(
                 children: [
-                  const Expanded(
+                  Expanded(
                     child: ExcludeSemantics(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Traduza o mundo\ncom sua câmera',
+                            tr('Traduza o mundo\ncom sua câmera'),
                             style: TextStyle(
                               fontFamily: _font,
                               fontSize: 17,
@@ -650,7 +651,7 @@ class CameraBanner extends StatelessWidget {
                           ),
                           SizedBox(height: 4),
                           Text(
-                            'Aponte, Traduza,\nAprenda na hora.',
+                            tr('Aponte, Traduza,\nAprenda na hora.'),
                             style: TextStyle(
                               fontFamily: _font,
                               fontSize: 12,
@@ -906,7 +907,7 @@ class _HomeModulesScreenState extends State<HomeModulesScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const BackTitle(title: 'Módulos'),
+          BackTitle(title: tr('Módulos')),
           const SizedBox(height: 12),
           if (loading)
             const Center(child: CircularProgressIndicator())
@@ -922,8 +923,8 @@ class _HomeModulesScreenState extends State<HomeModulesScreen> {
                 ),
               ),
           const SizedBox(height: 20),
-          const Text(
-            'Suas palavras',
+          Text(
+            tr('Suas palavras'),
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
           ),
           const SizedBox(height: 10),
@@ -1030,8 +1031,8 @@ class ModuleWordRow extends StatelessWidget {
       final categoryId = entry.raw['categoryId'];
       if (categoryId is! int) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Esta palavra ainda não tem categoria.'),
+          SnackBar(
+            content: Text(tr('Esta palavra ainda não tem categoria.')),
           ),
         );
         return;

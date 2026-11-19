@@ -5,6 +5,7 @@ import 'package:mobile/main.dart';
 import 'package:mobile/shared/widgets/lumin_button.dart';
 import 'package:mobile/shared/widgets/lumin_field.dart';
 import 'package:mobile/shared/widgets/lumin_page.dart';
+import 'package:mobile/core/i18n/i18n.dart';
 
 const googleClientId = String.fromEnvironment('GOOGLE_CLIENT_ID');
 
@@ -52,7 +53,7 @@ class GoogleAuthService {
       final idToken = account.authentication.idToken;
 
       if (idToken == null) {
-        throw Exception('O Google não devolveu um token de identificação.');
+        throw Exception(tr('O Google não devolveu um token de identificação.'));
       }
 
       final response = await luminApi.oauth(provider: 'GOOGLE', idToken: idToken);
@@ -82,18 +83,18 @@ class GoogleAuthService {
   static String readableError(GoogleSignInExceptionCode code) {
     switch (code) {
       case GoogleSignInExceptionCode.clientConfigurationError:
-        return 'O client ID do Google não está configurado corretamente neste build.';
+        return tr('O client ID do Google não está configurado corretamente neste build.');
       case GoogleSignInExceptionCode.userMismatch:
-        return 'Nenhuma conta Google disponível no aparelho.';
+        return tr('Nenhuma conta Google disponível no aparelho.');
       case GoogleSignInExceptionCode.providerConfigurationError:
-        return 'O provedor do Google não está configurado no aparelho.';
+        return tr('O provedor do Google não está configurado no aparelho.');
       case GoogleSignInExceptionCode.canceled:
       case GoogleSignInExceptionCode.interrupted:
-        return 'Login cancelado.';
+        return tr('Login cancelado.');
       case GoogleSignInExceptionCode.uiUnavailable:
-        return 'Não foi possível abrir a tela do Google.';
+        return tr('Não foi possível abrir a tela do Google.');
       default:
-        return 'Não foi possível concluir o login social.';
+        return tr('Não foi possível concluir o login social.');
     }
   }
 
@@ -150,7 +151,7 @@ class _GoogleRegisterScreenState extends State<GoogleRegisterScreen> {
   Future<void> submit() async {
     final name = nameController.text.trim();
     if (name.isEmpty || nativeLanguage == null || chosenLanguage == null) {
-      setState(() => error = 'Preencha o nome e escolha os idiomas.');
+      setState(() => error = tr('Preencha o nome e escolha os idiomas.'));
       return;
     }
     setState(() {
@@ -175,7 +176,7 @@ class _GoogleRegisterScreenState extends State<GoogleRegisterScreen> {
     }
 
     if (response.status == 409) {
-      setState(() => error = 'Essa conta do Google já está vinculada.');
+      setState(() => error = tr('Essa conta do Google já está vinculada.'));
       return;
     }
 
@@ -188,27 +189,27 @@ class _GoogleRegisterScreenState extends State<GoogleRegisterScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Quase lá',
+          Text(
+            tr('Quase lá'),
             style: TextStyle(fontSize: 26, fontWeight: FontWeight.w900),
           ),
           const SizedBox(height: 4),
           Text(
-            '${widget.pending.email} ainda não tem conta no Lumin.',
+            t('${widget.pending.email} ainda não tem conta no Lumin.', "${widget.pending.email} doesn't have a Lumin account yet."),
             style: const TextStyle(color: LuminColors.muted, fontSize: 12),
           ),
           const SizedBox(height: 22),
-          LuminField(label: 'Nome de usuário', controller: nameController),
+          LuminField(label: tr('Nome de usuário'), controller: nameController),
           const SizedBox(height: 14),
           LanguageChoice(
-            label: 'Língua nativa',
+            label: tr('Língua nativa'),
             languages: languages,
             selectedId: nativeLanguage,
             onSelect: (id) => setState(() => nativeLanguage = id),
           ),
           const SizedBox(height: 14),
           LanguageChoice(
-            label: 'Idioma de estudo',
+            label: tr('Idioma de estudo'),
             languages: languages,
             selectedId: chosenLanguage,
             onSelect: (id) => setState(() => chosenLanguage = id),
@@ -219,14 +220,14 @@ class _GoogleRegisterScreenState extends State<GoogleRegisterScreen> {
           ],
           const SizedBox(height: 28),
           LuminButton(
-            label: loading ? 'Criando conta...' : 'Criar conta',
+            label: loading ? tr('Criando conta...') : tr('Criar conta'),
             onPressed: loading ? () {} : submit,
           ),
           const SizedBox(height: 10),
           Center(
             child: TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancelar'),
+              child: Text(tr('Cancelar')),
             ),
           ),
         ],

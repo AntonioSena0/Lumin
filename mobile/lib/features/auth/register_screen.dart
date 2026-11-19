@@ -8,6 +8,7 @@ import 'package:mobile/features/level_test/level_test_screen.dart';
 import 'package:mobile/main.dart';
 import 'package:mobile/shared/widgets/lumin_button.dart';
 import 'package:mobile/shared/widgets/lumin_field.dart';
+import 'package:mobile/core/i18n/i18n.dart';
 
 class RegisterData {
   String name = '';
@@ -96,21 +97,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   void next() {
     if (passwordController.text != confirmController.text) {
-      setState(() => error = 'As senhas não conferem.');
+      setState(() => error = tr('As senhas não conferem.'));
       return;
     }
     if (nameController.text.trim().isEmpty ||
         emailController.text.trim().isEmpty ||
         passwordController.text.length < 8) {
       setState(
-        () => error = 'Preencha nome, e-mail e senha (mínimo 8 caracteres).',
+        () => error = tr('Preencha nome, e-mail e senha (mínimo 8 caracteres).'),
       );
       return;
     }
     if (!acceptedTerms) {
       setState(
         () => error =
-            'Aceite os Termos de Uso e a Política de Privacidade para continuar.',
+            tr('Aceite os Termos de Uso e a Política de Privacidade para continuar.'),
       );
       return;
     }
@@ -129,12 +130,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (!acceptedTerms) {
       setState(
         () => error =
-            'Aceite os Termos de Uso e a Política de Privacidade para se cadastrar.',
+            tr('Aceite os Termos de Uso e a Política de Privacidade para se cadastrar.'),
       );
       return;
     }
     if (data.nativeLanguage == null || data.chosenLanguage == null) {
-      setState(() => error = 'Escolha os idiomas.');
+      setState(() => error = tr('Escolha os idiomas.'));
       return;
     }
     setState(() {
@@ -186,14 +187,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
   List<Widget> stepOneFields() {
     return [
       LuminField(
-        label: 'Nome de Usuário',
+        label: tr('Nome de Usuário'),
         labelAbove: true,
         labelInset: 14,
         controller: nameController,
       ),
       const SizedBox(height: 14),
       LuminField(
-        label: 'E-mail',
+        label: tr('E-mail'),
         labelAbove: true,
         labelInset: 14,
         controller: emailController,
@@ -201,7 +202,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ),
       const SizedBox(height: 14),
       LuminField(
-        label: 'Senha',
+        label: tr('Senha'),
         labelAbove: true,
         labelInset: 14,
         controller: passwordController,
@@ -211,7 +212,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ),
       const SizedBox(height: 14),
       LuminField(
-        label: 'Confirmar Senha',
+        label: tr('Confirmar Senha'),
         labelAbove: true,
         labelInset: 14,
         controller: confirmController,
@@ -253,15 +254,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   TextSpan(
                     style: const TextStyle(color: Colors.white, fontSize: 12),
                     children: [
-                      const TextSpan(text: 'Eu aceito os '),
+                      TextSpan(text: tr('Eu aceito os ')),
                       TextSpan(
-                        text: 'Termos de Uso',
+                        text: tr('Termos de Uso'),
                         style: const TextStyle(color: _violet),
                         recognizer: _termsTap,
                       ),
-                      const TextSpan(text: ' e '),
+                      TextSpan(text: tr(' e ')),
                       TextSpan(
-                        text: 'Política de Privacidade.',
+                        text: tr('Política de Privacidade.'),
                         style: const TextStyle(color: _violet),
                         recognizer: _privacyTap,
                       ),
@@ -279,14 +280,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
   List<Widget> stepTwoFields() {
     return [
       LanguagePicker(
-        label: 'Língua nativa',
+        label: tr('Língua nativa'),
         languages: languages,
         selectedId: data.nativeLanguage,
         onSelect: (id) => setState(() => data.nativeLanguage = id),
       ),
       const SizedBox(height: 14),
       LanguagePicker(
-        label: 'Idioma de estudo',
+        label: tr('Idioma de estudo'),
         languages: languages,
         selectedId: data.chosenLanguage,
         onSelect: (id) => setState(() => data.chosenLanguage = id),
@@ -311,7 +312,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       Padding(
                         padding: const EdgeInsets.fromLTRB(8, 8, 0, 0),
                         child: IconButton(
-                          tooltip: 'Voltar',
+                          tooltip: tr('Voltar'),
                           onPressed: goBack,
                           icon: const Icon(
                             Icons.arrow_back,
@@ -332,7 +333,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      first ? 'Cadastro' : 'Idiomas',
+                                      first ? tr('Cadastro') : tr('Idiomas'),
                                       style: const TextStyle(
                                         fontSize: 26,
                                         fontWeight: FontWeight.w900,
@@ -341,8 +342,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     const SizedBox(height: 4),
                                     Text(
                                       first
-                                          ? 'Crie sua conta e comece agora!'
-                                          : 'Escolha sua língua nativa e a de estudo',
+                                          ? tr('Crie sua conta e comece agora!')
+                                          : tr('Escolha sua língua nativa e a de estudo'),
                                       style: const TextStyle(
                                         color: LuminColors.text,
                                         fontSize: 12,
@@ -369,10 +370,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   width: 243,
                                   child: LuminButton(
                                     label: first
-                                        ? 'Cadastrar'
+                                        ? tr('Cadastrar')
                                         : (loading
-                                            ? 'Cadastrando...'
-                                            : 'Concluir cadastro'),
+                                            ? tr('Cadastrando...')
+                                            : tr('Concluir cadastro')),
                                     onPressed:
                                         first ? next : (loading ? () {} : submit),
                                   ),
@@ -383,18 +384,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               Center(
                                 child: TextButton(
                                   onPressed: goToLogin,
-                                  child: const Text.rich(
+                                  child: Text.rich(
                                     TextSpan(
                                       children: [
                                         TextSpan(
-                                          text: 'Já possui uma conta? ',
+                                          text: tr('Já possui uma conta? '),
                                           style: TextStyle(
                                             color: Colors.white,
                                             fontWeight: FontWeight.w700,
                                           ),
                                         ),
                                         TextSpan(
-                                          text: 'Faça o Login',
+                                          text: tr('Faça o Login'),
                                           style: TextStyle(
                                             color: LuminColors.blue,
                                             fontStyle: FontStyle.italic,

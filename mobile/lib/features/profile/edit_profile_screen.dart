@@ -7,6 +7,7 @@ import 'package:mobile/shared/widgets/lumin_button.dart';
 import 'package:mobile/shared/widgets/lumin_avatar.dart';
 import 'package:mobile/shared/widgets/lumin_field.dart';
 import 'package:mobile/shared/widgets/lumin_page.dart';
+import 'package:mobile/core/i18n/i18n.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -86,7 +87,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final email = emailController.text.trim();
 
     if (name.isEmpty) {
-      setState(() => error = 'O nome não pode ficar vazio.');
+      setState(() => error = tr('O nome não pode ficar vazio.'));
       return;
     }
 
@@ -98,7 +99,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     if (chosenLanguage != null) body['chosenLanguage'] = chosenLanguage;
 
     if (body.isEmpty) {
-      setState(() => error = 'Nada para atualizar.');
+      setState(() => error = tr('Nada para atualizar.'));
       return;
     }
 
@@ -126,10 +127,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       currentEmail = newEmail;
       emailController.text = newEmail;
       if (emailChanged) {
-        notice = 'Enviamos um código para $email. Confirme para concluir a troca.';
+        notice = t('Enviamos um código para $email. Confirme para concluir a troca.', 'We sent a code to $email. Confirm to complete the change.');
         pendingEmail = email;
       } else {
-        notice = 'Dados atualizados.';
+        notice = tr('Dados atualizados.');
       }
     });
 
@@ -138,7 +139,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         MaterialPageRoute(
           builder: (_) => VerifyScreen(
             email: email,
-            title: 'Confirmar novo e-mail',
+            title: tr('Confirmar novo e-mail'),
             onVerified: () => Navigator.of(context).pop(true),
           ),
         ),
@@ -147,7 +148,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       if (confirmed == true) {
         setState(() {
           pendingEmail = null;
-          notice = 'E-mail atualizado com sucesso.';
+          notice = tr('E-mail atualizado com sucesso.');
         });
         await load();
       }
@@ -159,21 +160,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final selected = await showModalBottomSheet<int>(
       context: context,
       backgroundColor: LuminColors.panel,
+      isScrollControlled: true,
       builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            for (final avatar in avatars)
-              if (avatar['id'] is int)
-                ListTile(
-                  onTap: () => Navigator.of(context).pop(avatar['id'] as int),
-                  leading: avatar['imgUrl'] is String
-                      ? LuminAvatar(imgUrl: '${avatar['imgUrl']}', name: '${avatar['name'] ?? ''}', radius: 18)
-                      : LuminAvatar(imgUrl: null, name: '${avatar['name'] ?? ''}', radius: 18),
-                  title: Text('${avatar['name'] ?? ''}'),
-                  trailing: avatar['id'] == avatarId ? const Icon(Icons.check, color: LuminColors.magenta) : null,
-                ),
-          ],
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.7),
+          child: AvatarGrid(
+            avatars: avatars,
+            selectedId: avatarId,
+            onSelect: (id) => Navigator.of(context).pop(id),
+          ),
         ),
       ),
     );
@@ -196,7 +191,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         if (match.isNotEmpty && match.first['imgUrl'] is String) {
           avatarUrl = match.first['imgUrl'] as String;
         }
-        notice = 'Avatar atualizado.';
+        notice = tr('Avatar atualizado.');
       });
     } else {
       setState(() => error = response.error);
@@ -213,7 +208,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const BackTitle(title: 'Editar dados'),
+          BackTitle(title: tr('Editar dados')),
           const SizedBox(height: 18),
           Center(
             child: GestureDetector(
@@ -237,23 +232,23 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           const SizedBox(height: 8),
           Center(
             child: Text(
-              avatars.isEmpty ? 'Toque para trocar' : 'Toque na imagem para trocar',
+              avatars.isEmpty ? tr('Toque para trocar') : tr('Toque na imagem para trocar'),
               style: const TextStyle(color: LuminColors.muted, fontSize: 11),
             ),
           ),
           const SizedBox(height: 20),
-          LuminField(label: 'Nome de usuário', controller: nameController),
+          LuminField(label: tr('Nome de usuário'), controller: nameController),
           const SizedBox(height: 12),
-          LuminField(label: 'E-mail', controller: emailController, keyboardType: TextInputType.emailAddress),
+          LuminField(label: tr('E-mail'), controller: emailController, keyboardType: TextInputType.emailAddress),
           if (pendingEmail != null) ...[
             const SizedBox(height: 8),
             Text(
-              'E-mail pendente: $pendingEmail',
+              t('E-mail pendente: $pendingEmail', 'Pending email: $pendingEmail'),
               style: const TextStyle(color: Colors.orangeAccent, fontSize: 11),
             ),
           ],
           const SizedBox(height: 20),
-          const Text('Língua nativa', style: TextStyle(fontSize: 12)),
+          Text(tr('Língua nativa'), style: TextStyle(fontSize: 12)),
           const SizedBox(height: 8),
           Wrap(
             spacing: 8,
@@ -271,7 +266,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ],
           ),
           const SizedBox(height: 20),
-          const Text('Idioma de estudo', style: TextStyle(fontSize: 12)),
+          Text(tr('Idioma de estudo'), style: TextStyle(fontSize: 12)),
           const SizedBox(height: 8),
           Wrap(
             spacing: 8,
@@ -298,11 +293,77 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ],
           const SizedBox(height: 28),
           LuminButton(
-            label: saving ? 'Salvando...' : 'Salvar alterações',
+            label: saving ? tr('Salvando...') : tr('Salvar alterações'),
             onPressed: saving ? () {} : save,
           ),
         ],
       ),
+    );
+  }
+}
+
+class AvatarGrid extends StatelessWidget {
+  const AvatarGrid({
+    super.key,
+    required this.avatars,
+    required this.selectedId,
+    required this.onSelect,
+  });
+
+  final List<Map<String, dynamic>> avatars;
+  final int? selectedId;
+  final ValueChanged<int> onSelect;
+
+  /// Mostra os avatares em grade rolável de 4 colunas, destacando o selecionado.
+  @override
+  Widget build(BuildContext context) {
+    final items = avatars.where((a) => a['id'] is int).toList();
+    return GridView.builder(
+      shrinkWrap: true,
+      padding: const EdgeInsets.all(16),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 4,
+        mainAxisSpacing: 14,
+        crossAxisSpacing: 14,
+      ),
+      itemCount: items.length,
+      itemBuilder: (context, index) {
+        final avatar = items[index];
+        final id = avatar['id'] as int;
+        final name = '${avatar['name'] ?? ''}';
+        return Semantics(
+          button: true,
+          label: name,
+          excludeSemantics: true,
+          child: GestureDetector(
+            onTap: () => onSelect(id),
+            child: Stack(
+              alignment: Alignment.bottomRight,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(3),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: id == selectedId ? LuminColors.magenta : Colors.transparent,
+                      width: 3,
+                    ),
+                  ),
+                  child: LayoutBuilder(
+                    builder: (context, c) => LuminAvatar(
+                      imgUrl: avatar['imgUrl'] is String ? avatar['imgUrl'] as String : null,
+                      name: name,
+                      radius: c.maxWidth / 2,
+                    ),
+                  ),
+                ),
+                if (id == selectedId)
+                  const Icon(Icons.check_circle, color: LuminColors.magenta, size: 20),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

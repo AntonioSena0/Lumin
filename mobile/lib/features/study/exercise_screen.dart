@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/core/i18n/i18n.dart';
 import 'package:mobile/core/speech/speech_service.dart';
 import 'package:mobile/core/theme/lumin_colors.dart';
+import 'package:mobile/features/study/exercise_widgets.dart';
 import 'package:mobile/main.dart';
-import 'package:mobile/shared/widgets/back_title.dart';
 import 'package:mobile/shared/widgets/lumin_button.dart';
 import 'package:mobile/shared/widgets/lumin_field.dart';
 import 'package:mobile/shared/widgets/lumin_page.dart';
@@ -29,65 +30,51 @@ class SpeakingAnswerInput extends StatelessWidget {
   final bool listening;
   final VoidCallback onTap;
 
+  /// Mostra o texto reconhecido e o botão de microfone para falar a resposta.
   @override
   Widget build(BuildContext context) {
     final answer = controller.text.trim();
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(16, 14, 10, 14),
-      decoration: BoxDecoration(
-        color: LuminColors.panelLight,
-        borderRadius: BorderRadius.circular(9),
-        border: Border.all(
-          color: listening ? LuminColors.violet : Colors.white12,
-        ),
-        boxShadow: listening
-            ? [
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: onTap,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 220),
+            width: 96,
+            height: 96,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: const LinearGradient(colors: [LuminColors.violet, LuminColors.magenta]),
+              boxShadow: [
                 BoxShadow(
-                  color: LuminColors.violet.withValues(alpha: 0.25),
-                  blurRadius: 18,
-                ),
-              ]
-            : null,
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  listening ? 'Ouvindo...' : 'Resposta por voz',
-                  style: const TextStyle(
-                    color: LuminColors.muted,
-                    fontSize: 12,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  answer.isEmpty ? 'Toque no microfone e fale' : answer,
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: answer.isEmpty ? LuminColors.muted : Colors.white,
-                    fontSize: 14,
-                    height: 1.25,
-                  ),
+                  color: LuminColors.magenta.withValues(alpha: listening ? 0.6 : 0.25),
+                  blurRadius: listening ? 36 : 18,
+                  spreadRadius: listening ? 6 : 0,
                 ),
               ],
             ),
-          ),
-          IconButton(
-            onPressed: onTap,
-            tooltip: listening ? 'Parar gravação' : 'Falar resposta',
-            icon: Icon(
-              listening ? Icons.stop_circle_outlined : Icons.mic_none_outlined,
-              color: listening ? LuminColors.violet : Colors.white,
-              size: 28,
+            child: Icon(
+              listening ? Icons.stop_rounded : Icons.mic_rounded,
+              color: Colors.white,
+              size: 42,
+              semanticLabel: listening ? tr('Parar gravação') : tr('Falar resposta'),
             ),
           ),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          listening ? tr('Ouvindo...') : tr('Toque no microfone e fale'),
+          style: const TextStyle(color: LuminColors.muted, fontSize: 13),
+        ),
+        if (answer.isNotEmpty) ...[
+          const SizedBox(height: 10),
+          Text(
+            answer,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          ),
         ],
-      ),
+      ],
     );
   }
 }
@@ -100,6 +87,8 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
   bool loading = true;
   bool sending = false;
   bool? lastCorrect;
+  String? correctAnswer;
+  String blockAnswer = '';
   String? error;
   String voice = 'FEMALE';
   final speechRecognizer = SpeechToText();
@@ -120,13 +109,16 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
     super.dispose();
   }
 
-  bool get isLast => totalExercises > 0 && currentIndex >= totalExercises - 1;
-
   bool get isDone => totalExercises > 0 && currentIndex >= totalExercises;
 
-  bool get isSpeakingExercise =>
-      '${exercise?['type']}'.toLowerCase() == 'speaking';
+  ExerciseKind get kind => exercise == null ? ExerciseKind.text : exerciseKind(exercise!);
 
+  /// Resposta atual conforme o formato: bloco ou frase montada, texto digitado ou fala reconhecida.
+  String get currentAnswer => kind == ExerciseKind.choice || kind == ExerciseKind.sentence
+      ? blockAnswer.trim()
+      : answerController.text.trim();
+
+  /// Procura no aparelho o reconhecimento de voz do idioma do exercício.
   Future<String?> getSpeechLocaleId() async {
     final language = exercise?['language'];
     if (language is! Map || language['code'] is! String) return null;
@@ -140,6 +132,7 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
     return null;
   }
 
+  /// Carrega a voz escolhida nas configurações para a leitura dos enunciados.
   Future<void> loadSettings() async {
     final response = await luminApi.settings();
     if (!mounted) return;
@@ -147,6 +140,7 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
     if (response.ok && value is String) setState(() => voice = value);
   }
 
+  /// Busca o progresso da sessão e o exercício atual, limpando a resposta e o feedback anteriores.
   Future<void> load() async {
     setState(() {
       loading = true;
@@ -167,27 +161,29 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
     final current = results[1];
     setState(() {
       loading = false;
+      lastCorrect = null;
+      correctAnswer = null;
+      blockAnswer = '';
+      answerController.clear();
       if (current.ok) {
         exercise = current.map;
-        answerController.clear();
-        lastCorrect = null;
-        speakPrompt();
-      } else if (isDone) {
-        exercise = null;
+        if (kind == ExerciseKind.speaking) speakPrompt();
       } else {
         exercise = null;
-        error = current.error;
+        if (!isDone) error = current.error;
       }
     });
   }
 
+  /// Lê o enunciado em voz alta no idioma de estudo.
   void speakPrompt() {
     final prompt = exercise?['prompt'];
     if (prompt is String && prompt.isNotEmpty) {
-      SpeechService.instance.speak(prompt, voice: voice);
+      SpeechService.instance.speak(prompt.replaceAll(RegExp(r'_{3,}'), '...'), voice: voice);
     }
   }
 
+  /// Liga ou desliga o microfone, preenchendo a resposta com o que for reconhecido.
   Future<void> toggleSpeechInput() async {
     if (listening) {
       await speechRecognizer.stop();
@@ -204,7 +200,7 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
         if (!mounted) return;
         setState(() {
           listening = false;
-          error = 'Não foi possível reconhecer sua fala.';
+          error = tr('Não foi possível reconhecer sua fala.');
         });
       },
     );
@@ -213,7 +209,7 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
     if (!available) {
       setState(() {
         listening = false;
-        error = 'O reconhecimento de voz não está disponível neste aparelho.';
+        error = tr('O reconhecimento de voz não está disponível neste aparelho.');
       });
       return;
     }
@@ -228,12 +224,7 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
     await speechRecognizer.listen(
       onResult: (result) {
         if (!mounted) return;
-        setState(() {
-          answerController.text = result.recognizedWords;
-          answerController.selection = TextSelection.collapsed(
-            offset: answerController.text.length,
-          );
-        });
+        setState(() => answerController.text = result.recognizedWords);
       },
       listenOptions: SpeechListenOptions(
         localeId: localeId,
@@ -243,38 +234,33 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
     );
   }
 
+  /// Envia a resposta e mostra o feedback com a resposta certa, sem avançar até o usuário continuar.
   Future<void> answer() async {
-    final current = exercise;
-    final id = current?['id'];
-    if (id is! int || answerController.text.trim().isEmpty) return;
-    setState(() {
-      sending = true;
-      lastCorrect = null;
-      error = null;
-    });
-    final response = await luminApi.answerExercise(
-      widget.sessionId,
-      id,
-      answerController.text.trim(),
-    );
-    if (!mounted) return;
-    if (!response.ok) {
-      setState(() {
-        sending = false;
-        error = response.error;
-      });
-      return;
-    }
+    final id = exercise?['id'];
+    if (id is! int || currentAnswer.isEmpty) return;
     if (listening) {
       await speechRecognizer.stop();
       listening = false;
     }
-    lastCorrect = response.map['correct'] == true;
-    await load();
+    setState(() {
+      sending = true;
+      error = null;
+    });
+    final response = await luminApi.answerExercise(widget.sessionId, id, currentAnswer);
     if (!mounted) return;
-    setState(() => sending = false);
+    setState(() {
+      sending = false;
+      if (!response.ok) {
+        error = response.error;
+        return;
+      }
+      lastCorrect = response.map['correct'] == true;
+      final expected = response.map['correctAnswer'];
+      correctAnswer = expected is String ? expected : null;
+    });
   }
 
+  /// Finaliza a sessão para registrar o progresso e volta para a tela anterior.
   Future<void> finish() async {
     setState(() => sending = true);
     final response = await luminApi.finishSession(widget.sessionId);
@@ -287,122 +273,196 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
     }
   }
 
+  /// Mostra progresso, enunciado, a área de resposta do formato do exercício e o feedback.
   @override
   Widget build(BuildContext context) {
     final current = exercise;
+    final answered = lastCorrect != null;
+    final progress = totalExercises == 0 ? 0.0 : (currentIndex + (answered ? 1 : 0)) / totalExercises;
+
     return LuminPage(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          BackTitle(
-            title: current?['title'] is String
-                ? current!['title'] as String
-                : 'Exercício',
+          Row(
+            children: [
+              IconButton(
+                onPressed: () => Navigator.of(context).maybePop(),
+                icon: const Icon(Icons.close_rounded),
+                tooltip: tr('Voltar'),
+              ),
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: TweenAnimationBuilder<double>(
+                    tween: Tween(end: progress.clamp(0, 1)),
+                    duration: const Duration(milliseconds: 400),
+                    builder: (context, value, _) => LinearProgressIndicator(
+                      value: value,
+                      minHeight: 10,
+                      backgroundColor: LuminColors.panelLight,
+                      valueColor: const AlwaysStoppedAnimation(LuminColors.magenta),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                totalExercises == 0 ? '' : '${(currentIndex + 1).clamp(1, totalExercises)}/$totalExercises',
+                style: const TextStyle(color: LuminColors.muted, fontWeight: FontWeight.w700),
+              ),
+            ],
           ),
-          if (totalExercises > 0 && !isDone) ...[
-            const SizedBox(height: 4),
-            Text(
-              'Exercício ${currentIndex + 1} de $totalExercises',
-              style: const TextStyle(color: LuminColors.muted, fontSize: 12),
-            ),
-          ],
-          const SizedBox(height: 12),
+          const SizedBox(height: 24),
           if (loading)
-            const Center(child: CircularProgressIndicator())
+            const Padding(
+              padding: EdgeInsets.only(top: 80),
+              child: Center(child: CircularProgressIndicator()),
+            )
           else if (current == null) ...[
+            const SizedBox(height: 40),
+            Center(
+              child: Icon(
+                isDone ? Icons.emoji_events_rounded : Icons.info_outline_rounded,
+                size: 72,
+                color: LuminColors.magenta,
+              ),
+            ),
+            const SizedBox(height: 16),
             Text(
-              isDone
-                  ? 'Sessão concluída. Toque em finalizar para salvar seu progresso.'
-                  : error ?? 'Sessão encerrada.',
+              isDone ? tr('Sessão concluída. Toque em finalizar para salvar seu progresso.') : error ?? tr('Sessão encerrada.'),
+              textAlign: TextAlign.center,
               style: const TextStyle(color: LuminColors.muted),
             ),
             const SizedBox(height: 28),
             LuminButton(
-              label: sending ? 'Salvando...' : 'Finalizar sessão',
+              label: sending ? tr('Salvando...') : tr('Finalizar sessão'),
               onPressed: sending ? () {} : finish,
             ),
           ] else ...[
+            _TypeLabel(exercise: current),
+            const SizedBox(height: 10),
             Text(
               '${current['instruction'] ?? ''}',
               style: const TextStyle(color: LuminColors.muted),
             ),
-            const SizedBox(height: 14),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: LuminColors.panel,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '${current['prompt'] ?? ''}',
-                    style: const TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w700,
-                    ),
+            const SizedBox(height: 16),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: '${current['subType']}' == 'FILL_IN'
+                      ? FillInPrompt(
+                          prompt: '${current['prompt'] ?? ''}',
+                          filled: blockAnswer.isEmpty ? null : blockAnswer,
+                        )
+                      : Text(
+                          '${current['prompt'] ?? ''}',
+                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700, height: 1.4),
+                        ),
+                ),
+                if ('${current['subType']}' != 'TRANSLATE')
+                  IconButton(
+                    onPressed: speakPrompt,
+                    tooltip: tr('Ouvir pronúncia'),
+                    icon: const Icon(Icons.volume_up_rounded, color: LuminColors.magenta),
                   ),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: IconButton(
-                      onPressed: speakPrompt,
-                      icon: const Icon(
-                        Icons.volume_up,
-                        color: LuminColors.magenta,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+              ],
             ),
-            const SizedBox(height: 14),
-            if (isSpeakingExercise)
-              SpeakingAnswerInput(
+            const SizedBox(height: 24),
+            AbsorbPointer(
+              absorbing: answered || sending,
+              child: _AnswerArea(
+                key: ValueKey(current['id']),
+                exercise: current,
+                kind: kind,
+                selected: blockAnswer,
                 controller: answerController,
                 listening: listening,
-                onTap: toggleSpeechInput,
-              )
-            else
-              LuminField(label: 'Sua resposta', controller: answerController),
+                onBlocks: (value) => setState(() => blockAnswer = value),
+                onToggleMic: toggleSpeechInput,
+                onTyped: () => setState(() {}),
+              ),
+            ),
             if (error != null) ...[
-              const SizedBox(height: 10),
-              Text(
-                error!,
-                style: const TextStyle(color: Colors.redAccent, fontSize: 12),
-              ),
-            ],
-            if (lastCorrect != null) ...[
-              const SizedBox(height: 10),
-              Text(
-                lastCorrect! ? 'Correto!' : 'Não foi dessa vez.',
-                style: TextStyle(
-                  color: lastCorrect!
-                      ? Colors.greenAccent
-                      : Colors.orangeAccent,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
+              const SizedBox(height: 12),
+              Text(error!, style: const TextStyle(color: LuminColors.danger, fontSize: 12)),
             ],
             const SizedBox(height: 28),
-            LuminButton(
-              label: sending ? 'Corrigindo...' : 'Responder',
-              onPressed: sending ? () {} : answer,
-            ),
-            if (isLast) ...[
-              const SizedBox(height: 10),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton(
-                  onPressed: sending ? () {} : finish,
-                  child: const Text('Finalizar sessão'),
-                ),
+            if (answered)
+              AnswerFeedback(correct: lastCorrect!, correctAnswer: correctAnswer, onContinue: load)
+            else
+              LuminButton(
+                label: sending ? tr('Corrigindo...') : tr('Verificar'),
+                onPressed: sending || currentAnswer.isEmpty ? () {} : answer,
               ),
-            ],
           ],
         ],
       ),
     );
+  }
+}
+
+class _TypeLabel extends StatelessWidget {
+  const _TypeLabel({required this.exercise});
+
+  final Map<String, dynamic> exercise;
+
+  /// Mostra o tipo do exercício com ícone, para o usuário saber como responder.
+  @override
+  Widget build(BuildContext context) {
+    final (label, icon) = exerciseLabel(exercise);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: LuminColors.violet.withValues(alpha: 0.22),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: LuminColors.cyan),
+          const SizedBox(width: 6),
+          Text(label, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
+        ],
+      ),
+    );
+  }
+}
+
+class _AnswerArea extends StatelessWidget {
+  const _AnswerArea({
+    super.key,
+    required this.exercise,
+    required this.kind,
+    required this.selected,
+    required this.controller,
+    required this.listening,
+    required this.onBlocks,
+    required this.onToggleMic,
+    required this.onTyped,
+  });
+
+  final Map<String, dynamic> exercise;
+  final ExerciseKind kind;
+  final String selected;
+  final TextEditingController controller;
+  final bool listening;
+  final ValueChanged<String> onBlocks;
+  final VoidCallback onToggleMic;
+  final VoidCallback onTyped;
+
+  /// Escolhe a área de resposta pelo formato: blocos, montador de frase, microfone ou campo de texto.
+  @override
+  Widget build(BuildContext context) {
+    final options = (exercise['options'] as List? ?? const []).map((o) => '$o').toList();
+    return switch (kind) {
+      ExerciseKind.choice => ChoiceAnswer(options: options, selected: selected.isEmpty ? null : selected, onSelect: onBlocks),
+      ExerciseKind.sentence => SentenceBuilder(blocks: options, onChanged: onBlocks),
+      ExerciseKind.speaking => Center(
+          child: SpeakingAnswerInput(controller: controller, listening: listening, onTap: onToggleMic),
+        ),
+      ExerciseKind.text => LuminField(label: tr('Sua resposta'), controller: controller, onChanged: (_) => onTyped()),
+    };
   }
 }

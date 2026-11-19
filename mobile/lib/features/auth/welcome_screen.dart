@@ -5,6 +5,7 @@ import 'package:mobile/core/theme/lumin_spacing.dart';
 import 'package:mobile/features/auth/login_screen.dart';
 import 'package:mobile/features/auth/register_screen.dart';
 import 'package:mobile/shared/widgets/lumin_button.dart';
+import 'package:mobile/core/i18n/i18n.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -46,7 +47,7 @@ class WelcomeScreen extends StatelessWidget {
                   const SizedBox(height: 30),
 
                   LuminButton(
-                    label: 'Começar',
+                    label: tr('Começar'),
                     onPressed: () => Navigator.of(context).push(
                       MaterialPageRoute(builder: (_) => const RegisterScreen()),
                     ),
@@ -58,15 +59,15 @@ class WelcomeScreen extends StatelessWidget {
                       onPressed: () => Navigator.of(context).push(
                         MaterialPageRoute(builder: (_) => const LoginScreen()),
                       ),
-                      child: const Text.rich(
+                      child: Text.rich(
                         TextSpan(
                           children: [
                             TextSpan(
-                              text: 'Já possui conta? ',
+                              text: tr('Já possui conta? '),
                               style: TextStyle(color: Colors.white),
                             ),
                             TextSpan(
-                              text: 'Faça o Login',
+                              text: tr('Faça o Login'),
                               style: TextStyle(
                                 color: LuminColors.blue,
                                 fontStyle: FontStyle.italic,
@@ -131,7 +132,7 @@ class WelcomeHeadline extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -144,7 +145,7 @@ class WelcomeHeadline extends StatelessWidget {
           ),
         ),
         Text(
-          'Aprenda',
+          tr('Aprenda'),
           style: TextStyle(
             color: LuminColors.magenta,
             fontSize: 34,
@@ -153,7 +154,7 @@ class WelcomeHeadline extends StatelessWidget {
           ),
         ),
         Text(
-          'Conecte-se',
+          tr('Conecte-se'),
           style: TextStyle(
             color: LuminColors.blue,
             fontSize: 34,

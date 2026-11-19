@@ -5,9 +5,10 @@ import 'package:mobile/features/auth/google_auth.dart';
 import 'package:mobile/features/auth/register_screen.dart';
 import 'package:mobile/features/auth/reset_password_screen.dart';
 import 'package:mobile/features/auth/verify_screen.dart';
-import 'package:mobile/features/shell/app_shell.dart';
+import 'package:mobile/features/shell/bootstrap_screen.dart';
 import 'package:mobile/main.dart';
 import 'package:mobile/shared/widgets/lumin_field.dart';
+import 'package:mobile/core/i18n/i18n.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -31,9 +32,10 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+  /// Após o login, volta para o bootstrap, que aplica o idioma das configurações e abre o app.
   void goHome() {
     Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => const AppShell()),
+      MaterialPageRoute(builder: (_) => const BootstrapScreen()),
       (route) => false,
     );
   }
@@ -67,7 +69,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> signInWithGoogle() async {
     if (!GoogleAuthService.isConfigured) {
-      setState(() => error = 'Login social ainda não configurado neste build.');
+      setState(() => error = tr('Login social ainda não configurado neste build.'));
       return;
     }
     setState(() {
@@ -83,7 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
       }
       final pending = result.pending;
       if (pending == null) {
-        setState(() => error = 'Não foi possível entrar com o Google.');
+        setState(() => error = tr('Não foi possível entrar com o Google.'));
         return;
       }
       final created = await Navigator.of(context).push<bool>(
@@ -95,11 +97,11 @@ class _LoginScreenState extends State<LoginScreen> {
       if (created == true) {
         goHome();
       } else {
-        setState(() => error = 'Cadastro com Google cancelado.');
+        setState(() => error = tr('Cadastro com Google cancelado.'));
       }
     } catch (e) {
       if (!mounted) return;
-      setState(() => error = 'Falha no login social: $e');
+      setState(() => error = t('Falha no login social: $e', 'Social sign-in failed: $e'));
     } finally {
       if (mounted) setState(() => loadingGoogle = false);
     }
@@ -109,10 +111,10 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return AuthScaffold(
       title: 'Login',
-      subtitle: 'Entre para continuar aprendendo sem limites',
-      action: loading ? 'Entrando...' : 'Entrar',
-      footer: 'Não possui uma conta?',
-      footerAction: 'Cadastre-se',
+      subtitle: tr('Entre para continuar aprendendo sem limites'),
+      action: loading ? tr('Entrando...') : tr('Entrar'),
+      footer: tr('Não possui uma conta?'),
+      footerAction: tr('Cadastre-se'),
       onAction: loading ? () {} : submit,
       onGoogle: loadingGoogle ? () {} : signInWithGoogle,
       onFooter: () => Navigator.of(context).push(
@@ -120,14 +122,14 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
       children: [
         LuminField(
-          label: 'E-mail',
+          label: tr('E-mail'),
           labelAbove: true,
           controller: emailController,
           keyboardType: TextInputType.emailAddress,
         ),
         const SizedBox(height: 18),
         LuminField(
-          label: 'Senha',
+          label: tr('Senha'),
           labelAbove: true,
           controller: passwordController,
           obscureText: obscurePassword,
@@ -140,8 +142,8 @@ class _LoginScreenState extends State<LoginScreen> {
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const ForgotPasswordScreen()),
             ),
-            child: const Text(
-              'Esqueceu sua senha?',
+            child: Text(
+              tr('Esqueceu sua senha?'),
               style: TextStyle(
                 fontSize: 12,
                 color: LuminColors.blue,

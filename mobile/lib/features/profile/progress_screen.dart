@@ -4,6 +4,7 @@ import 'package:mobile/main.dart';
 import 'package:mobile/shared/widgets/back_title.dart';
 import 'package:mobile/shared/widgets/lumin_page.dart';
 import 'package:mobile/shared/widgets/neon_card.dart';
+import 'package:mobile/core/i18n/i18n.dart';
 
 class ProgressScreen extends StatefulWidget {
   const ProgressScreen({super.key});
@@ -69,7 +70,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const BackTitle(title: 'Meu progresso'),
+          BackTitle(title: tr('Meu progresso')),
           const SizedBox(height: 16),
           ProgressSummary(level: level, progress: progress, xpText: xpText),
           const SizedBox(height: 18),
@@ -78,7 +79,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const NeonCardTitle(text: 'SEU DESEMPENHO'),
+                NeonCardTitle(text: tr('SEU DESEMPENHO')),
                 const SizedBox(height: 14),
                 Row(
                   children: [
@@ -86,7 +87,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                     Container(width: 1, height: 42, color: LuminColors.violet.withValues(alpha: 0.3)),
                     Expanded(child: _BigMetric(value: saved, label: 'salvas')),
                     Container(width: 1, height: 42, color: LuminColors.violet.withValues(alpha: 0.3)),
-                    Expanded(child: _BigMetric(value: weak, label: 'a treinar')),
+                    Expanded(child: _BigMetric(value: weak, label: tr('a treinar'))),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -95,7 +96,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                     const Icon(Icons.track_changes, color: LuminColors.violet, size: 16),
                     const SizedBox(width: 8),
                     Text(
-                      accuracy.isEmpty ? 'Sem precisão ainda' : 'Precisão média de $accuracy',
+                      accuracy.isEmpty ? tr('Sem precisão ainda') : t('Precisão média de $accuracy', 'Average accuracy of $accuracy'),
                       style: const TextStyle(color: Colors.white70, fontSize: 12),
                     ),
                   ],
@@ -104,18 +105,18 @@ class _ProgressScreenState extends State<ProgressScreen> {
             ),
           ),
           const SizedBox(height: 18),
-          const Text('Rotina', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
+          Text(tr('Rotina'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
           const SizedBox(height: 10),
-          ProgressMetric(title: 'Palavras praticadas', value: practiced, description: 'Palavras praticadas ao menos uma vez'),
-          ProgressMetric(title: 'Palavras salvas', value: saved, description: 'Salvas para revisar depois'),
-          ProgressMetric(title: 'Palavras com dificuldade', value: weak, description: 'Ainda precisam de mais treino'),
-          ProgressMetric(title: 'Precisão média', value: accuracy.isEmpty ? '-' : accuracy, description: 'Baseada nos exercícios respondidos'),
+          ProgressMetric(title: tr('Palavras praticadas'), value: practiced, description: tr('Palavras praticadas ao menos uma vez')),
+          ProgressMetric(title: tr('Palavras salvas'), value: saved, description: tr('Salvas para revisar depois')),
+          ProgressMetric(title: tr('Palavras com dificuldade'), value: weak, description: tr('Ainda precisam de mais treino')),
+          ProgressMetric(title: tr('Precisão média'), value: accuracy.isEmpty ? '-' : accuracy, description: tr('Baseada nos exercícios respondidos')),
           const SizedBox(height: 18),
-          const Text('Categorias recentes', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
+          Text(tr('Categorias recentes'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
           const SizedBox(height: 10),
           for (final category in categories)
             CategoryProgress(
-              label: '${category['categoryName'] ?? ''}',
+              label: tr('${category['categoryName'] ?? ''}'),
               value: categoryValue(category),
             ),
         ],
@@ -150,7 +151,7 @@ class ProgressSummary extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            level.isEmpty ? 'Sem nivelamento' : 'Nível $level',
+            level.isEmpty ? tr('Sem nivelamento') : t('Nível $level', 'Level $level'),
             style: const TextStyle(color: LuminColors.magenta, fontSize: 20, fontWeight: FontWeight.w900),
           ),
           const SizedBox(height: 8),

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:mobile/core/theme/lumin_colors.dart';
@@ -6,6 +7,7 @@ import 'package:mobile/core/theme/lumin_spacing.dart';
 import 'package:mobile/features/camera/detected_object.dart';
 import 'package:mobile/features/camera/detection_confidence_policy.dart';
 import 'package:mobile/features/camera/detection_frame.dart';
+import 'package:mobile/features/camera/label_stability.dart';
 import 'package:mobile/features/camera/lumin_detector_model.dart';
 import 'package:mobile/features/camera/object_translation_dictionary.dart';
 import 'package:mobile/features/camera/yolo_object_selection_service.dart';
@@ -14,6 +16,7 @@ import 'package:mobile/main.dart';
 import 'package:mobile/shared/widgets/language_flag.dart';
 import 'package:mobile/shared/widgets/marker_circle.dart';
 import 'package:ultralytics_yolo/ultralytics_yolo.dart';
+import 'package:mobile/core/i18n/i18n.dart';
 
 class CameraScreen extends StatefulWidget {
   const CameraScreen({super.key});
@@ -32,17 +35,19 @@ class _CameraScreenState extends State<CameraScreen> {
   String activeModelPath = LuminDetectorModel.configuredModelPath;
   YOLOTask activeModelTask = LuminDetectorModel.configuredTask;
   String statusText = LuminDetectorModel.usesCustomModel
-      ? 'Carregando detector personalizado'
-      : 'Carregando detector';
-  String? stableLabel;
-  int stableFrameCount = 0;
+      ? tr('Carregando detector personalizado')
+      : tr('Carregando detector');
+  String? acceptedLabel;
+  final labelStability = LabelStability(
+    window: LuminDetectorModel.stableFrameWindow,
+  );
   bool modelFailed = false;
   bool fallbackModelActive = !LuminDetectorModel.usesCustomModel;
   bool translationDictionaryReady = false;
   DateTime lastAcceptedObject = DateTime.fromMillisecondsSinceEpoch(0);
-  String fromLanguage = 'Origem';
+  String fromLanguage = tr('Origem');
   String fromLanguageCode = '';
-  String toLanguage = 'Destino';
+  String toLanguage = tr('Destino');
   String toLanguageCode = '';
 
   @override
@@ -94,7 +99,7 @@ class _CameraScreenState extends State<CameraScreen> {
 
     if (selectedObject == null) {
       clearSelectedObject();
-      updateStatus('Centralize um objeto');
+      updateStatus(tr('Centralize um objeto'));
       return;
     }
 
@@ -134,19 +139,26 @@ class _CameraScreenState extends State<CameraScreen> {
     return boxMovement > 0.018 || confidenceMovement > 0.08;
   }
 
+  /// Registra um frame sem objeto e só apaga a tradução quando o rótulo sai da janela de votos.
   void clearSelectedObject() {
-    if (selectedObject == null) {
+    labelStability.miss();
+    final label = acceptedLabel;
+    final lost = label != null && !labelStability.hasVotes(label);
+
+    if (selectedObject == null && !lost) {
       return;
     }
 
     setState(() {
       selectedObject = null;
-      detectedTranslation = null;
-      stableLabel = null;
-      stableFrameCount = 0;
+      if (lost) {
+        detectedTranslation = null;
+        acceptedLabel = null;
+      }
     });
   }
 
+  /// Vota no rótulo detectado e, quando estável e confiável, monta a tradução na direção língua nativa para idioma de estudo.
   void registerStableObject(YOLOResult result) {
     final detectedLabel = result.className.trim();
 
@@ -154,23 +166,20 @@ class _CameraScreenState extends State<CameraScreen> {
       return;
     }
 
-    if (stableLabel == detectedLabel) {
-      stableFrameCount += 1;
-    } else {
-      stableLabel = detectedLabel;
-      stableFrameCount = 1;
-    }
+    final stable = labelStability.add(
+      detectedLabel,
+      required: confidencePolicy.requiredStableFramesFor(detectedLabel),
+    );
 
-    if (stableFrameCount <
-        confidencePolicy.requiredStableFramesFor(detectedLabel)) {
-      updateStatus('Mantenha o objeto na área iluminada');
+    if (stable == null) {
+      updateStatus(tr('Mantenha o objeto na área iluminada'));
       return;
     }
 
     if (!confidencePolicy.accepts(result)) {
       setState(() {
         detectedTranslation = null;
-        statusText = 'Detecção incerta';
+        statusText = tr('Detecção incerta');
       });
       return;
     }
@@ -179,7 +188,8 @@ class _CameraScreenState extends State<CameraScreen> {
     final now = DateTime.now();
 
     if (currentTranslation != null &&
-        currentTranslation.originalText == detectedLabel) {
+        (currentTranslation.originalText == detectedLabel ||
+            currentTranslation.translatedText == detectedLabel)) {
       return;
     }
 
@@ -188,20 +198,23 @@ class _CameraScreenState extends State<CameraScreen> {
     }
 
     if (!translationDictionaryReady) {
-      updateStatus('Preparando traduções');
+      updateStatus(tr('Preparando traduções'));
       return;
     }
 
     lastAcceptedObject = now;
-    final translatedText = ObjectTranslationDictionary.translate(detectedLabel);
+    acceptedLabel = detectedLabel;
+    final englishText = detectedLabel;
+    final portugueseText = ObjectTranslationDictionary.translate(detectedLabel);
+    final nativeIsEnglish = fromLanguageCode.toLowerCase().startsWith('en');
 
     setState(() {
       detectedTranslation = DetectedTranslation(
-        originalText: translatedText,
-        translatedText: detectedLabel,
+        originalText: nativeIsEnglish ? englishText : portugueseText,
+        translatedText: nativeIsEnglish ? portugueseText : englishText,
         confidence: result.confidence,
       );
-      statusText = 'Tradução pronta';
+      statusText = tr('Tradução pronta');
     });
   }
 
@@ -213,7 +226,7 @@ class _CameraScreenState extends State<CameraScreen> {
 
       setState(() {
         modelFailed = true;
-        statusText = 'Não foi possível carregar o detector';
+        statusText = tr('Não foi possível carregar o detector');
       });
       return;
     }
@@ -224,10 +237,9 @@ class _CameraScreenState extends State<CameraScreen> {
       activeModelTask = LuminDetectorModel.fallbackTask;
       selectedObject = null;
       detectedTranslation = null;
-      stableLabel = null;
-      stableFrameCount = 0;
+      labelStability.clear();
       modelFailed = false;
-      statusText = 'Carregando detector rápido';
+      statusText = tr('Carregando detector rápido');
     });
 
     try {
@@ -235,7 +247,7 @@ class _CameraScreenState extends State<CameraScreen> {
         LuminDetectorModel.fallbackModelPath,
         LuminDetectorModel.fallbackTask,
       );
-      updateStatus('Centralize um objeto');
+      updateStatus(tr('Centralize um objeto'));
     } catch (_) {
       if (!mounted) {
         return;
@@ -243,7 +255,7 @@ class _CameraScreenState extends State<CameraScreen> {
 
       setState(() {
         modelFailed = true;
-        statusText = 'Não foi possível carregar o detector';
+        statusText = tr('Não foi possível carregar o detector');
       });
     }
   }
@@ -258,21 +270,31 @@ class _CameraScreenState extends State<CameraScreen> {
     });
   }
 
+  /// Captura a foto do objeto sem marcações e abre a tela de salvar com a tradução detectada.
   Future<void> saveDetectedTranslation() async {
     final translation = detectedTranslation;
 
     if (translation == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Aponte para um único objeto primeiro')),
+        SnackBar(content: Text(tr('Aponte para um único objeto primeiro'))),
       );
       return;
     }
+
+    Uint8List? photo;
+    try {
+      photo = await yoloController.capturePhoto(withOverlays: false);
+    } catch (_) {
+      photo = null;
+    }
+    if (!mounted) return;
 
     await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => SaveTranslationScreen(
           originalText: translation.originalText,
           translatedText: translation.translatedText,
+          imageBytes: photo,
         ),
       ),
     );
@@ -305,7 +327,7 @@ class _CameraScreenState extends State<CameraScreen> {
               onResult: processYoloResults,
               onModelLoad: (_, _) {
                 unawaited(yoloController.setShowOverlays(false));
-                updateStatus('Centralize um objeto');
+                updateStatus(tr('Centralize um objeto'));
               },
               onModelError: (_, _, _) {
                 unawaited(loadFallbackDetector());
@@ -340,7 +362,7 @@ class _CameraScreenState extends State<CameraScreen> {
                       selected: objectOnCenter != null,
                       enabled: objectOnCenter != null,
                       size: 128,
-                      label: 'Foco do objeto detectado',
+                      label: tr('Foco do objeto detectado'),
                     ),
                   ),
                   const SizedBox(height: 18),
@@ -481,8 +503,8 @@ class CameraTranslationPanel extends StatelessWidget {
       children: [
         Row(
           children: [
-            const Text(
-              'OBJETO IDENTIFICADO',
+            Text(
+              tr('OBJETO IDENTIFICADO'),
               style: TextStyle(
                 color: LuminColors.violet,
                 fontSize: 10,

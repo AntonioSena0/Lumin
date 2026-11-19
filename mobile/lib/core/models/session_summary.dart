@@ -1,4 +1,5 @@
-class SessionSummary {
+
+import 'package:mobile/core/i18n/i18n.dart';class SessionSummary {
   SessionSummary(this.raw);
 
   final Map<String, dynamic> raw;
@@ -42,10 +43,10 @@ class SessionSummary {
   }
 
   String get progressLabel {
-    if (isFinished) return 'Finalizada';
-    if (isCompleted) return 'Exercícios concluídos';
-    if (totalExercises == 0) return 'Sem exercícios';
-    return 'Exercício $currentIndex de $totalExercises';
+    if (isFinished) return tr('Finalizada');
+    if (isCompleted) return tr('Exercícios concluídos');
+    if (totalExercises == 0) return tr('Sem exercícios');
+    return t('Exercício $currentIndex de $totalExercises', 'Exercise $currentIndex of $totalExercises');
   }
 
   static int asInt(dynamic value) => value is num ? value.toInt() : 0;

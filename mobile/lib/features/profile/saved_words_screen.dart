@@ -6,6 +6,7 @@ import 'package:mobile/main.dart';
 import 'package:mobile/shared/widgets/back_title.dart';
 import 'package:mobile/shared/widgets/lumin_field.dart';
 import 'package:mobile/shared/widgets/lumin_page.dart';
+import 'package:mobile/core/i18n/i18n.dart';
 
 class SavedWordsScreen extends StatefulWidget {
   const SavedWordsScreen({super.key});
@@ -68,15 +69,15 @@ class _SavedWordsScreenState extends State<SavedWordsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const BackTitle(title: 'Palavras salvas'),
+          BackTitle(title: tr('Palavras salvas')),
           const SizedBox(height: 14),
-          LuminField(label: 'Buscar palavra salva', controller: searchController),
+          LuminField(label: tr('Buscar palavra salva'), controller: searchController),
           const SizedBox(height: 8),
           SizedBox(
             width: double.infinity,
             child: OutlinedButton(
               onPressed: () => load(searchController.text),
-              child: const Text('Buscar'),
+              child: Text(tr('Buscar')),
             ),
           ),
           const SizedBox(height: 16),
@@ -91,9 +92,9 @@ class _SavedWordsScreenState extends State<SavedWordsScreen> {
               ),
             )
           else if (items.isEmpty)
-            const Center(
+            Center(
               child: Text(
-                'Nenhuma palavra salva ainda.',
+                tr('Nenhuma palavra salva ainda.'),
                 style: TextStyle(color: LuminColors.muted, fontSize: 12),
               ),
             )
@@ -112,11 +113,11 @@ class _SavedWordsScreenState extends State<SavedWordsScreen> {
 
   String savedDetail(WordEntry entry) {
     final parts = <String>[];
-    if (entry.categoryName.isNotEmpty) parts.add(entry.categoryName);
+    if (entry.categoryName.isNotEmpty) parts.add(tr(entry.categoryName));
     if (entry.correctAnswers > 0 || entry.incorrectAnswers > 0) {
-      parts.add('${entry.correctAnswers} acertos / ${entry.incorrectAnswers} erros');
+      parts.add(t('${entry.correctAnswers} acertos / ${entry.incorrectAnswers} erros', '${entry.correctAnswers} correct / ${entry.incorrectAnswers} wrong'));
     }
-    return parts.isEmpty ? 'Sem exercícios ainda' : parts.join(' · ');
+    return parts.isEmpty ? tr('Sem exercícios ainda') : parts.join(' · ');
   }
 }
 

@@ -4,6 +4,7 @@ import 'package:mobile/features/profile/settings_language_screen.dart';
 import 'package:mobile/main.dart';
 import 'package:mobile/shared/widgets/back_title.dart';
 import 'package:mobile/shared/widgets/lumin_page.dart';
+import 'package:mobile/core/i18n/i18n.dart';
 
 class NotificationSettingsScreen extends StatefulWidget {
   const NotificationSettingsScreen({super.key});
@@ -59,19 +60,19 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const BackTitle(title: 'Notificações'),
+          BackTitle(title: tr('Notificações')),
           const SizedBox(height: 16),
           const NotificationStatusPanel(),
           const SizedBox(height: 16),
           PreferenceOption(
-            title: 'Rotina diária',
-            description: 'Um lembrete curto para continuar aprendendo',
+            title: tr('Rotina diária'),
+            description: tr('Um lembrete curto para continuar aprendendo'),
             selected: daily,
             onTap: toggleDaily,
           ),
           PreferenceOption(
-            title: 'Revisão de palavras',
-            description: 'Avisos quando uma palavra salva precisa ser praticada',
+            title: tr('Revisão de palavras'),
+            description: tr('Avisos quando uma palavra salva precisa ser praticada'),
             selected: review,
             onTap: toggleReview,
           ),
@@ -93,13 +94,13 @@ class NotificationStatusPanel extends StatelessWidget {
         color: LuminColors.panel,
         borderRadius: BorderRadius.circular(8),
       ),
-      child: const Row(
+      child: Row(
         children: [
           Icon(Icons.notifications_active, color: LuminColors.magenta),
           SizedBox(width: 12),
           Expanded(
             child: Text(
-              'As notificações devem reforçar rotina, não competição.',
+              tr('As notificações devem reforçar rotina, não competição.'),
               style: TextStyle(color: LuminColors.muted, height: 1.35),
             ),
           ),

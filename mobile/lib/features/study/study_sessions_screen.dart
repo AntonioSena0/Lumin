@@ -6,6 +6,7 @@ import 'package:mobile/features/translation/word_detail_screen.dart';
 import 'package:mobile/main.dart';
 import 'package:mobile/shared/widgets/back_title.dart';
 import 'package:mobile/shared/widgets/lumin_page.dart';
+import 'package:mobile/core/i18n/i18n.dart';
 
 class StudySessionsScreen extends StatefulWidget {
   const StudySessionsScreen({super.key});
@@ -97,10 +98,10 @@ class _StudySessionsScreenState extends State<StudySessionsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          BackTitle(title: 'Minhas sessões'),
+          BackTitle(title: tr('Minhas sessões')),
           const SizedBox(height: 6),
           Text(
-            totalPages > 0 ? '$totalPages página(s) de histórico' : 'Histórico de prática',
+            totalPages > 0 ? t('$totalPages página(s) de histórico', '$totalPages page(s) of history') : tr('Histórico de prática'),
             style: const TextStyle(color: LuminColors.muted, fontSize: 12),
           ),
           const SizedBox(height: 14),
@@ -130,11 +131,11 @@ class _StudySessionsScreenState extends State<StudySessionsScreen> {
                         child: Center(child: CircularProgressIndicator()),
                       ),
                     if (!loadingMore && !hasMore && items.isNotEmpty)
-                      const Padding(
+                      Padding(
                         padding: EdgeInsets.symmetric(vertical: 18),
                         child: Center(
                           child: Text(
-                            'Você chegou ao fim do histórico',
+                            tr('Você chegou ao fim do histórico'),
                             style: TextStyle(color: LuminColors.muted, fontSize: 12),
                           ),
                         ),
@@ -220,7 +221,7 @@ class SessionCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        session.wordTranslated.isEmpty ? 'Sessão de estudo' : session.wordTranslated,
+                        session.wordTranslated.isEmpty ? tr('Sessão de estudo') : session.wordTranslated,
                         style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
                       ),
                       if (session.wordOriginal.isNotEmpty)
@@ -261,15 +262,14 @@ class SessionCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  '${session.progressLabel} · ${session.score} acertos'
-                  '${session.languageName.isEmpty ? '' : ' · ${session.languageName}'}',
+                  '${t('${session.progressLabel} · ${session.score} acertos', '${session.progressLabel} · ${session.score} correct')}${session.languageName.isEmpty ? '' : ' · ${session.languageName}'}',
                   style: const TextStyle(color: LuminColors.muted, fontSize: 11),
                 ),
               ),
               if (canResume || session.id != null)
                 TextButton(
                   onPressed: onOpenSession,
-                  child: Text(finished ? 'Ver resultado' : 'Continuar'),
+                  child: Text(finished ? tr('Ver resultado') : tr('Continuar')),
                 ),
             ],
           ),
@@ -293,7 +293,7 @@ class StatusTag extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
-        finished ? 'Concluída' : 'Em andamento',
+        finished ? tr('Concluída') : tr('Em andamento'),
         style: TextStyle(
           color: finished ? Colors.greenAccent : LuminColors.magenta,
           fontSize: 10,
@@ -309,7 +309,7 @@ class EmptySessionsState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    return Center(
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 24),
         child: Column(
@@ -318,13 +318,13 @@ class EmptySessionsState extends StatelessWidget {
             Icon(Icons.school_outlined, color: LuminColors.muted, size: 40),
             SizedBox(height: 14),
             Text(
-              'Você ainda não tem sessões de estudo.',
+              tr('Você ainda não tem sessões de estudo.'),
               textAlign: TextAlign.center,
               style: TextStyle(color: LuminColors.muted, fontSize: 12),
             ),
             SizedBox(height: 6),
             Text(
-              'Abra uma palavra e toque em praticar para criar a primeira.',
+              tr('Abra uma palavra e toque em praticar para criar a primeira.'),
               textAlign: TextAlign.center,
               style: TextStyle(color: LuminColors.muted, fontSize: 12),
             ),
@@ -357,7 +357,7 @@ class ErrorState extends StatelessWidget {
               style: const TextStyle(color: Colors.redAccent, fontSize: 12),
             ),
             const SizedBox(height: 14),
-            OutlinedButton(onPressed: onRetry, child: const Text('Tentar de novo')),
+            OutlinedButton(onPressed: onRetry, child: Text(tr('Tentar de novo'))),
           ],
         ),
       ),
@@ -376,7 +376,7 @@ class SessionFinishedScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          BackTitle(title: 'Resultado da sessão'),
+          BackTitle(title: tr('Resultado da sessão')),
           const SizedBox(height: 18),
           Container(
             width: double.infinity,
@@ -391,7 +391,7 @@ class SessionFinishedScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  session.wordTranslated.isEmpty ? 'Sessão concluída' : session.wordTranslated,
+                  session.wordTranslated.isEmpty ? tr('Sessão concluída') : session.wordTranslated,
                   style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
                 ),
                 if (session.wordOriginal.isNotEmpty) ...[
@@ -403,19 +403,19 @@ class SessionFinishedScreen extends StatelessWidget {
                 ],
                 const SizedBox(height: 16),
                 Text(
-                  '${session.score} de ${session.totalExercises} acertos',
+                  t('${session.score} de ${session.totalExercises} acertos', '${session.score} of ${session.totalExercises} correct'),
                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
                 ),
               ],
             ),
           ),
           const SizedBox(height: 18),
-          DetailRow(label: 'Progresso', value: '${(session.progress * 100).round()}%'),
-          DetailRow(label: 'Acertos', value: '${session.score}'),
-          DetailRow(label: 'Exercícios', value: '${session.totalExercises}'),
+          DetailRow(label: tr('Progresso'), value: '${(session.progress * 100).round()}%'),
+          DetailRow(label: tr('Acertos'), value: '${session.score}'),
+          DetailRow(label: tr('Exercícios'), value: '${session.totalExercises}'),
           if (session.languageName.isNotEmpty)
-            DetailRow(label: 'Idioma', value: session.languageName),
-          DetailRow(label: 'Situação', value: session.status),
+            DetailRow(label: tr('Idioma'), value: session.languageName),
+          DetailRow(label: tr('Situação'), value: session.status),
           const SizedBox(height: 28),
         ],
       ),

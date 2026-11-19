@@ -5,6 +5,7 @@ import 'package:mobile/features/explore/explore_screen.dart';
 import 'package:mobile/features/home/home_screen.dart';
 import 'package:mobile/features/languages/languages_screen.dart';
 import 'package:mobile/features/profile/profile_screen.dart';
+import 'package:mobile/core/i18n/i18n.dart';
 
 class AppShell extends StatefulWidget {
   const AppShell({super.key});
@@ -65,32 +66,32 @@ class _AppShellState extends State<AppShell> {
           children: [
             NavigationIcon(
               icon: Icons.home,
-              label: 'Início',
+              label: tr('Início'),
               selected: selectedIndex == 0,
               onTap: () => selectPage(0),
             ),
             NavigationIcon(
               icon: Icons.search,
-              label: 'Explorar',
+              label: tr('Explorar'),
               selected: selectedIndex == 1,
               onTap: () => selectPage(1),
             ),
             NavigationIcon(
               icon: Icons.add,
-              label: 'Câmera',
+              label: tr('Câmera'),
               selected: selectedIndex == 2,
               onTap: () => selectPage(2),
               highlighted: true,
             ),
             NavigationIcon(
               icon: Icons.article,
-              label: 'Idiomas',
+              label: tr('Idiomas'),
               selected: selectedIndex == 3,
               onTap: () => selectPage(3),
             ),
             NavigationIcon(
               icon: Icons.person,
-              label: 'Perfil',
+              label: tr('Perfil'),
               selected: selectedIndex == 4,
               onTap: () => selectPage(4),
             ),

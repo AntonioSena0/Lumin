@@ -5,6 +5,7 @@ import 'package:mobile/main.dart';
 import 'package:mobile/shared/widgets/lumin_field.dart';
 import 'package:mobile/shared/widgets/lumin_page.dart';
 import 'package:mobile/shared/widgets/language_flag.dart';
+import 'package:mobile/core/i18n/i18n.dart';
 
 class LanguagesScreen extends StatefulWidget {
   const LanguagesScreen({super.key});
@@ -73,13 +74,13 @@ class _LanguagesScreenState extends State<LanguagesScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Idiomas',
+          Text(
+            tr('Idiomas'),
             style: TextStyle(fontSize: 27, fontWeight: FontWeight.w900),
           ),
           const SizedBox(height: 14),
           LuminField(
-            label: 'Pesquisar idiomas',
+            label: tr('Pesquisar idiomas'),
             controller: searchController,
             icon: Icons.search,
             onChanged: (_) => setState(() {}),
@@ -88,9 +89,9 @@ class _LanguagesScreenState extends State<LanguagesScreen> {
           if (loading)
             const Center(child: CircularProgressIndicator())
           else if (filtered.isEmpty)
-            const Center(
+            Center(
               child: Text(
-                'Nenhum idioma encontrado.',
+                tr('Nenhum idioma encontrado.'),
                 style: TextStyle(color: LuminColors.muted, fontSize: 12),
               ),
             )
@@ -101,9 +102,9 @@ class _LanguagesScreenState extends State<LanguagesScreen> {
                   code: '${lang['code'] ?? ''}',
                   label: '${lang['name'] ?? ''}',
                   tag: lang['id'] == nativeId
-                      ? 'Sua língua'
+                      ? tr('Sua língua')
                       : lang['id'] == chosenId
-                      ? 'Em estudo'
+                      ? tr('Em estudo')
                       : null,
                   onTap: () => openWords(lang),
                 ),

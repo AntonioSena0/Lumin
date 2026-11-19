@@ -6,9 +6,10 @@ import 'package:mobile/core/repositories/lumin_repository.dart';
 
 const apiBaseUrl = String.fromEnvironment(
   'API_BASE_URL',
-  defaultValue: 'https://lumin-api.up.railway.app',
+  defaultValue: 'https://lumin.up.railway.app',
 );
 
+/// Converte um caminho relativo da API em URL absoluta, mantendo URLs que já são completas.
 String resolveAssetUrl(String path) {
   if (path.isEmpty) return '';
   if (path.startsWith('http://') || path.startsWith('https://')) return path;

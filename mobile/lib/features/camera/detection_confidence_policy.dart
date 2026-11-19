@@ -39,53 +39,29 @@ class DetectionConfidencePolicy {
     'wrench',
   };
 
-  static const slenderLabels = {
-    'adapter',
-    'adhesive tape',
-    'cable',
-    'candle',
-    'charging cable',
-    'cotton swab',
-    'glue stick',
-    'highlighter',
-    'knife',
-    'lighter',
-    'marker',
-    'mechanical pencil',
-    'paint brush',
-    'pen',
-    'pencil',
-    'ruler',
-    'screw',
-    'screwdriver',
-    'straw',
-    'tablet pen',
-    'toothpick',
-    'toothbrush',
-    'wire',
-    'wrench',
-  };
-
+  /// Retorna a confiança mínima do rótulo, mais alta para objetos fáceis de confundir.
   double minimumConfidenceFor(String label) {
     final normalizedLabel = ObjectTranslationDictionary.normalize(label);
 
     if (cautiousLabels.contains(normalizedLabel)) {
-      return 0.72;
+      return LuminDetectorModel.cautiousConfidenceThreshold;
     }
 
     return LuminDetectorModel.confidenceThreshold;
   }
 
+  /// Retorna quantos votos na janela o rótulo precisa para ser considerado estável.
   int requiredStableFramesFor(String label) {
     final normalizedLabel = ObjectTranslationDictionary.normalize(label);
 
     if (cautiousLabels.contains(normalizedLabel)) {
-      return 12;
+      return LuminDetectorModel.cautiousStableFrameTarget;
     }
 
     return LuminDetectorModel.stableFrameTarget;
   }
 
+  /// Aceita a detecção quando tem rótulo, confiança mínima e área útil na tela.
   bool accepts(YOLOResult result) {
     final normalizedLabel = ObjectTranslationDictionary.normalize(
       result.className,
@@ -103,36 +79,12 @@ class DetectionConfidencePolicy {
       return false;
     }
 
-    if (slenderLabels.contains(normalizedLabel)) {
-      return hasSlenderShape(result.normalizedBox);
-    }
-
     return true;
   }
 
-  bool isAmbiguous(YOLOResult selectedResult, YOLOResult candidate) {
-    final candidateLabel = ObjectTranslationDictionary.normalize(
-      candidate.className,
-    );
-    final selectedLabel = ObjectTranslationDictionary.normalize(
-      selectedResult.className,
-    );
-    final confidenceGap = selectedResult.confidence - candidate.confidence;
-
-    return candidateLabel.isNotEmpty &&
-        candidateLabel != selectedLabel &&
-        confidenceGap >= 0 &&
-        confidenceGap <= 0.1 &&
-        candidate.normalizedBox.overlaps(selectedResult.normalizedBox);
-  }
-
+  /// Rejeita caixas pequenas demais ou que ocupam quase a tela inteira.
   bool hasUsefulArea(Rect box) {
     final area = box.width * box.height;
     return area >= 0.0025 && area <= 0.82;
-  }
-
-  bool hasSlenderShape(Rect box) {
-    final ratio = box.width / box.height;
-    return ratio <= 0.58 || ratio >= 1.72;
   }
 }

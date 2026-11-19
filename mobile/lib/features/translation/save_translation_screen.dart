@@ -7,6 +7,7 @@ import 'package:mobile/core/theme/lumin_spacing.dart';
 import 'package:mobile/features/translation/word_detail_screen.dart';
 import 'package:mobile/main.dart';
 import 'package:mobile/shared/widgets/language_flag.dart';
+import 'package:mobile/core/i18n/i18n.dart';
 
 const String _font = 'Poppins';
 
@@ -37,8 +38,8 @@ class _SaveTranslationScreenState extends State<SaveTranslationScreen> {
   late final TextEditingController translatedController;
   List<Map<String, dynamic>> categories = [];
   int? categoryId;
-  String nativeName = 'Nativo';
-  String chosenName = 'Estudo';
+  String nativeName = tr('Nativo');
+  String chosenName = tr('Estudo');
   String nativeCode = '';
   String chosenCode = '';
   String? error;
@@ -87,7 +88,7 @@ class _SaveTranslationScreenState extends State<SaveTranslationScreen> {
     if (originalController.text.trim().isEmpty ||
         translatedController.text.trim().isEmpty ||
         categoryId == null) {
-      setState(() => error = 'Preencha os textos e a categoria.');
+      setState(() => error = tr('Preencha os textos e a categoria.'));
       return;
     }
     setState(() {
@@ -114,6 +115,11 @@ class _SaveTranslationScreenState extends State<SaveTranslationScreen> {
       setState(() => error = response.error);
     }
   }
+
+  /// Indica se a tela recebeu a foto do objeto capturada pela câmera.
+  bool get hasPhoto =>
+      widget.imageBytes != null ||
+      (widget.imagePath != null && widget.imagePath!.isNotEmpty);
 
   @override
   Widget build(BuildContext context) {
@@ -142,16 +148,18 @@ class _SaveTranslationScreenState extends State<SaveTranslationScreen> {
                             ),
                           ),
                           const SizedBox(height: 18),
-                          _WireField(
-                            label: 'Texto Original',
-                            controller: originalController,
-                          ),
-                          const SizedBox(height: 14),
-                          _WireField(
-                            label: 'Tradução',
-                            controller: translatedController,
-                          ),
-                          const SizedBox(height: 18),
+                          if (!hasPhoto) ...[
+                            _WireField(
+                              label: tr('Texto Original'),
+                              controller: originalController,
+                            ),
+                            const SizedBox(height: 14),
+                            _WireField(
+                              label: tr('Tradução'),
+                              controller: translatedController,
+                            ),
+                            const SizedBox(height: 18),
+                          ],
                           Row(
                             children: [
                               Expanded(
@@ -180,15 +188,15 @@ class _SaveTranslationScreenState extends State<SaveTranslationScreen> {
                           // Categoria: mantida como no app.
                           DropdownButtonFormField<int>(
                             initialValue: categoryId,
-                            decoration: const InputDecoration(
-                              labelText: 'Categoria',
+                            decoration: InputDecoration(
+                              labelText: tr('Categoria'),
                             ),
                             items: [
                               for (final category in categories)
                                 if (category['id'] is int)
                                   DropdownMenuItem<int>(
                                     value: category['id'] as int,
-                                    child: Text('${category['name'] ?? ''}'),
+                                    child: Text(tr('${category['name'] ?? ''}')),
                                   ),
                             ],
                             onChanged: (id) => setState(() => categoryId = id),
@@ -211,13 +219,13 @@ class _SaveTranslationScreenState extends State<SaveTranslationScreen> {
                         children: [
                           const SizedBox(height: 22),
                           _SaveButton(
-                            label: loading ? 'Salvando...' : 'Salvar',
+                            label: loading ? tr('Salvando...') : tr('Salvar'),
                             onTap: loading ? null : save,
                           ),
                           TextButton(
                             onPressed: () => Navigator.of(context).pop(),
-                            child: const Text(
-                              'Cancelar',
+                            child: Text(
+                              tr('Cancelar'),
                               style: TextStyle(
                                 fontFamily: _font,
                                 fontSize: 15,
@@ -249,14 +257,14 @@ class _SaveTranslationScreenState extends State<SaveTranslationScreen> {
           Align(
             alignment: Alignment.centerLeft,
             child: IconButton(
-              tooltip: 'Voltar',
+              tooltip: tr('Voltar'),
               padding: EdgeInsets.zero,
               onPressed: () => Navigator.of(context).pop(),
               icon: const Icon(Icons.arrow_back, size: 28, color: Colors.white),
             ),
           ),
-          const Text(
-            'Salvar Tradução',
+          Text(
+            tr('Salvar Tradução'),
             style: TextStyle(
               fontFamily: _font,
               fontSize: 18,
@@ -279,7 +287,9 @@ class _PhotoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width * 0.7;
+    final hasPhoto =
+        imageBytes != null || (imagePath != null && imagePath!.isNotEmpty);
+    final width = MediaQuery.of(context).size.width * (hasPhoto ? 0.88 : 0.7);
     Widget photo;
     if (imageBytes != null) {
       photo = Image.memory(imageBytes!, fit: BoxFit.cover);
@@ -299,7 +309,7 @@ class _PhotoCard extends StatelessWidget {
     return SizedBox(
       width: width,
       child: AspectRatio(
-        aspectRatio: 257 / 165,
+        aspectRatio: hasPhoto ? 1 : 257 / 165,
         child: Container(
           padding: const EdgeInsets.all(3),
           decoration: BoxDecoration(

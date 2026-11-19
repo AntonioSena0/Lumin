@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/core/i18n/i18n.dart';
 import 'package:mobile/core/theme/lumin_colors.dart';
 
 enum LegalSection { terms, privacy }
@@ -41,7 +42,7 @@ class _LegalScreenState extends State<LegalScreen> {
             Padding(
               padding: const EdgeInsets.fromLTRB(8, 8, 0, 0),
               child: IconButton(
-                tooltip: 'Voltar',
+                tooltip: tr('Voltar'),
                 onPressed: () => Navigator.of(context).pop(),
                 icon: const Icon(
                   Icons.arrow_back,
@@ -56,31 +57,31 @@ class _LegalScreenState extends State<LegalScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Termos de Uso e Política de Privacidade',
-                      style: TextStyle(
+                    Text(
+                      tr('Termos de Uso e Política de Privacidade'),
+                      style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w900,
                       ),
                     ),
                     const SizedBox(height: 6),
-                    const Text(
-                      'Última atualização: 06 de outubro de 2026 · Versão 1.0',
-                      style: TextStyle(color: LuminColors.muted, fontSize: 12),
+                    Text(
+                      tr('Última atualização: 06 de outubro de 2026 · Versão 1.0'),
+                      style: const TextStyle(color: LuminColors.muted, fontSize: 12),
                     ),
                     const SizedBox(height: 10),
-                    const Text(
-                      'Este documento apresenta as condições de uso e as práticas de privacidade previstas para o aplicativo Lumin.',
-                      style: TextStyle(fontSize: 13, height: 1.5),
+                    Text(
+                      tr('Este documento apresenta as condições de uso e as práticas de privacidade previstas para o aplicativo Lumin.'),
+                      style: const TextStyle(fontSize: 13, height: 1.5),
                     ),
                     const SizedBox(height: 28),
                     _PartTitle('TERMOS DE USO', key: _termsKey),
                     ..._buildSections(_termsSections),
                     const SizedBox(height: 20),
                     _PartTitle('POLÍTICA DE PRIVACIDADE', key: _privacyKey),
-                    const Text(
-                      'Esta Política descreve, em linguagem objetiva, os dados que poderão ser tratados pela Lumin, as finalidades desse tratamento, as medidas de proteção e os direitos dos titulares.',
-                      style: TextStyle(fontSize: 13, height: 1.5),
+                    Text(
+                      tr('Esta Política descreve, em linguagem objetiva, os dados que poderão ser tratados pela Lumin, as finalidades desse tratamento, as medidas de proteção e os direitos dos titulares.'),
+                      style: const TextStyle(fontSize: 13, height: 1.5),
                     ),
                     ..._buildSections(_privacySections),
                     const SizedBox(height: 20),
@@ -100,7 +101,7 @@ class _LegalScreenState extends State<LegalScreen> {
       for (final s in sections) ...[
         const SizedBox(height: 18),
         Text(
-          s.title,
+          tr(s.title),
           style: const TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w800,
@@ -124,7 +125,7 @@ class _PartTitle extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 4),
       child: Text(
-        text,
+        tr(text),
         style: const TextStyle(
           fontSize: 17,
           fontWeight: FontWeight.w900,
@@ -152,10 +153,10 @@ class _BlockView extends StatelessWidget {
         children: [
           if (block.lead != null)
             TextSpan(
-              text: '${block.lead} ',
+              text: '${tr(block.lead!)} ',
               style: const TextStyle(fontWeight: FontWeight.w700),
             ),
-          TextSpan(text: block.text),
+          TextSpan(text: tr(block.text)),
         ],
       ),
       style: style,

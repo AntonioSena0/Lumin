@@ -5,6 +5,7 @@ import 'package:mobile/features/shell/app_shell.dart';
 import 'package:mobile/main.dart';
 import 'package:mobile/shared/widgets/lumin_button.dart';
 import 'package:mobile/shared/widgets/lumin_page.dart';
+import 'package:mobile/core/i18n/i18n.dart';
 
 class PlacementScreen extends StatefulWidget {
   const PlacementScreen({super.key, required this.languageId});
@@ -79,7 +80,7 @@ class _PlacementScreenState extends State<PlacementScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Seu nível', style: TextStyle(fontSize: 26, fontWeight: FontWeight.w900)),
+            Text(tr('Seu nível'), style: TextStyle(fontSize: 26, fontWeight: FontWeight.w900)),
             const SizedBox(height: 8),
             Text(
               result!.level,
@@ -87,11 +88,11 @@ class _PlacementScreenState extends State<PlacementScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Acertos: ${result!.score} de ${result!.totalQuestions}',
+              t('Acertos: ${result!.score} de ${result!.totalQuestions}', 'Correct: ${result!.score} of ${result!.totalQuestions}'),
               style: const TextStyle(color: LuminColors.muted),
             ),
             const SizedBox(height: 28),
-            LuminButton(label: 'Começar a aprender', onPressed: goHome),
+            LuminButton(label: tr('Começar a aprender'), onPressed: goHome),
           ],
         ),
       );
@@ -103,9 +104,9 @@ class _PlacementScreenState extends State<PlacementScreen> {
       return LuminPage(
         child: Column(
           children: [
-            Text(error ?? 'Sem questões.'),
+            Text(error ?? tr('Sem questões.')),
             const SizedBox(height: 16),
-            LuminButton(label: 'Pular', onPressed: goHome),
+            LuminButton(label: tr('Pular'), onPressed: goHome),
           ],
         ),
       );
@@ -116,7 +117,7 @@ class _PlacementScreenState extends State<PlacementScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Questão ${index + 1} de ${questions.length}', style: const TextStyle(color: LuminColors.muted, fontSize: 12)),
+          Text(t('Questão ${index + 1} de ${questions.length}', 'Question ${index + 1} of ${questions.length}'), style: const TextStyle(color: LuminColors.muted, fontSize: 12)),
           const SizedBox(height: 12),
           Text(question.question, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
           const SizedBox(height: 18),
@@ -141,14 +142,14 @@ class _PlacementScreenState extends State<PlacementScreen> {
           const SizedBox(height: 28),
           Row(
             children: [
-              TextButton(onPressed: goHome, child: const Text('Pular')),
+              TextButton(onPressed: goHome, child: Text(tr('Pular'))),
               const SizedBox(height: 28),
               Text('${answers.length}/${questions.length}'),
             ],
           ),
           const SizedBox(height: 8),
           LuminButton(
-            label: sending ? 'Enviando...' : 'Finalizar',
+            label: sending ? tr('Enviando...') : tr('Finalizar'),
             onPressed: (sending || answers.length != questions.length) ? () {} : send,
           ),
         ],

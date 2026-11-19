@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/core/theme/lumin_colors.dart';
+import 'package:mobile/features/shell/bootstrap_screen.dart';
 import 'package:mobile/main.dart';
 import 'package:mobile/shared/widgets/back_title.dart';
 import 'package:mobile/shared/widgets/lumin_page.dart';
+import 'package:mobile/core/i18n/i18n.dart';
 
 class SettingsLanguageScreen extends StatefulWidget {
   const SettingsLanguageScreen({super.key});
@@ -35,6 +37,7 @@ class _SettingsLanguageScreenState extends State<SettingsLanguageScreen> {
     });
   }
 
+  /// Salva o idioma do app e reconstrói todas as telas no novo idioma.
   Future<void> select(int id) async {
     setState(() {
       previousId = selectedId;
@@ -45,7 +48,13 @@ class _SettingsLanguageScreenState extends State<SettingsLanguageScreen> {
     if (!response.ok) {
       setState(() => selectedId = previousId);
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(response.error)));
+      return;
     }
+    applyLanguage(response.map['appLanguage']);
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const BootstrapScreen()),
+      (_) => false,
+    );
   }
 
   @override
@@ -54,7 +63,7 @@ class _SettingsLanguageScreenState extends State<SettingsLanguageScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const BackTitle(title: 'Idioma do app'),
+          BackTitle(title: tr('Idioma do app')),
           const SizedBox(height: 16),
           for (final lang in languages)
             if (lang['id'] is int)

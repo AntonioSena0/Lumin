@@ -1,5 +1,4 @@
-import 'dart:typed_data';
-
+import 'package:mobile/core/i18n/i18n.dart';
 import 'package:mobile/core/network/api_client.dart';
 
 class LuminApi {
@@ -7,6 +6,7 @@ class LuminApi {
 
   final ApiClient client;
 
+  /// Cadastra o usuário enviando também o idioma atual da interface.
   Future<ApiResult> register({
     required String name,
     required String email,
@@ -20,6 +20,7 @@ class LuminApi {
       'password': password,
       'nativeLanguage': nativeLanguage,
       'chosenLanguage': chosenLanguage,
+      'appLanguage': appLanguageId,
     });
   }
 
@@ -55,6 +56,7 @@ class LuminApi {
     return client.post('/lumin/auth/oauth', {'provider': provider, 'idToken': idToken});
   }
 
+  /// Conclui o cadastro via Google enviando também o idioma atual da interface.
   Future<ApiResult> registerOauth({
     required String name,
     required int nativeLanguage,
@@ -68,6 +70,7 @@ class LuminApi {
       'chosenLanguage': chosenLanguage,
       'provider': provider,
       'idToken': idToken,
+      'appLanguage': appLanguageId,
     });
   }
 
@@ -167,8 +170,14 @@ class LuminApi {
     return client.get('/lumin/me/words/$wordId');
   }
 
-  Future<ApiResult> catalogWords({int page = 0, int size = 20}) {
-    return client.get('/lumin/words', query: {'page': page, 'size': size});
+  /// Pesquisa palavras salvas por qualquer usuário no par de idiomas do usuário logado, filtrando por texto e categoria.
+  Future<ApiResult> catalogSearch({String? q, int? categoryId, int page = 0, int size = 40}) {
+    return client.get('/lumin/words/catalog', query: {
+      'q': ?q,
+      'categoryId': ?categoryId,
+      'page': page,
+      'size': size,
+    });
   }
 
   Future<ApiResult> searchWords({required int languageId, required String q, int page = 0, int size = 20}) {
@@ -176,14 +185,6 @@ class LuminApi {
       '/lumin/words/$languageId/search=${Uri.encodeComponent(q)}',
       query: {'page': page, 'size': size},
     );
-  }
-
-  Future<ApiResult> categoryWords({required int categoryId, int page = 0, int size = 40}) {
-    return client.get('/lumin/me/words', query: {
-      'categoryId': categoryId,
-      'page': page,
-      'size': size,
-    });
   }
 
   Future<ApiResult> startSession(int wordId) {
@@ -210,8 +211,35 @@ class LuminApi {
     return client.get('/lumin/me/categories/progress');
   }
 
-  Future<ApiResult> users({int page = 0, int size = 20}) {
-    return client.get('/lumin/users', query: {'page': page, 'size': size});
+  /// Lista usuários, filtrando pelo nome quando q é informado.
+  Future<ApiResult> users({String? q, int page = 0, int size = 20}) {
+    return client.get('/lumin/users', query: {'q': ?q, 'page': page, 'size': size});
+  }
+
+  /// Busca o perfil público de um usuário.
+  Future<ApiResult> userProfile(int id) {
+    return client.get('/lumin/users/$id/profile');
+  }
+
+  /// Segue um usuário.
+  Future<ApiResult> follow(int id) {
+    return client.post('/lumin/users/$id/follow');
+  }
+
+  /// Deixa de seguir um usuário.
+  Future<ApiResult> unfollow(int id) async {
+    final status = await client.delete('/lumin/users/$id/follow');
+    return ApiResult(status, null);
+  }
+
+  /// Lista os seguidores de um usuário.
+  Future<ApiResult> followers(int id, {int page = 0, int size = 20}) {
+    return client.get('/lumin/users/$id/followers', query: {'page': page, 'size': size});
+  }
+
+  /// Lista quem um usuário segue.
+  Future<ApiResult> following(int id, {int page = 0, int size = 20}) {
+    return client.get('/lumin/users/$id/following', query: {'page': page, 'size': size});
   }
 
   Future<ApiResult> user(int id) {
@@ -247,11 +275,6 @@ class LuminApi {
     return client.get('/lumin/me/sessions', query: {'page': page, 'size': size});
   }
 
-  Future<Uint8List?> assetBytes(String url) async {
-    final bytes = await client.bytes(url);
-    return bytes;
-  }
-
   Future<ApiResult> currentExercise(int sessionId) {
     return client.get('/lumin/me/sessions/$sessionId/current-exercise');
   }
@@ -262,6 +285,11 @@ class LuminApi {
 
   Future<ApiResult> finishSession(int sessionId) {
     return client.patch('/lumin/me/sessions/finish/$sessionId');
+  }
+
+  /// Pede ao backend o idioma padrão do app com base no IP.
+  Future<ApiResult> detectLanguage() {
+    return client.get('/lumin/languages/detect');
   }
 
   Future<ApiResult> languages() {
