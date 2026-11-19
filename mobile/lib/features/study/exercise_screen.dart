@@ -287,7 +287,7 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
           Row(
             children: [
               IconButton(
-                onPressed: () => Navigator.of(context).maybePop(),
+                onPressed: isDone && !sending ? finish : () => Navigator.of(context).maybePop(),
                 icon: const Icon(Icons.close_rounded),
                 tooltip: tr('Voltar'),
               ),

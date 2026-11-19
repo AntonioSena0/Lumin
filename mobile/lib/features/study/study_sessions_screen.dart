@@ -157,14 +157,22 @@ class _StudySessionsScreenState extends State<StudySessionsScreen> {
         .then((_) => refresh());
   }
 
+  /// Abre a sessão; se todos os exercícios já foram respondidos, finaliza na API antes de mostrar o resultado.
   Future<void> openSession(SessionSummary session) async {
     final id = session.id;
     if (id == null) return;
 
     if (session.isFinished || session.isCompleted) {
+      var shown = session;
+      if (session.needsFinishing) {
+        final finished = await luminApi.finishSession(id);
+        if (!mounted) return;
+        if (finished.ok) shown = SessionSummary({...session.raw, ...finished.map});
+      }
       await Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => SessionFinishedScreen(session: session)),
+        MaterialPageRoute(builder: (_) => SessionFinishedScreen(session: shown)),
       );
+      if (mounted && shown != session) refresh();
       return;
     }
 
@@ -415,7 +423,7 @@ class SessionFinishedScreen extends StatelessWidget {
           DetailRow(label: tr('Exercícios'), value: '${session.totalExercises}'),
           if (session.languageName.isNotEmpty)
             DetailRow(label: tr('Idioma'), value: session.languageName),
-          DetailRow(label: tr('Situação'), value: session.status),
+          DetailRow(label: tr('Situação'), value: session.statusLabel),
           const SizedBox(height: 28),
         ],
       ),

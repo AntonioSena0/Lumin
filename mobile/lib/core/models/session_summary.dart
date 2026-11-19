@@ -21,6 +21,12 @@ import 'package:mobile/core/i18n/i18n.dart';class SessionSummary {
 
   bool get isCompleted => totalExercises > 0 && currentIndex >= totalExercises;
 
+  /// Todos os exercícios respondidos, mas a API ainda não registrou o fim da sessão.
+  bool get needsFinishing => isCompleted && !isFinished;
+
+  /// Situação legível no idioma do app, em vez do enum cru da API (IN_PROGRESS, FINISHED).
+  String get statusLabel => isFinished ? tr('Finalizada') : tr('Em andamento');
+
   double get progress {
     if (totalExercises == 0) return 0;
     return (currentIndex / totalExercises).clamp(0, 1).toDouble();
