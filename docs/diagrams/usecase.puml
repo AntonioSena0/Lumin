@@ -1,0 +1,67 @@
+@startuml UseCase Diagram
+!pragma layout elk
+skinparam backgroundColor white
+skinparam defaultFontName Arial
+skinparam defaultFontSize 13
+skinparam nodesep 25
+skinparam ranksep 90
+skinparam actor {
+  BackgroundColor #8B5CF6
+  BorderColor #3B0764
+}
+skinparam usecase {
+  BackgroundColor white
+  BorderColor black
+}
+skinparam rectangle {
+  BackgroundColor #8B5CF6
+  BorderColor #3B0764
+  FontColor white
+  FontStyle bold
+  FontSize 18
+}
+skinparam ArrowColor #333333
+
+actor "Usuário" as Usuario
+
+actor "Assistente IA" as IA
+actor "Serviço de\nGeolocalização" as Geo
+actor "Google" as Google
+
+rectangle "Lumin" {
+  usecase "Autenticar-se\n(cadastro, login, Google)" as UC_Auth
+  usecase "Definir Idioma do App" as UC_Idioma
+  usecase "Detectar e Traduzir Objeto" as UC_Detectar
+  usecase "Salvar Palavra" as UC_Salvar
+  usecase "Validar Categoria\ne Gerar Descrição" as UC_Categoria
+  usecase "Pesquisar Palavras\nda Comunidade" as UC_Pesquisar
+  usecase "Praticar Palavra" as UC_Praticar
+  usecase "Gerar Exercícios" as UC_Exercicios
+  usecase "Fazer Teste de Nivelamento" as UC_Nivelamento
+  usecase "Acompanhar Progresso" as UC_Progresso
+  usecase "Gerenciar Perfil\ne Preferências" as UC_Perfil
+  usecase "Ver Perfil Público" as UC_VerPerfil
+  usecase "Seguir Usuário" as UC_Seguir
+}
+
+Usuario --> UC_Auth
+Usuario --> UC_Detectar
+Usuario --> UC_Pesquisar
+Usuario --> UC_Praticar
+Usuario --> UC_Nivelamento
+Usuario --> UC_Progresso
+Usuario --> UC_Perfil
+Usuario --> UC_VerPerfil
+
+UC_Auth ..> UC_Idioma : <<include>>
+UC_Salvar ..> UC_Detectar : <<extend>>
+UC_Salvar ..> UC_Pesquisar : <<extend>>
+UC_Salvar ..> UC_Categoria : <<include>>
+UC_Praticar ..> UC_Exercicios : <<include>>
+UC_Seguir ..> UC_VerPerfil : <<extend>>
+
+UC_Idioma --> Geo
+UC_Auth --> Google
+UC_Categoria --> IA
+UC_Exercicios --> IA
+@enduml

@@ -1,0 +1,110 @@
+@startuml Class Diagram
+!pragma layout smetana
+skinparam backgroundColor #1E1E1E
+skinparam defaultFontName Arial
+skinparam defaultFontSize 13
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam nodesep 60
+skinparam ranksep 70
+skinparam class {
+  BackgroundColor #111111
+  BorderColor #DDDDDD
+  FontColor white
+  AttributeFontColor #EEEEEE
+  StereotypeFontColor #BBBBBB
+}
+skinparam ArrowColor #DDDDDD
+skinparam ArrowFontColor #DDDDDD
+hide circle
+hide empty methods
+
+class User {
+  - id: Long
+  - name: String
+  - email: String
+  - password: String
+  - emailVerified: boolean
+}
+
+class Follow {
+  - follower: User
+  - followed: User
+  - createdAt: LocalDateTime
+}
+
+class Language {
+  - id: Integer
+  - name: String
+  - code: String
+}
+
+class Category {
+  - id: Integer
+  - name: String
+}
+
+class Word {
+  - id: Long
+  - original: String
+  - translated: String
+  - description: String
+}
+
+class UserWord {
+  - isSaved: boolean
+  - correctAnswers: Long
+  - incorrectAnswers: Long
+  - level: WordDomainLevel
+}
+
+class UserLanguageProgress {
+  - level: UserLanguageLevel
+  - xp: Long
+  - placementTestCompleted: boolean
+}
+
+class StudySession {
+  - id: Long
+  - currentIndex: Integer
+  - score: Integer
+  - status: SessionStatus
+}
+
+interface Checkable <<Interface>> {
+  + checkAnswer(String answer): boolean
+  + getCorrectAnswer(): String
+}
+
+abstract class Exercise <<Abstract>> {
+  - id: Long
+  - title: String
+  - instruction: String
+  - prompt: String
+  - correct: ExerciseCorrect
+}
+
+class WrittenExercise {
+  - correctAnswer: String
+  - options: List<String>
+}
+
+class SpeakingExercise {
+  - requiredWords: List<String>
+}
+
+User "1" -- "*" Follow : segue / é seguido
+User "*" --> "2" Language : nativa / estudo
+User "1" -- "*" UserWord
+UserWord "*" --> "1" Word
+Word "*" --> "2" Language : origem / destino
+Word "*" --> "1" Category
+User "1" -- "*" UserLanguageProgress
+UserLanguageProgress "*" --> "1" Language
+User "1" -- "*" StudySession
+StudySession "1" *-- "*" Exercise
+Exercise "*" --> "1" Word
+Exercise ..|> Checkable
+WrittenExercise --|> Exercise
+SpeakingExercise --|> Exercise
+@enduml
